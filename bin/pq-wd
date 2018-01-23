@@ -1,0 +1,3 @@
+#!/bin/sh
+#echo "$@"
+pl2sparql -u sparqlprog/ontologies/wikidata  -s wd "$@"

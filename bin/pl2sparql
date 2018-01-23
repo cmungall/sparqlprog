@@ -1,0 +1,302 @@
+#!/usr/bin/env swipl
+
+:- initialization main.
+
+:- use_module(library(main)).
+:- use_module(library(optparse)).
+%:- use_module(library(semweb/rdf_db)).
+:- use_module(library(option)).
+
+:- use_module(library(semweb/rdf_library)).
+:- use_module(library(semweb/rdf_http_plugin)).
+:- use_module(library(semweb/rdf_cache)).
+:- use_module(library(semweb/rdf11)).
+:- use_module(library(semweb/rdfs)).
+%:- rdf_attach_library('void.ttl').
+:- use_module(library(rdf_owl/owl)).
+:- use_module(library(rdf_owl)).
+
+:- rdf_set_cache_options([ global_directory('RDF-Cache'),
+                           create_global_directory(true)
+                         ]).
+
+:- use_module(library(sparqlprog)).
+:- use_module(library(sparqlprog/labelutils)).
+
+
+main(Argv) :-
+        Spec =
+        [
+         [opt(output), type(atom),
+          longflags(['output']),
+          shortflags([o]),
+          help('Outfile')
+         ],
+         [opt(format), type(atom),
+          longflags(['format']),
+          shortflags([f]),
+          help('Output format: csv')
+         ],
+         [opt(input), type(atom),
+          longflags(['input']),
+          shortflags([i]),
+          help('Input RDF file (use in combo with -x)')
+         ],
+         [opt(goal), type(term),
+          longflags([goal]),
+          shortflags([g]),
+          help('Prolog goal to call')
+         ],
+         [opt(consult), type(atom),
+          longflags([consult]),
+          shortflags([c]),
+          help('Prolog program to load/consult')
+         ],
+         [opt(use), type(atom),
+          longflags([use]),
+          shortflags([u]),
+          help('Prolog module to use')
+         ],
+         [opt(use_no_import), type(atom),
+          longflags([use_no_import]),
+          shortflags(['U']),
+          help('Prolog module to use, do not import all')
+         ],
+         [opt(debug), type(term),
+          longflags([debug]),
+          shortflags([d]),
+          help('term passed to debug/1')
+         ],
+         [opt(service), type(atom),
+          longflags([service]),
+          shortflags([s]),
+          help('name of remote service to query')
+         ],
+         [opt(inject_labels),
+          type(boolean),
+          default(false),
+          longflags([label]),
+          shortflags([l]),
+          help('Inject query for rdfs labels into query')
+         ],
+         [opt(verbose),
+          type(boolean),
+          default(false),
+          longflags([verbose]),
+          shortflags([v]),
+          help('Same as --debug sparqlprog')
+         ],
+         [opt(stacktrace),
+          type(boolean),
+          default(false),
+          longflags([stacktrace]),
+          shortflags(['T']),
+          help('Shows stack trace on error')
+         ],
+         [opt(execute),
+          type(boolean),
+          default(false),
+          longflags([execute]),
+          shortflags(['e']),
+          help('Executes query directly in prolog')
+         ],
+         [opt(query), type(term),
+          longflags([query]),
+          shortflags([q]),
+          help('Prolog query')
+         ]
+        ],
+        opt_parse(Spec, Argv, Opts, QueryAtoms, [duplicated_flags(keepall)]),
+        handle_opts(Opts),
+        run(QueryAtoms, Opts).
+
+handle_opts(Opts) :-
+        opt_if_call(verbose,debug(sparqlprog),Opts),
+        opt_if_call(stacktrace,use_module(library(sparqlprog/stacktrace)),Opts),
+        opt_forall(debug(X),debug(X),Opts),
+        opt_forall(use(X),use_module(library(X)),Opts),
+        opt_forall(use_no_import(X),use_module(library(X),[]),Opts),
+        opt_forall(consult(X),consult(X),Opts),
+        opt_forall(input(X),rdf_load(X),Opts).
+
+run([QueryAtom,SelectAtom], Opts) :-
+        !,
+        % USER SPECIFIES SELECT
+        % ensure the same variables are used:
+        % create a term object to be parsed of form (S)-(Q)
+        concat_atom(['(',SelectAtom,')-(',QueryAtom,')'],SQA),
+        atom_to_term(SQA,Select-Query,Bindings),
+        exec_query(Select, Query, Bindings, Opts).
+
+run([QueryAtom],Opts) :-
+        % USER USES PRED/ARITY SHORTCUT
+        % todo bindings
+        atom_to_term(QueryAtom,Pred/Arity,Bindings),
+        !,
+        functor(Query,Pred,Arity),
+        create_default_select(Query,Select),
+        exec_query(Select, Query, Bindings, Opts).
+run([QueryAtom],Opts) :-
+        % USER USES PRED/ARITY SHORTCUT
+        % todo bindings
+        atom_to_term(QueryAtom,Pred,_),
+        atom(Pred),
+        !,
+        find_arity(Pred,Arity),
+        functor(Query,Pred,Arity),
+        create_default_select(Query,Select),
+        bindings_from_srule(Query,Bindings),
+        exec_query(Select, Query, Bindings, Opts).
+run([QueryAtom],Opts) :-
+        % DEFAULT: MAKE SELECT FROM QUERY
+        !,
+        atom_to_term(QueryAtom,Query,Bindings),
+        create_default_select(Query,Select),
+        exec_query(Select, Query, Bindings, Opts).
+
+bindings_from_srule(Query,Bindings) :-
+        Query =.. [Pred|Args],
+        length(Args,Arity),
+        srule(Pred,Cols,_,_),
+        length(Cols,Arity),
+        !,
+        make_bindings(Args,Cols,Bindings).
+bindings_from_srule(_,[]).
+
+make_bindings([],[],[]).
+make_bindings([A|Args],[C|Cols],[C=A|Bindings]) :-
+        make_bindings(Args, Cols, Bindings).
+
+
+
+
+
+exec_query(Select, Query, Bindings, Opts) :-
+        debug(sparqlprog,'SELECT=~q QUERY=~q BINDINGS=~q',[Select,Query,Bindings]),
+        exec_query_direct(Select, Query, Bindings, Opts).
+
+exec_query_direct(Select, Query, _Bindings, Opts) :-
+        option(service(Service),Opts),
+        nonvar(Service),
+        % execute on remote service
+        !,
+        (   sparql_endpoint_url(Service,_)
+        ->  true
+        ;   throw(no_such_endpoint(Service))),
+        forall('??'(Service,Query),
+               write_result(Select,Opts)),
+        nl.
+
+exec_query_direct(Select, Query, _Bindings, Opts) :-
+        option(execute(true),Opts),
+        % execute in prolog
+        !,
+        (   option(inject_labels(true),Opts)
+        ->  Opts2=[dynlabel(true)|Opts]
+        ;   Opts2=Opts),
+        forall(Query,
+               write_result(Select,Opts2)),
+        nl.
+
+exec_query_direct(Select, Query, Bindings, Opts) :-
+        % translate to SPARQL
+        tr_opts(Opts, Opts2),
+        create_sparql_select(Select, Query, SPARQL, [bindings(Bindings)|Opts2]),
+        format(SPARQL),
+        nl.
+
+% execute a goal for every ground instance of Template
+opt_forall(Template,Goal,Opts) :-
+        debug(sparqlprog,'Running ~q for all ground ~q in ~q',[Goal,Template,Opts]),
+        forall((member(Template,Opts),ground(Template)),
+               Goal).
+
+opt_if_call(Opt,Goal,Opts) :-
+        T =.. [Opt,Var],
+        member(T,Opts),
+        ground(Var),
+        Var=true,
+        !,
+        Goal.
+opt_if_call(_,_,_).
+
+opt_if(T,Opts) :-
+        member(T,Opts),
+        ground(T),
+        !.
+opt_if(T,Opts,Opts2) :-
+        select(T,Opts,Opts2),
+        ground(T),
+        !.
+
+
+tr_opts([],[]).
+tr_opts([H|T],[H|T2]) :-
+        H=..[P|_],
+        is_pass_thru(P),
+        !,
+        tr_opts(T,T2).
+tr_opts([_|T],T2) :-
+        tr_opts(T,T2).
+
+is_pass_thru(inject_labels).
+
+
+write_result(Term,Opts) :-
+        opt_if(dynlabel(true),Opts,Opts2),
+        row_labelify(Term,Term2),
+        write_result(Term2,Opts2).
+write_result(Term,Opts) :-
+        member(format(Fmt),Opts),
+        csv_format_separator(Fmt,Sep),
+        csv_write_stream(current_output, [Term], [separator(Sep)]),
+        !.
+
+write_result(Term,_Opts) :-
+        write_canonical(Term),
+        writeln('.').
+
+csv_format_separator(csv,0',).
+csv_format_separator(tsv,0'\t).
+csv_format_separator(psv,0'|).
+
+create_default_select(Q,Q) :-
+        Q =.. [_|Args],
+        forall(member(A,Args),
+               \+ compound(A)),
+        !.
+create_default_select(Q,S) :-
+        term_variables(Q,Vars),
+        S =.. [row|Vars].
+
+
+find_arity(Pred,Arity) :-
+        find_arity(Pred,Arity,1).
+find_arity(Pred,Arity,Arity) :-
+        functor(T,Pred,Arity),
+        clause(T,_),
+        !.
+find_arity(Pred,_,N) :-
+        N > 99,
+        !,
+        throw(no_clause_with_pred(Pred)).
+find_arity(Pred,Arity,N) :-
+        N2 is N+1,
+        find_arity(Pred,Arity,N2).
+
+        
+
+
+
+/*
+
+pl2sparql -u rdf_owl/owl  -q 'subClassOf(X,A),subClassOf(Y,A),X\=Y -> A,X'
+
+pl2sparql -u rdf_owl -u rdf_owl/owl  -q 'subClassOf(X,R),owl_some(R,P,V)'
+
+pl2sparql -u obo_ro/ro -u rdf_owl -u rdf_owl/owl  -q 'occurs_in(A,B)'  
+
+pl2sparql -u obo_ro/ro -u rdf_owl -u rdf_owl/owl  -q 'equivalentClass(X,R),intersectionOf(R,L),rdf_member(X,L)
+
+pl2sparql -U obo_ro/ro -u rdf_owl/owl -v  -i tests/go_nucleus.ttl 'subClassOf(A,R),owl_some(R,P,B),ro:part_of_iri(P)'.  
+*/
