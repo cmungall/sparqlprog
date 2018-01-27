@@ -37,6 +37,10 @@ term_labelify(T,T).
 %
 % given a row term Foo(V1,V2,...,Vn)
 % add an extra argument for the label for each
+row_labelify(X,X2) :-
+        X = _^^_,
+        !,
+        label_atom(X,X2).
 row_labelify(Row,Row2) :-
         Row =.. [P|Args],
         rowargs_labelify(Args,Args2),

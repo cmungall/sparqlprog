@@ -162,6 +162,7 @@ goal(rdf(S,P,O)) -->
 
 goal(rdf(S,P,O,G)) --> "GRAPH ", resource(G), " ", brace(goal(rdf(S,P,O))).
     
+goal(bind(Expr,V)) --> "BIND( ", expr(Expr), " AS ", variable(V), " )".
 goal(filter(Cond)) --> "FILTER ", cond(Cond).
 
 % support for rdf_where/1 in semweb/rdf11    
@@ -169,6 +170,9 @@ goal({Cond}) --> "FILTER ", cond(Cond).
 goal(rdf_where(Cond)) --> "FILTER ", cond(Cond).
 
 goal(true) --> "true" .
+
+% TODO: put this in its own section
+goal(str_before(Str, Sep, Sub)) --> goal(bind(str_before(Str, Sep), Sub)).
 
 % allow conditions not wrapped by rdf_where/1
 goal(G) --> goal(filter(G)).
@@ -208,6 +212,7 @@ cond(G)            --> {throw(cond(G))}.
 string_literal_expr(A) --> {atomic(A),atom_string(A,S)},expr(S).
 string_literal_expr(S) --> expr(S).
 
+expr(str_before(Str,Sep)) --> "strBefore(", string_literal_expr(Str), string_literal_expr(Sep), ")".
 expr(S)            --> {string(S)},"\"", at(S), "\"".
 expr('^^'(S,T))    --> "\"", at(S), "\"^^", resource(T).
 expr('@'(S,Lang))    --> "\"", at(S), "\"@", resource(Lang).
