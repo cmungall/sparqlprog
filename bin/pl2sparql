@@ -79,6 +79,13 @@ main(Argv) :-
           shortflags([l]),
           help('Inject query for rdfs labels into query')
          ],
+         [opt(show),
+          type(boolean),
+          default(false),
+          longflags([show]),
+          shortflags(['S']),
+          help('Show SPARQL query')
+         ],
          [opt(verbose),
           type(boolean),
           default(false),
@@ -168,14 +175,21 @@ make_bindings([A|Args],[C|Cols],[C=A|Bindings]) :-
         make_bindings(Args, Cols, Bindings).
 
 
-
+opt_show_query(Select, Query, Bindings, Opts) :-
+        option(show(true),Opts),
+        !,
+        tr_opts(Opts, Opts2),
+        format('# SELECT=~q QUERY=~q BINDINGS=~q~n',[Select,Query,Bindings]),        
+        create_sparql_select(Select, Query, SPARQL, [bindings(Bindings)|Opts2]),
+        format('# SPARQL: ~w~n',[SPARQL]).
+opt_show_query(_, _, _, _).
 
 
 exec_query(Select, Query, Bindings, Opts) :-
         debug(sparqlprog,'SELECT=~q QUERY=~q BINDINGS=~q',[Select,Query,Bindings]),
         exec_query_direct(Select, Query, Bindings, Opts).
 
-exec_query_direct(Select, Query, _Bindings, Opts) :-
+exec_query_direct(Select, Query, Bindings, Opts) :-
         option(service(Service),Opts),
         nonvar(Service),
         % execute on remote service
@@ -183,6 +197,7 @@ exec_query_direct(Select, Query, _Bindings, Opts) :-
         (   sparql_endpoint_url(Service,_)
         ->  true
         ;   throw(no_such_endpoint(Service))),
+        opt_show_query(Select, Query, Bindings, Opts),
         forall('??'(Service,Query),
                write_result(Select,Opts)),
         nl.
@@ -202,6 +217,7 @@ exec_query_direct(Select, Query, Bindings, Opts) :-
         % translate to SPARQL
         tr_opts(Opts, Opts2),
         create_sparql_select(Select, Query, SPARQL, [bindings(Bindings)|Opts2]),
+        opt_show_query(Select, Query, Bindings, Opts),
         format(SPARQL),
         nl.
 
@@ -244,17 +260,34 @@ is_pass_thru(inject_labels).
 
 write_result(Term,Opts) :-
         opt_if(dynlabel(true),Opts,Opts2),
+        !,
         row_labelify(Term,Term2),
         write_result(Term2,Opts2).
 write_result(Term,Opts) :-
         member(format(Fmt),Opts),
         csv_format_separator(Fmt,Sep),
-        csv_write_stream(current_output, [Term], [separator(Sep)]),
+        term_saferow(Term,Term2),
+        csv_write_stream(current_output, [Term2], [separator(Sep)]),
         !.
-
 write_result(Term,_Opts) :-
         write_canonical(Term),
         writeln('.').
+
+term_saferow(T^^_,A) :- !, atom_string(A,T).
+term_saferow(T@_, A) :- !, atom_string(A,T).
+term_saferow(T@_, A) :- !, atom_string(A,T).
+term_saferow(literal(type(_,A)), A) :- !.
+term_saferow(T,T2) :-
+        T =.. [P|Args],
+        Args = [_|_],
+        !,
+        maplist(term_saferow,Args,Args2),
+        T2 =.. [P|Args2].
+term_saferow(T,T).
+
+
+        
+
 
 csv_format_separator(csv,0',).
 csv_format_separator(tsv,0'\t).
