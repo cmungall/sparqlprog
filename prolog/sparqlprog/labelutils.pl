@@ -7,7 +7,10 @@
 
 :- use_module(library(semweb/rdf11)).
 
-
+label_atom(S,A) :-
+        string(S),
+        !,
+        atom_string(A,S).
 label_atom(X,A) :-
         \+ compound(X),
         rdf(X,rdfs:label,S^^_),

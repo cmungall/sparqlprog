@@ -128,6 +128,9 @@ rewrite_goal(rdf_has(S,P,O), T2,_) :- !, replace_string_unification(rdf(S,P,O),T
 % TODO: consider adding semantics
 %rewrite_goal(rdf(S,P,O), rdf_has(S,P,O),_) :- !.
 
+%rewrite_goal('??'(Opts,Q), '??'(Opts,Q2), _) :- !, rewrite_goal(Q,Q2).
+
+
 % rdfs terminals
 rewrite_goal(rdf_where(Q), rdf_where(Q), _) :- !.
 rewrite_goal({Q}, {Q}, _) :- !.
@@ -137,6 +140,7 @@ rewrite_goal(optional(Q), optional(Q2), _) :-
 rewrite_goal(rdfs_subclass_of(C,P), rdf(C,oneOrMore(rdfs:subClassOf),P),_) :- !.
 rewrite_goal(rdfs_subproperty_of(C,P), rdf(C,oneOrMore(rdfs:subPropertyOf),P),_) :- !.
 rewrite_goal(rdfs_individual_of(I,C), (rdf(I,rdf:type,X),rdf(X,zeroOrMore(rdfs:subClassOf),C)),_) :- !.
+rewrite_goal(a(I,C), rdf(I,rdf:type,C),_) :- !.
 %rewrite_goal(rdf_member(X,L), rdf(L,oneOrMore(rdf:rest)/rdf:last,X),_) :- !.
 rewrite_goal(rdf_member(X,L), rdf(L,(zeroOrMore(rdf:rest)/(rdf:first)),X),_) :- !.
 
