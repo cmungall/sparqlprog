@@ -1,0 +1,3 @@
+#!/bin/sh
+#echo "$@"
+pl2sparql  -s dbpedia -u sparqlprog/endpoints  -u sparqlprog/ontologies/dbpedia  -s dbpedia "$@"

@@ -19,3 +19,30 @@ coverage:
 
 t-%:
 	$(SWIPL) -l tests/$*_test.pl -g run_tests,halt
+
+# --------------------
+# Run SPARQL service inside Docker
+# --------------------
+BGVERSION = 2.1.4
+bg: bg-run pause bg-load
+
+bg-data: examples/load-data/goslim_generic.ttl
+
+examples/load-data:
+	mkdir $@
+examples/load-data/%.ttl: examples/data/%.ttl.gz examples/load-data 
+	gzip -dc $< > $@
+
+bg-run:
+	docker run --name blazegraph -d -p 8889:8080 -v $(PWD)/examples/RWStore.properties:/RWStore.properties -v $(PWD)/examples/load-data/:/data lyrasis/blazegraph:$(BGVERSION)
+
+
+pause:
+	sleep 1
+
+bg-load: bg-data
+	curl -X POST --data-binary @examples/dataloader.txt   --header 'Content-Type:text/plain'   http://localhost:8889/bigdata/dataloader
+
+bg-stop:
+	docker kill blazegraph; docker rm blazegraph
+

@@ -35,6 +35,7 @@
    ,  create_sparql_select/4
    ,  create_sparql_construct/3
    ,  create_sparql_construct/4
+   ,  inject_label_query/5
    ,  (??)/1
    ,  (??)/2
    ,  op(1150,fx,??)
@@ -392,19 +393,23 @@ filter_opts([_|T],T2) :-
         filter_opts(T,T2).
 
 
-
-inject_label_query(Select,Goal,(Select,ConjGoal),(Goal,ConjGoal),_Opts) :-
+%% inject_label_query(+Select, +Query, ?Select2, ?Query2, +Opts) is det
+%
+% Add an optional(rdf(X,rdfs:label,XL)) for every variable X in Select
+% TODO: interleave
+inject_label_query(Select, Goal, Select-LabelVars, (Goal,ConjGoal), _Opts) :-
         term_variables(Select,Vars),
-        inject_label_for_vars(Vars,ConjGoal).
+        inject_label_for_vars(Vars,ConjGoal,LabelVars).
 
-inject_label_for_vars([Var],Goal) :-
+
+inject_label_for_vars([Var],Goal,[LabelVar]) :-
         !,
-        inject_label_for_var(Var,Goal).
-inject_label_for_vars([Var|Vars],(Goal1,Goal2)) :-
+        inject_label_for_var(Var,Goal,LabelVar).
+inject_label_for_vars([Var|Vars],(Goal1,Goal2),[LabelVar|LabelVars]) :-
         !,
-        inject_label_for_var(Var,Goal1),
-        inject_label_for_vars(Vars,Goal2).
-inject_label_for_var(Var,optional(rdf(Var,rdfs:label,_))).
+        inject_label_for_var(Var,Goal1,LabelVar),
+        inject_label_for_vars(Vars,Goal2,LabelVars).
+inject_label_for_var(Var,optional(rdf(Var,rdfs:label,VarLabel)),VarLabel).
 
 
        

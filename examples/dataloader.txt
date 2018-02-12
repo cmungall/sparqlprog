@@ -1,0 +1,8 @@
+namespace=kb
+propertyFile=/RWStore.properties
+fileOrDirs=/data
+-format=n-triples
+quiet=false
+verbose=0
+closure=false
+durableQueues=true

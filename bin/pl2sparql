@@ -86,6 +86,20 @@ main(Argv) :-
           shortflags(['S']),
           help('Show SPARQL query')
          ],
+         [opt(interactive),
+          type(boolean),
+          default(false),
+          longflags([interactive]),
+          shortflags(['I']),
+          help('Interactive prolog')
+         ],
+         [opt(compile),
+          type(boolean),
+          default(false),
+          longflags([compile]),
+          shortflags(['C']),
+          help('Compile Prolog to SPARQL (no execution)')
+         ],
          [opt(verbose),
           type(boolean),
           default(false),
@@ -115,7 +129,9 @@ main(Argv) :-
         ],
         opt_parse(Spec, Argv, Opts, QueryAtoms, [duplicated_flags(keepall)]),
         handle_opts(Opts),
+        opt_if_call(interactive,prolog,Opts),
         run(QueryAtoms, Opts).
+
 
 handle_opts(Opts) :-
         opt_if_call(verbose,debug(sparqlprog),Opts),
@@ -176,6 +192,14 @@ make_bindings([A|Args],[C|Cols],[C=A|Bindings]) :-
 
 
 opt_show_query(Select, Query, Bindings, Opts) :-
+        option(compile(true),Opts),
+        !,
+        tr_opts(Opts, Opts2),
+        format('# SELECT=~q QUERY=~q BINDINGS=~q~n',[Select,Query,Bindings]),        
+        create_sparql_select(Select, Query, SPARQL, [bindings(Bindings)|Opts2]),
+        format('~w~n',[SPARQL]),
+        halt.
+opt_show_query(Select, Query, Bindings, Opts) :-
         option(show(true),Opts),
         !,
         tr_opts(Opts, Opts2),
@@ -196,10 +220,17 @@ exec_query_direct(Select, Query, Bindings, Opts) :-
         !,
         (   sparql_endpoint_url(Service,_)
         ->  true
-        ;   throw(no_such_endpoint(Service))),
+        ;   debug(sparqlprog,'~w not found - loading default endpoints...',[Service]),
+            load_default_endpoints,
+            (   sparql_endpoint_url(Service,_)
+            ->  true
+            ;   throw(no_such_endpoint(Service)))),
         opt_show_query(Select, Query, Bindings, Opts),
-        forall('??'(Service,Query),
-               write_result(Select,Opts)),
+        (   option(inject_labels(true),Opts)
+        ->  inject_label_query(Select,Query,Select2,Query2,Opts)
+        ;   Select2=Select, Query2=Query),
+        forall('??'(Service,Query2),
+               write_result(Select2,Opts)),
         nl.
 
 exec_query_direct(Select, Query, _Bindings, Opts) :-
@@ -259,6 +290,12 @@ is_pass_thru(inject_labels).
 
 
 write_result(Term,Opts) :-
+        option(format(Fmt),Opts),
+        Fmt == prolog,
+        !,
+        format('~q.~n',[Term]).
+        
+write_result(Term,Opts) :-
         opt_if(dynlabel(true),Opts,Opts2),
         !,
         row_labelify(Term,Term2),
@@ -277,6 +314,8 @@ term_saferow(T^^_,A) :- !, atom_string(A,T).
 term_saferow(T@_, A) :- !, atom_string(A,T).
 term_saferow(T@_, A) :- !, atom_string(A,T).
 term_saferow(literal(type(_,A)), A) :- !.
+term_saferow(literal(lang(_,A)), A) :- !.
+term_saferow(literal(A), A) :- !.
 term_saferow(T,T2) :-
         T =.. [P|Args],
         Args = [_|_],
@@ -284,9 +323,6 @@ term_saferow(T,T2) :-
         maplist(term_saferow,Args,Args2),
         T2 =.. [P|Args2].
 term_saferow(T,T).
-
-
-        
 
 
 csv_format_separator(csv,0',).
@@ -318,6 +354,8 @@ find_arity(Pred,Arity,N) :-
         find_arity(Pred,Arity,N2).
 
         
+load_default_endpoints :-
+        use_module(library(sparqlprog/endpoints)).
 
 
 
