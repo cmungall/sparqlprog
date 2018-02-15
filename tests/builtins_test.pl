@@ -47,6 +47,30 @@ test(arith_types) :-
         Two="2",
         assertion( seval(One+Two,3) ).
 
+test(agg) :-
+        assertion( seval(count(append([a,b],[c])), 3) ).
+test(max) :-
+        assertion( seval(max(append([1,2],[3,5])), 5) ).
+test(intersects) :-
+        X=[a,b,c,d],
+        Y=[c,d,e,f],
+        assertion( seval(intersection(X,Y), [c,d]) ).
+test(n_intersects) :-
+        X=[a,b,c,d],
+        Y=[c,d,e,f],
+        assertion( seval(count(intersection(X,Y)) / 2, 1) ).
+
+test(jac) :-
+        X=[a,b,c,d],
+        Y=[c,d,e,f,g,h],
+        assertion( (seval(count(intersection(X,Y)) / count(union(X,Y)), N),
+                    N=0.25)
+                   ).
+
+
+
+
+
 
         
 

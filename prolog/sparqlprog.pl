@@ -163,12 +163,29 @@ rewrite_goal(\+A, \+A2, D) :-
         rewrite_goal(A,A2,D).
 
 rewrite_goal(A,A2,D) :-
-        increase_depth(D,D2),
+        % TODO: see refl/2 test in test_aux
         setof(Clause,safe_clause(A,Clause),Clauses),
         !,
+        debug(sparqlprog,' ~q CLAUSES==> ~q',[A,Clauses,A]),
+        increase_depth(D,D2),
         list_to_disj(Clauses,X),
         rewrite_goal(X,A2,D2).
 rewrite_goal(A,A,_).
+
+% for certain predicates, do not use replace_string_unification(T,T3)
+% TODO: make this a hook
+nofilter(P) :-
+        ground(P),
+        rdf_global_id(P,Px),
+        atomic(Px),
+        atom_concat('http://www.bigdata.com/rdf/search#',_,Px).
+
+replace_string_unification(T,T) :-
+        (   T=rdf(_,P,_)
+        ;   T=rdf(_,P,_,_)),
+        nofilter(P),
+        !.
+
 
 % We avoid translation rdf(X,rdf:label,"foo") to a direct
 % triple in the SPARQL query, since this may fail to
@@ -201,6 +218,7 @@ safe_clause(Goal,Body) :-
              Mod=emulate_builtins)).
 
 
+
 % TODO: attempt at expanding clauses not exported
 % not clear this is a good idea...
 todo__safe_clause(Goal,LocalBody) :-
@@ -229,8 +247,8 @@ increase_depth(D,D2) :-
 
         
         
-%! srule(+Pred, +Args) is det
-%! srule(+Pred, +Args, +Desc) is det
+%! srule(+Pred, +Args) is det.
+%! srule(+Pred, +Args, +Desc) is det.
 %
 % declare a new sparql rule
 srule(P,A) :- srule(P,A,'').

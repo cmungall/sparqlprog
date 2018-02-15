@@ -11,6 +11,9 @@
 :- use_module(library(sparqlprog)).
 :- use_module(library(sparqlprog/emulate_builtins)).
 
+% run docker
+:- sparql_endpoint( local, 'http://127.0.0.1:8889/bigdata/sparql').
+
 :- begin_tests(prolog_test,
                [setup(load_test_file),
                 cleanup(rdf_retractall(_,_,_,_))]).
@@ -18,10 +21,11 @@
 load_test_file :-
         rdf_load('tests/go_nucleus.ttl').
 
-test_select(Q,ExpectedSPARQL) :-
-        create_sparql_select(Q,SPARQL,[]),
-        format(' ~q ==> ~w~n',[ Q, SPARQL ]),
-        assertion( SPARQL = ExpectedSPARQL ).
+run_test_query(N,X,G,L,L1) :-
+        setof(X,G,L1),
+        format('** ~w~n',[N]),
+        wl(L1),
+        assertion(L = L1).
 
 test(direct_subclass_of) :-
         label(C,"nucleus"),
@@ -60,6 +64,27 @@ test(str_before) :-
         % test with argument not-bound
         setof(P,has_dbxref_with_prefix(C,P),Ps),
         assertion( Ps = ["NIF_Subcellular","Wikipedia"] ).
+
+wl(L) :-
+        forall((member(X,L),optional(label(X,N))),
+               format('~w ~w~n', [X,N])).
+
+
+test(z) :-
+        label(C,"intracellular"),
+        run_test_query(foo,D,rdf(_,_,_),_,_).
+
+
+test(path) :-
+        label(C,"intracellular"),
+        run_test_query(onePlus,D,rdf_path(C,oneOrMore(rdfs:subClassOf),D),[_,_,_],_),
+        run_test_query(zeroPlus,D,rdf_path(C,zeroOrMore(rdfs:subClassOf),D),[_,_,_,_],Lz),
+        assertion(member(C,Lz)),
+        label(C2,"intracellular part"),
+        run_test_query(inv,D,rdf_path(C2,inverseOf(rdfs:subClassOf),D),[_],_),
+        run_test_query(or,D,rdf_path(C2,(rdfs:subClassOf|inverseOf(rdfs:subClassOf)),D),[_,_,_],_),
+        run_test_query(all,D,rdf_path(C2,zeroOrMore((rdfs:subClassOf)|(\(rdfs:subClassOf))),D),[_,_,_,_],_),
+        true.
 
 
 :- end_tests(prolog_test).

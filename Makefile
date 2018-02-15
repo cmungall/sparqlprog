@@ -20,6 +20,16 @@ coverage:
 t-%:
 	$(SWIPL) -l tests/$*_test.pl -g run_tests,halt
 
+
+# --------------------
+# Run pengine
+# --------------------
+pe:
+	docker kill sprog
+	docker rm sprog
+	docker build . -t sprog
+	docker run -p 9083:9083 --name sprog sprog
+
 # --------------------
 # Run SPARQL service inside Docker
 # --------------------

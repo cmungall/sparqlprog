@@ -154,14 +154,23 @@ goal(optional(G))     --> "OPTIONAL ", brace(goal(G)).
 
 goal(service(S,G)) --> "SERVICE ",resource(S)," ",brace(G).
 
+goal(rdf_path(S,P,O,G)) --> goal(rdf(S,P,O,G)).
+goal(rdf_path(S,P,O)) --> goal(rdf(S,P,O)).
+
+
 goal(rdf(S,P,O)) -->
    { rdf_global_object(O,OO) },
    resource(S), " ",
    property(P), " ",
    object(OO).
 
+
 goal(rdf(S,P,O,G)) --> "GRAPH ", resource(G), " ", brace(goal(rdf(S,P,O))).
-    
+
+goal(aggregate(Expr,G,Result)) --> "SELECT ", expr(Expr), " AS ", variable(Result), " ", where(G).
+
+
+goal(is(V,Expr)) --> goal(bind(Expr,V)).
 goal(bind(Expr,V)) --> "BIND( ", expr(Expr), " AS ", variable(V), " )".
 goal(filter(Cond)) --> "FILTER ", cond(Cond).
 
@@ -198,6 +207,7 @@ cond(X@>=Y)   --> p expr(X), " >= ", expr(Y).
 cond(between(L,U,X)) --> cond((L=<X,X=<U)).
 cond(in(X,Ys))     --> p expr(X), " in ", (p seqmap_with_sep(", ",expr,Ys)).
 cond(str_starts(X,Y))   --> p "strStarts(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
+cond(str_ends(X,Y))   --> p "strEnds(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
 cond(regex(P,V))   --> "regex(", expr(V), ",", quote(at(P)), ")".
 cond(regex(P,V,F)) --> "regex(", expr(V), ",", quote(at(P)),  ",", quote(at(F)), ")".
 cond(regex_str(P,V))   --> "regex(", expr(str(V)), ",", quote(at(P)), ")".
@@ -222,6 +232,7 @@ expr(count(X))     --> "COUNT(", expr(X), ")".
 expr(datatype(V))  --> "DATATYPE(", object(V), ")".
 expr(quote(V))     --> quote(at(V)).
 
+expr(max(X))   --> "max(", expr(X), ")".
 expr(+X) -->  p "+ ", expr(X), ")".
 expr(-X) -->  p "- ", expr(X), ")".
 expr(X+Y) --> p expr(X), " + ", expr(Y).
@@ -237,6 +248,7 @@ property(zeroOrMore(R)) --> property(R),"*".
 property(zeroOrOne(R)) --> property(R),"?".
 property(inverse(R)) --> "^", property(R).
 property(\+R) --> "!(", property(R), ")".
+property(\R) --> "^(", property(R), ")".
 property(R1/R2) --> "(",property(R1),"/",property(R2),")".
 property(R1|R2) --> "(",property(R1),"|",property(R2),")".
 
@@ -248,6 +260,7 @@ resource(R) --> {rdf_global_id(R,RR)}, uri(RR).
 object(literal(Lit)) --> literal(Lit).
 object('^^'(Val,Type)) --> quote(wr(Val)), "^^", resource(Type).
 object('@'(Val,Lang)) --> quote(at(Val)), "@", at(Lang).
+object(S) --> {string(S)}, quote(at(S)).
 object(Resource) --> resource(Resource).
 
 % old-style literals

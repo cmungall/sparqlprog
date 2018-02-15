@@ -13,7 +13,7 @@
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/rdfs)).
 %:- rdf_attach_library('void.ttl').
-:- use_module(library(rdf_owl/owl)).
+:- use_module(library(rdf_owl/owl), []).
 :- use_module(library(rdf_owl)).
 
 :- rdf_set_cache_options([ global_directory('RDF-Cache'),

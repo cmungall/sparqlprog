@@ -13,7 +13,12 @@ https://www.w3.org/TR/sparql11-query/#expressions
 
            str_replace/4,
 
+           count/2,
            group_concat/3,
+
+           optional/1,
+           rdf_path/3,
+           rdf_path/4,
            
            seval/2
            ]).
@@ -79,6 +84,10 @@ str_replace(S,In,Out,NewS) :-
         atomic_list_concat(Toks,Out1,NewS1),
         ensure_string(NewS1,NewS).
 
+% for compat
+count(L,N) :- length(L,N).
+max(L,N) :- aggregate(max(X),member(X,L),N).
+
 
 % aggregates TODO
 group_concat(L, Sep, V) :-
@@ -86,6 +95,35 @@ group_concat(L, Sep, V) :-
         ensure_atom(Sep,Sep1),
         atomic_list_concat(L1,Sep1,V1),
         ensure_string(V1,V).
+
+%:- rdf_meta rdf_path(r,r,r).
+%:- rdf_meta rdf_path(r,r,r,g).
+
+rdf_path(A,P,B) :-  rdf_path(A,P,B,_).
+
+rdf_path(A,(\P),B,G) :-  rdf_path(B,P,A,G).
+rdf_path(A,inverseOf(P),B,G) :-  rdf_path(B,P,A,G).
+rdf_path(A,(P|Q),B,G) :-  (rdf_path(A,P,B,G) ;rdf_path(A,Q,B,G)).
+rdf_path(A,(P/Q),B,G) :-  rdf_path(A,P,Z,G), rdf_path(Z,Q,B,G).
+
+rdf_path(A,zeroOrMore(_),A,_).
+rdf_path(A,zeroOrMore(P),B,G) :-  rdf_path(A,oneOrMore(P),B,G).
+
+rdf_path(A,oneOrMore(P),B,G) :-  rdf_path(A,P,B,G).
+rdf_path(A,oneOrMore(P),B,G) :-  rdfx(A,P,Z,G),rdf_path(Z,oneOrMore(P),B,G).
+rdf_path(A,P,B,G) :- rdfx(A,P,B,G).
+
+rdfx(A,P,B,G) :-
+        ground(P),
+        rdf_global_id(P,Px),
+        atomic(Px),
+        rdf(A,Px,B,G).
+
+
+optional(G) :- G,!.
+optional(_).
+
+
 
 
 

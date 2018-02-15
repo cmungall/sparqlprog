@@ -113,7 +113,8 @@ test(not_equals) :-
                       A\=B),
                      "SELECT ?v0 ?v1 ?v2 WHERE {?v0 <http://example.org/p1> ?v1 . ?v2 <http://example.org/p1> ?v1 . FILTER (?v0 != ?v2)}").
 
-xxtest(expand_multi) :-
+
+test(expand_multi) :-
         test_select( a_or_b(_X),
                      "SELECT ?v0 WHERE {{?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/a>} UNION {?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/b>}}").
 
@@ -121,6 +122,37 @@ test(inject_labels) :-
         test_select( rdf(_A,rdf:type,'':c1),
                      [inject_labels(true)],
                      "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/c1> . OPTIONAL {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1}}").
+
+
+test(rdf_path) :-
+        test_select( rdf(_,zeroOrMore(rdfs:subClassOf),'':c1),
+                     "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#subClassOf>* <http://example.org/c1>}").
+
+
+test(rdf_path2) :-
+        test_select( rdf_path(_,zeroOrMore(rdfs:subClassOf),'':c1),
+                     "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#subClassOf>* <http://example.org/c1>}").
+
+test(nofilter) :-
+        test_select( (rdf(X,rdfs:label,L),
+                      rdf(L,'http://www.bigdata.com/rdf/search#search',"foo")),
+                     "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . ?v1 <http://www.bigdata.com/rdf/search#search> \"foo\"}").
+
+test(arith) :-
+        test_select( (rdf(X,'':v,V),
+                      V2 is V/2),
+                     "SELECT ?v0 ?v1 ?v2 WHERE {?v0 <http://example.org/v> ?v1 . BIND( (?v1 / 2) AS ?v2 )}").
+
+:- debug(sparqlprog).
+
+xxxtest(refl) :-
+        test_select( refl(_,_),
+                     "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . ?v1 <http://www.bigdata.com/rdf/search#search> \"foo\"}").
+
+test(agg) :-
+        test_select( aggregate(max(Val),rdf(_,'':v,Val),_MaxVal),
+                     "").
+
 
 :- end_tests(basic_test).
 

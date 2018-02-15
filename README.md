@@ -120,3 +120,10 @@ compiler.
 	batch size is determined by the sparkle:limit setting.
 
 
+
+## Running Pengines Service via Docker
+
+```
+docker build . -t sprog
+docker run --name sprog -d -p 4242:4242   sprog
+```
