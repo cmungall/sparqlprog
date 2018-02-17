@@ -1,6 +1,5 @@
 #!/usr/bin/env swipl
 
-:- initialization http_daemon.
 
 :- use_module(library(main)).
 :- use_module(library(optparse)).
@@ -15,13 +14,6 @@
 %:- rdf_attach_library('void.ttl').
 :- use_module(library(rdf_owl/owl), []).
 :- use_module(library(rdf_owl)).
-:- use_module(library(doc_http), []).
-:- use_module(library(settings)).
-:- use_module(library(http/http_host)).
-:- use_module(library(http/http_path)).
-
-:- set_setting_default(http:public_port,   443).
-:- set_setting_default(http:public_scheme, https).
 
 :- multifile http:location/3.
 :- dynamic   http:location/3.
@@ -32,7 +24,6 @@ http:location(root, '/', []).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_error)).
 :- use_module(library(http/html_write)).
-:- http_handler(root(.), say_hi, []).
 
 :- use_module(library(pengines)).
 
@@ -49,8 +40,6 @@ sandbox:safe_primitive(rdf11:rdf_iri(_)).
 sandbox:safe_primitive(sparqlprog:'??'(_,_)).
 %sandbox:safe_primitive(clause(_,_,_)).
 
-:- use_module(library(http/http_unix_daemon)).
-
 
 http:location(pldoc, root(documentation), [priority(100)]).
 
@@ -62,6 +51,7 @@ http:location(pldoc, root(documentation), [priority(100)]).
 :- use_module(library(sparqlprog)).
 :- use_module(library(sparqlprog/labelutils)).
 :- use_module(library(sparqlprog/endpoints)).
+:- use_module(library(sparqlprog/ontologies/wikidata)).
 
 %:- initialization prolog_ide(thread_monitor).
 :- initialization debug(sparqlprog).
@@ -72,9 +62,6 @@ tobjprop(zzz).
 
 sandbox:safe_primitive(user:tobjprop(_)).
 
-say_hi(_Request) :-
-    reply_html_page(
-	   [title('SparqlProg Pengine')],
-	   [h1('SparqlProg Pengine'),
-	        p('This is the home page of SparqlProg Pengine'),
-                a([href='https://github.com/cmungall/sparqlprog'],'GitHub project')]).
+
+server(Port) :-
+        http_server(http_dispatch, [port(Port)]).
