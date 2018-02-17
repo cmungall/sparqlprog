@@ -10,6 +10,7 @@ ADD . $HOME
 ENV PORT 9083
 EXPOSE 9083
 
-swipl -g "pack_install(sparqlprog)"
+## RUN swipl -g "getenv('HOME',Home),atom_concat('file://',Home,Path),Opts=[interactive(false)],pack_install(Path,Opts),halt"
+RUN swipl -g "Opts=[interactive(false)],pack_install(dcgutils,Opts),halt"
 
-CMD ./bin/sprog-service --port=$PORT
+CMD swipl -p library=prolog -g "[bin/sprog_service]" -g 'server(9083),sleep(9999)'

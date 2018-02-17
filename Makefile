@@ -24,10 +24,16 @@ t-%:
 # --------------------
 # Run pengine
 # --------------------
-pe:
-	docker kill sprog
-	docker rm sprog
-	docker build . -t sprog
+pe: pe-clean pe-build pe-run
+
+pe-clean:
+	docker kill sprog || echo not running ;
+	docker rm sprog || echo not made 
+
+pe-build:
+	docker build . -t sprog 
+
+pe-run:
 	docker run -p 9083:9083 --name sprog sprog
 
 # --------------------
