@@ -316,6 +316,7 @@ term_saferow(T@_, A) :- !, atom_string(A,T).
 term_saferow(literal(type(_,A)), A) :- !.
 term_saferow(literal(lang(_,A)), A) :- !.
 term_saferow(literal(A), A) :- !.
+term_saferow(L,A) :- is_list(L), !, maplist(term_saferow,L,L2),concat_atom(L2,',',A).
 term_saferow(T,T2) :-
         T =.. [P|Args],
         Args = [_|_],
