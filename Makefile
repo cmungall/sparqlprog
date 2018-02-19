@@ -24,17 +24,29 @@ t-%:
 # --------------------
 # Run pengine
 # --------------------
+
+# TODO: get from pack
+VERSION = "v0.0.1" 
+
+IM = cmungall/sparqlprog
+
 pe: pe-clean pe-build pe-run
 
 pe-clean:
-	docker kill sprog || echo not running ;
-	docker rm sprog || echo not made 
+	docker kill sparqlprog || echo not running ;
+	docker rm sparqlprog || echo not made 
 
 pe-build:
-	docker build . -t sprog 
+	@docker build -t $(IM):$(VERSION) . \
+	&& docker tag $(IM):$(VERSION) $(IM):latest
+
 
 pe-run:
-	docker run -p 9083:9083 --name sprog sprog
+	docker run -p 9083:9083 --name sparqlprog sparqlprog
+
+pe-publish: pe-build
+	@docker push $(IM):$(VERSION) \
+	&& docker push $(IM):latest
 
 # --------------------
 # Run SPARQL service inside Docker
