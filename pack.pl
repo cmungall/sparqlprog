@@ -1,7 +1,10 @@
-name('<PACKNAME>').
-%version('<VER>').
+name('sparqlprog').
+title('Logic programming with SPARQL').
+version('0.0.1').
+author('Chris Mungall','cjmungall@lbl.gov').
 author('Samer Abdallah','s.abdallah@ucl.ac.uk').
-title('Prolog-friendly interface to SPARQL endpoints').
-%download('<DOWNLOAD>').
+maintainer('Chris Mungall','cjmungall@lbl.gov').
+packager('Chris Mungall','cjmungall@lbl.gov').
+download('https://github.com/cmungall/sparqlprog/releases/*.zip' ).
 requires(dcgutils).
 

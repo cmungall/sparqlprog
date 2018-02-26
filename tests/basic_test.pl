@@ -143,19 +143,19 @@ test(arith) :-
                       V2 is V/2),
                      "SELECT ?v0 ?v1 ?v2 WHERE {?v0 <http://example.org/v> ?v1 . BIND( (?v1 / 2) AS ?v2 )}").
 
-:- debug(sparqlprog).
+%:- debug(sparqlprog).
 
-xxxtest(refl) :-
-        test_select( refl(_,_),
-                     "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . ?v1 <http://www.bigdata.com/rdf/search#search> \"foo\"}").
+%xxxtest(refl) :-
+%        test_select( refl(_,_),
+%                     "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . ?v1 <http://www.bigdata.com/rdf/search#search> \"foo\"}").
 
 test(agg) :-
         create_sparql_select(MaxVal,
                              aggregate(max(Val),rdf(_,'':v,Val),MaxVal),
                              SPARQL,
                              []),
-        format(' ~q ==> ~w~n',[ SPARQL ]),
-        assertion( SPARQL = "SELECT ?v0 WHERE {SELECT max(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}" ).
+        format(' Query ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT ?v0 WHERE {SELECT max(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}}" ).
 
 
 :- end_tests(basic_test).
