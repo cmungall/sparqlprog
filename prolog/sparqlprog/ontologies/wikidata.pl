@@ -4,18 +4,17 @@ expose a subclass of dbpedia for demo purposes
 
   For complete ontology use rdfs2pl
 
-  
+Note: this module uses macros to generate predicates. For every pname_wid/2 and cname_wid/2, predicates will be generated 
   
 */
 
 :- module(wikidata,
           [
-           %continent/1,
-           %country/1,
-           %city/1,
-
+           var_drug_condition/4,
+           
            enlabel/2,
            exact_match/2
+
            ]).
 
 :- use_module(library(sparqlprog)).
@@ -37,12 +36,47 @@ expose a subclass of dbpedia for demo purposes
 
 user:term_expansion(pname_wid(P,Id),
                     [(   Head :- Body),
+                     (   Head_s :- Body_s),
+                     (   Head_ps :- Body_ps),
+                     (   Head_q :- Body_q),
+                     (:- initialization(export(P_s/2), now)),
+                     (:- initialization(export(P_ps/2), now)),
+                     (:- initialization(export(P_q/2), now)),
                      (:- initialization(export(P/2), now))
-                     ]) :-
-        Head =.. [P,S,O],
+                    ]) :-
+
+        % e.g. p9 ==> P9
         upcase_atom(Id,Frag),
+
+        % Truthy assertions about the data, links entity to value directly
+        % wd:Q2  wdt:P9 <http://acme.com/> ==> P9(Q2,"...")
+        Head =.. [P,S,O],
         atom_concat('http://www.wikidata.org/prop/direct/',Frag,Px),
-        Body = rdf(S,Px,O).
+        Body = rdf(S,Px,O),
+        
+        % p: Links entity to statement
+        % wd:Q2 p:P9 wds:Q2-82a6e009 ==> P9_statement(Q2,wds:....)
+        atom_concat(P,'_e2s',P_s),
+        Head_s =.. [P_s,S,O],
+        atom_concat('http://www.wikidata.org/prop/',Frag,Px_s),
+        Body_s = rdf(S,Px_s,O),
+        
+        % ps: Links value from statement
+        % wds:Q3-24bf3704-4c5d-083a-9b59-1881f82b6b37 ps:P8 "-13000000000-01-01T00:00:00Z"^^xsd:dateTime
+        atom_concat(P,'_s2v',P_ps),
+        Head_ps =.. [P_ps,S,O],
+        atom_concat('http://www.wikidata.org/prop/statement/',Frag,Px_ps),
+        Body_ps = rdf(S,Px_ps,O),
+        
+        % pq: Links qualifier from statement node
+        % wds:Q3-24bf3704-4c5d-083a-9b59-1881f82b6b37 pq:P8 "-13000000000-01-01T00:00:00Z"^^xsd:dateTime
+        % => P8_q(wds:..., "..."^^...)
+        atom_concat(P,'_s2q',P_q),
+        Head_q =.. [P_q,S,O],
+        atom_concat('http://www.wikidata.org/prop/qualifier/',Frag,Px_q),
+        Body_q = rdf(S,Px_q,O).
+
+        
 
 user:term_expansion(cname_wid(C,Id),
                     [Rule,
@@ -115,6 +149,7 @@ pname_wid(author, p50).
 pname_wid(coordinate_location, p625).
 
 % bio
+% IDs
 pname_wid(hp_id, p3841).
 pname_wid(envo_id, p3859).
 pname_wid(doid_id, p699).
@@ -124,14 +159,24 @@ pname_wid(ncbigene_id, p351).
 pname_wid(ipr_id, p2926).
 pname_wid(civic_id, p3329).
 
+% rels
 pname_wid(encodes, p688).
 pname_wid(genetic_association, p2293).
 pname_wid(treated_by_drug, p2176).
 pname_wid(symptoms, p780).
 pname_wid(pathogen_transmission_process, p1060).
 pname_wid(has_cause, p828).
+pname_wid(biological_variant_of, p3433).
+pname_wid(has_part, p527).
+
+% https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/queries/examples#Get_known_variants_reported_in_CIViC_database_(Q27612411)_of_genes_reported_in_a_Wikipathways_pathway:_Bladder_Cancer_(Q30230812)
+pname_wid(positive_therapeutic_predictor, p3354).
+pname_wid(negative_therapeutic_predictor, p3355).
+pname_wid(positive_diagnostic_predictor, p3356).
+pname_wid(negative_diagnostic_predictor, p3357).
 pname_wid(positive_prognostic_predictor, p3358).
-pname_wid(biological_variant_of, p3358).
+pname_wid(negative_prognostic_predictor, p3359).
+pname_wid(medical_condition_treated, p2175).
 
 % CLASSES
 
@@ -147,4 +192,15 @@ cname_wid(infectious_disease, q18123741).
 
 % random
 cname_wid(power_station, q159719).
+
+% TODO
+nary(ptp_var_drug_condition, positive_therapeutic_predictor, medical_condition_treated).
+
+
+var_drug_condition(V,D,C,positive_therapeutic_predictor) :-
+        positive_therapeutic_predictor_e2s(V,S),
+        medical_condition_treated_s2q(S,C),
+        positive_therapeutic_predictor_s2v(S,D).
+
+
 

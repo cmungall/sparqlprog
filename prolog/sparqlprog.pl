@@ -36,6 +36,7 @@
    ,  create_sparql_construct/3
    ,  create_sparql_construct/4
    ,  inject_label_query/5
+   ,  service_query_all/4
    ,  (??)/1
    ,  (??)/2
    ,  op(1150,fx,??)
@@ -86,6 +87,12 @@ sandbox:safe_primitive(sparql_dcg:describe(_,_,_,_)).
 sandbox:safe_primitive(sparql_dcg:describe(_,_,_)).
 sandbox:safe_primitive(sparql_dcg:ask(_,_,_)).
 
+service_query_all(EP,Template,Spec,Results) :-
+        setof(Template,??(EP,Spec),Results),
+        !.
+service_query_all(_,_,_,[]).
+
+
 %% '??'(+Goal:sparql_goal) is nondet.
 %  Equivalent to _ ?? Goal. Will query all endpoints
 %  in parallel. Identical bindings may be returned multiple times.
@@ -130,6 +137,10 @@ rewrite_goal(rdf_has(S,P,O), T2,_) :- !, replace_string_unification(rdf(S,P,O),T
 %rewrite_goal(rdf(S,P,O), rdf_has(S,P,O),_) :- !.
 
 %rewrite_goal('??'(Opts,Q), '??'(Opts,Q2), _) :- !, rewrite_goal(Q,Q2).
+
+rewrite_goal(aggregate(A,G,V), aggregate(A,G2,V), D) :- !, rewrite_goal(G,G2,D).
+rewrite_goal(aggregate_group(A,GVs,G,V), aggregate_group(A,GVs,G2,V), D) :- !, rewrite_goal(G,G2,D).
+
 
 
 % rdfs terminals

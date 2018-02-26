@@ -1,0 +1,3 @@
+#!/bin/sh
+#echo "$@"
+pl2sparql -u sparqlprog/ontologies/uniprot -u sparqlprog/ontologies/faldo -s uniprot "$@"

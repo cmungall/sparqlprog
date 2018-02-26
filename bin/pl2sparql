@@ -213,6 +213,17 @@ exec_query(Select, Query, Bindings, Opts) :-
         debug(sparqlprog,'SELECT=~q QUERY=~q BINDINGS=~q',[Select,Query,Bindings]),
         exec_query_direct(Select, Query, Bindings, Opts).
 
+exec_query_direct(Select, Query, _Bindings, Opts) :-
+        option(execute(true),Opts),
+        % execute in prolog
+        !,
+        (   option(inject_labels(true),Opts)
+        ->  Opts2=[dynlabel(true)|Opts]
+        ;   Opts2=Opts),
+        forall(Query,
+               write_result(Select,Opts2)),
+        nl.
+
 exec_query_direct(Select, Query, Bindings, Opts) :-
         option(service(Service),Opts),
         nonvar(Service),
@@ -233,16 +244,6 @@ exec_query_direct(Select, Query, Bindings, Opts) :-
                write_result(Select2,Opts)),
         nl.
 
-exec_query_direct(Select, Query, _Bindings, Opts) :-
-        option(execute(true),Opts),
-        % execute in prolog
-        !,
-        (   option(inject_labels(true),Opts)
-        ->  Opts2=[dynlabel(true)|Opts]
-        ;   Opts2=Opts),
-        forall(Query,
-               write_result(Select,Opts2)),
-        nl.
 
 exec_query_direct(Select, Query, Bindings, Opts) :-
         % translate to SPARQL

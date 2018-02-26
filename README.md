@@ -1,22 +1,335 @@
 # sparqlprog - programming with SPARQL
 
+Example of use (command line):
+
+```
+pl2sparql  -u sparqlprog/ontologies/ebi -u sparqlprog/ontologies/faldo  -s ebi "\
+  protein_coding_gene(G), \
+  location(G,L,B,E,grcm38:'11'), \
+  B >= 101100523,E =< 101190725, \
+  homologous_to(G,H),in_taxon(H,taxon:'9606')" \
+  "h(G,H)"
+```
+
+The command passes a *logic program query* to sparqlprog. In this
+case, the query is a conjunction of conditions involving different
+variables (each indicated with a leading upper-case letter):
+
+ 1. `G` is a *protein coding gene*
+ 2. `G` is located on mouse chromosome 11, with an interval bounded by `B` (begin) and `E` (end)
+ 3. The interval is within a certain range
+ 4. `G` is *homologus to* `H`
+ 5. `H` is a human gene (indicated by taxon ID 9606)
+ 6. The results are bound to a tuples `h(G,H)` (i.e. two column table)
+
+This logic query compiles down to a SPARQL query for fetching G and
+H. The query is then executed on the [EBI RDF
+Platform](https://www.ebi.ac.uk/rdf/services/sparql), giving:
+
+```
+http://rdf.ebi.ac.uk/resource/ensembl/ENSMUSG00000017167,http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000108797
+http://rdf.ebi.ac.uk/resource/ensembl/ENSMUSG00000044052,http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000184451
+http://rdf.ebi.ac.uk/resource/ensembl/ENSMUSG00000035172,http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000068137
+...
+```
+
+How does this work? The query compilation makes use of pre-defined
+n-ary predicates, such as this one defined in the [faldo
+module](./prolog/sparqlprog/ontologies/faldo.pl):
+
+```
+location(F,L,B,E,R) :-
+  rdf(F,faldo:location,L),
+  begin(L,PB),position(PB,B),reference(PB,R),
+  end(L,PE),position(PE,E),reference(PE,R).
+```
+
+The `:-` connects a rule head to a rule body. In this case the body is
+a conjuncation of goals. Each of these may be defined in their own
+rules. Typically everything bottoms out at a call over a 3-ary
+predicate `rdf(S,P,O)` which maps to a single triple. In this case the vocabulary used for genomic locations is [faldo](https://github.com/OBF/FALDO)
+
+This approach allows for *composability* of queries. Rather that
+repeating the same verbose SPARQL each time in different queries,
+reusable modules can be defined.
+
+In addition to providing a composable language that compiles to
+SPARQL, this package provides a complete turing-complete environment
+for mixing code and queries in a relational/logic programming
+paradigm. See below for examples.
+
+## Quick Start
+
+There are a variety of ways to use this framework:
+
+ * Executing queries on remote services via command line
+ * Compiling logic queries to SPARQL queries, for use in another framework
+ * Programmatically within a logic program (interleaving remote and local operations)
+ * Programmatically from a language like python/javascript, using a __sparqlprog service__
+
+Consult the appropriate section below:
+
+### Running queries from the command line
+
+First [install][INSTALL.md], making sure the [bin](bin) directory is
+in your path. This will give you access to the the pl2sparql script.
+
+For full options, run:
+
+```
+pl2sparql -h
+```
+
+Note you should also have a number of convenience scripts in your
+path. For example the `pq-wd` script is simply a shortcut for
+
+```
+pl2sparql -s wikidata -u sparqlprog/ontologies/wikidata -s dbpedia ARGS
+```
+
+This will give you access to a number of convenience predicates such
+as positive_therapeutic_predictor/2 (for drug queries). The `-u`
+option uses the wikidata module, and the `-s` option sets the service
+to the one with handle `dbpedia` (the mapping from a handle to the
+full service URL is defined in the wikidata module).
+
+The best way to learn is to look at the [examples/](examples),
+together with the corresponding set of rules in
+[prolog/sparqlprog/ontologies](prolog/sparqlprog/ontologies).
+
+For example [examples/monarch-examples.sh](examples/monarch-examples.sh) has:
+
+```
+pq-mi  'label(D,DN),literal_exact_match(DN,"peroxisome biogenesis disorder"),\
+   rdfs_subclass_of(D,C),owl_equivalent_class(C,E),has_phenotype(E,Z)'\
+   'x(C,CN,E,Z)'
+```
+
+This finds a disease with a given name, finds equivalent classes of
+transitive reflexive subclasses, and then finds phenotypes for each
+
+### Compiling logic programs to SPARQL
+
+You can use pl2sparql (see above for installation) to compile a
+program with bindings to a SPARQL query by using the `-C` option. The
+SPARQL query can then be used without any dependence on
+sparqlprog. E.g.
+
+```
+pq-ebi -C "\
+  protein_coding_gene(G), \
+  location(G,L,B,E,grcm38:'11'), \
+  B >= 101100523,E =< 101190725, \
+  homologous_to(G,H),in_taxon(H,taxon:'9606')" \
+  "h(G,H)"
+```
+
+will generate the following SPARQL:
+
+```
+SELECT ?g ?h WHERE {?g <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.obolibrary.org/obo/SO_0001217> . ?g <http://biohackathon.org/resource/faldo#location> ?l . ?l <http://biohackathon.org/resource/faldo#begin> ?v0 . ?v0 <http://biohackathon.org/resource/faldo#position> ?b . ?v0 <http://biohackathon.org/resource/faldo#reference> <http://rdf.ebi.ac.uk/resource/ensembl/90/mus_musculus/GRCm38/11> . ?l <http://biohackathon.org/resource/faldo#end> ?v1 . ?v1 <http://biohackathon.org/resource/faldo#position> ?e . ?v1 <http://biohackathon.org/resource/faldo#reference> <http://rdf.ebi.ac.uk/resource/ensembl/90/mus_musculus/GRCm38/11> . FILTER (?b >= 101100523) . FILTER (?e <= 101190725) . ?g <http://semanticscience.org/resource/SIO_000558> ?h . ?h <http://purl.obolibrary.org/obo/RO_0002162> <http://identifiers.org/taxonomy/9606>}
+```
+
+withOUT executing it remotely
+
+note: indentation and URI shortening are on the cards for future releases.
+
+### Using a sparqlprog service
+
+You can start a sparqlprog service running locally:
+
+`docker run -p 9083:9083 cmungall/sparqlprog`
+
+(requires docker)
+
+This creates a prolog engine using the awesome [pengines
+framework](http://pengines.swi-prolog.org/), which can be contacted on
+port 9083 on localhost. There is an example of how to contact this
+service in javascript in
+[bin/sprog-client.js](bin/sprog-client.js). You will need to do a `npm
+install pengines`.
+
+Pengines allows the client to send logic programs to the server, and
+then to invoke them. 
+
+```
+pengines = require('pengines');
+
+peng = pengines({
+    server: "http://localhost:9083/pengine",
+    ask: "q(X)",
+    chunk: 100,
+    sourceText: "q(X):- (wd ?? continent(X)).\n"
+}
+).on('success', handleSuccess).on('error', handleError);
+function handleSuccess(result) {
+    console.log('# Results: '+ result.data.length);
+    for (var i = 0; i < result.data.length; i++) {
+        console.log(result.data[i])
+    }
+    if (result.data.length == 0) {
+        console.log("No results!")
+    }
+}
+function handleError(result) {
+    console.error(result)
+}
+```
+
+Note that *any* safe subset of prolog can be passed as a program. In
+this case we are passing a small program:
+
+`q(X):- (wd ?? continent(X))`
+
+This trivially defines a unary predicate `q/1`. The argument is bound
+to any continent. The `??` is a special infix binary predicate, the
+left side is the service name and the right side is the query to be
+compiled.
+
+The `ask` portion of the javascript will simply pass the query to the
+server.
+
+### SWISH
+
+TODO
+
+### Use within logic programs
+
+For this example, consider writing a music band recommender, based on
+similarity of genres. dbpedia has triples linking bands to genres, so
+we will use that.
+
+We will write a program
+[dbpedia_rules.pl](examples/dbpedia/dbpedia_rules.pl) that contains
+definitions of predicates we will use.
+
+First we define a binary predicate that counts the number of bands per genre:
+
+```
+genre_num_bands(G,Count) :-
+        aggregate_group(count(distinct(B)),[G],(rdf(B,dbont:genre,G),band(B)),Count).
+```
+
+you can try this with:
+
+`pq-dbpedia -c examples/dbpedia/dbpedia_rules.pl "genre_num_bands(G,Count)"`
+
+this will give results like:
+
+```
+http://dbpedia.org/resource/Independent_music,184
+http://dbpedia.org/resource/Funky_Club_Music,1
+http://dbpedia.org/resource/Ghettotech,2
+http://dbpedia.org/resource/Indian_folk_music,1
+http://dbpedia.org/resource/Bakersfield_Sound,1
+http://dbpedia.org/resource/Punk_Rawk,1
+http://dbpedia.org/resource/Go-go,6
+http://dbpedia.org/resource/Jazz_pop,3
+http://dbpedia.org/resource/Dubstep,74
+http://dbpedia.org/resource/Alt.folk,1
+http://dbpedia.org/resource/AfroHouse,1
+http://dbpedia.org/resource/Electro-disco,1
+http://dbpedia.org/resource/Math_Rock,15
+```
+
+we are doing this because we want to weight band similarity according
+to how rare a genre is. If two bands share the genre of 'independent
+music' it is not remarkable, but if two bands share a rarer genre like
+'Ghettotech' then we will weight that higher.
+
+we can explicitly bind this to dbpedia using `??/2`:
+
+```
+get_genre_num_bands(G,Count) :-
+        ??(dbpedia,genre_num_bands(G,Count)).
+```
+
+we can define the Information Content (IC) of a genre `G` as `-log2(Pr(G))`:
+
+```
+genre_ic(G,IC) :-
+        get_genre_num_bands(G,Count),
+        get_num_bands(Total),
+        seval(-log(Count/Total)/log(2), IC).
+```
+
+This makes use of:
+
+```
+:- table get_num_bands/1.
+get_num_bands(Count) :-
+        ??(dbpedia,num_bands(Count)).
+num_bands(Count) :-
+        aggregate(count(distinct(B)),band(B),Count).
+```
+
+Note we are tabling (memoizing) the call to fetch the total number of
+bands. This means it will only be called once per sparqlprog session.
+
+Finally we can define a 3-ary predicate that compares any two bands
+and bindings the 3rd arg to a similarity score that is the sum of the
+ICs of all genres held in common. (for simplicity, we do not penalize
+unmatched genres, or try to use sub/super genre categories yet):
+
+```
+pair_genre_ic(A,B,SumIC) :-
+        get_all_genres(A,SA),
+        get_all_genres(B,SB),
+        ord_intersection(SA,SB,I),
+        aggregate(sum(IC),G^(member(G,I),genre_ic(G,IC)),SumIC).
+```
+
+This is a normal prolog goal and can be executed in a normal prolog context, or from the command line:
+
+`pq-dbpedia -c examples/dbpedia/dbpedia_rules.pl -e  "pair_genre_ic(dbr:'Metallica',dbr:'Megadeth',IC)"`
+
+The `-e` option tells the script to execute the query directly rather
+than try and compile everything to a single SPARQL query (this may be
+possible, but could be highly inefficient). It is only when the prolog
+engine executes the `??` goals that a remote SPARQL will be executed.
+
+If we want to adapt this program to search rather than compare two
+given bands, we can modify it slightly so that it does not waste
+cycles querying on bands that have no genres in common:
+
+```
+pair_genre_ic(A,B,SumIC) :-
+        get_all_genres(A,SA),
+        ??(dbpedia,has_shared_genre(A,B,_)),
+        get_all_genres(B,SB),
+        ord_intersection(SA,SB,I),
+        aggregate(sum(IC),G^(member(G,I),genre_ic(G,IC)),SumIC).
+```
+
+Example of running this:
+
+`pq-dbpedia -c examples/dbpedia/dbpedia_rules.pl -e  "pair_genre_ic(dbr:'Voivod_(band)',B,IC),IC>=10"`
+
+Note this is slow, as it will iterate across each band performing
+queries to gather stats. There are various approaches to optimizing
+this, but the core idea here is that the logic can be shuffled back
+and forth between the portion that is compiled to SPARQL and executed
+remotely, and the portion that is executed locally by a logic engine.
+
+### Using a local triplestore
+
+You can use sparqlprog with any local or remote triplestore that
+supports the SPARQL protocol. If you have RDF files and want to get
+started, here is one quick route (assuming you have docker):
+
+ 1. Place your files in [examples/data](examples/data)
+ 2. Run `make bg-run`
+
+This will run blazegraph within a docker container
+
+## Discussion
+
+
 SPARQL provides a declarative way of querying a triplestore. One of
 its limitations is the lack of ability to *compose* queries and reuse
 repeated patterns across multiple queries. Sparqlprog is an extension
 of SPARQL and a subset of Prolog for relational rule-oriented
 programming using SPARQL endpoints.
-
-To illustrate, we'll start with a basic example. If you are familiar
-with prolog you can skip ahead.
-
-```
-:- rdf_register_prefix(dbont,'http://dbpedia.org/ontology/').
-
-musical_artist(X) :- rdf(X, rdf:type, dbont:'MusicalArtist').
-
-```
-
-TODO
 
 ## Prolog programmers guide
 
@@ -33,8 +346,6 @@ run against all registered endpoints.
 
 The library is based on the idea implemented in Yves Raimond's swic package,
 but the code has been completely re-implemented.
-
-## Prerequisites
 
 You just need SWI Prolog with its Semantic Web libraries.
 
@@ -95,35 +406,15 @@ limited subset of pure prolog that can be executed outside
 the prolog environment - effectively a limited prolog to SPARQL
 compiler.
 
-## Change log
+## Credits
 
-	0.0.8: concurrent_or/3 moved to separate module, fixes to concurrent_or/3.
+The majority of code in this repo was developed by Samer Abdallah, as
+part of the [sparkle
+package](http://www.swi-prolog.org/pack/list?p=sparkle). Some of this
+code came from Yves Raimond's swic package.
 
-	0.0.7: More documentation. Renamed endpoint_query/3 to query_sparql/3.
-	Non-autopaged queries now use sparkle:limit setting for default limit to
-	avoid getting huge amounts of data when no limit is supplied.
+Extensions were implemented by Chris Mungall. In particular
 
-	New in version 0.0.6: both (??)/2 and query_goal/3 can accept a variable
-	as an endpoint. If this is the case, then multiple queries are made in parallel.
-	Each successful result binds the endpoint variable to the source of that data, eg
-	==
-	EP ?? rdf(Class,rdf:type,owl:'Class').
-	==
-	will bind Class to all known classes and EP to the endpoint which reported that class.
-	If the same bindings can be returned from several endpoints, then (??)/2 will produce
-	those binding multiple times, with EP bound to different values each time, even if the
-	query reduces to an ASK SPARQL query. It's up to you to use once/1 etc as necessary
-	if this is not the behaviour you want.
-
-	Also new in 0.0.6, autopaged queries, that is, you can forget about OFFSET and LIMIT;
-	multiple queries will be made as necessary to fetch data on demand. The default
-	batch size is determined by the sparkle:limit setting.
-
-
-
-## Running Pengines Service via Docker
-
-```
-docker build . -t sprog
-docker run --name sprog -d -p 4242:4242   sprog
-```
+ - goal rewriting
+ - DCG extensions: aggregates, filter operators
+ - predicate definitions for vocabularies used by various triplestores (faldo, ebi, wikidata, dbpedia, go, monarch)

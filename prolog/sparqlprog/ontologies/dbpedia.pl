@@ -16,6 +16,7 @@ expose a subclass of dbpedia for demo purposes
            child/2,
            has_director/2,
            directed/2,
+           band_member/2,
            has_name/2]).
 
 :- use_module(library(sparqlprog)).
@@ -33,6 +34,9 @@ has_name(S,L) :- rdf(S,foaf:'Name',L).
 has_director(S,O) :- rdf(S,dbont:director,O).
 directed(S,O) :- rdf(O,dbont:director,S).
 child(S,O) :- rdf(S,dbont:child,O).
+
+band_member(S,O) :- rdf(S,dbont:bandMember,O).
+
 
 related_to(S,O) :- child(S,O).
 related_to(S,O) :- child(O,S).

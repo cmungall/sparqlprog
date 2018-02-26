@@ -168,6 +168,9 @@ goal(rdf(S,P,O)) -->
 goal(rdf(S,P,O,G)) --> "GRAPH ", resource(G), " ", brace(goal(rdf(S,P,O))).
 
 goal(aggregate(Expr,G,Result)) --> "SELECT ", expr(Expr), " AS ", variable(Result), " ", where(G).
+goal(aggregate_group(Expr,GroupVars,G,Result)) --> 
+        "SELECT ", expr(Expr), " AS ", variable(Result), " ",seqmap_with_sep(" ",expr,GroupVars), " ",
+        where(G).
 
 
 goal(is(V,Expr)) --> goal(bind(Expr,V)).
@@ -229,6 +232,7 @@ expr('@'(S,Lang))    --> "\"", at(S), "\"@", resource(Lang).
 expr(str(V))       --> "STR(", object(V), ")".
 expr(lang(V))      --> "LANG(", object(V), ")".
 expr(count(X))     --> "COUNT(", expr(X), ")".
+expr(distinct(X))     --> "DISTINCT ", expr(X), " ".
 expr(datatype(V))  --> "DATATYPE(", object(V), ")".
 expr(quote(V))     --> quote(at(V)).
 

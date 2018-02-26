@@ -150,8 +150,12 @@ xxxtest(refl) :-
                      "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . ?v1 <http://www.bigdata.com/rdf/search#search> \"foo\"}").
 
 test(agg) :-
-        test_select( aggregate(max(Val),rdf(_,'':v,Val),_MaxVal),
-                     "").
+        create_sparql_select(MaxVal,
+                             aggregate(max(Val),rdf(_,'':v,Val),MaxVal),
+                             SPARQL,
+                             []),
+        format(' ~q ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT ?v0 WHERE {SELECT max(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}" ).
 
 
 :- end_tests(basic_test).

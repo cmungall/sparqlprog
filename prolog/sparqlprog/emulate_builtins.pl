@@ -140,6 +140,7 @@ ensure_string(A,_) :- throw(ensure_string(A)).
 
 ensure_number(N, N) :- number(N),!.
 ensure_number(S^^_, N) :- !, atom_string(A,S), atom_number(A,N). % todo: fail if incorrect datatype?
+ensure_number(literal(type(_,S)), N) :- !, atom_string(A,S), atom_number(A,N). % todo: fail if incorrect datatype?
 ensure_number(S, N) :- string(S), !, atom_string(A,S), atom_number(A,N).
 ensure_number(A, N) :- atom(A), !, atom_number(A,N).
 
@@ -155,6 +156,7 @@ seval(L,L2) :-
 seval(V, V) :- var(V),!.
 seval(T, T) :- T = _@_, !.
 seval(T, T) :- T = _^^_, !.
+seval(T, T) :- T = literal(_), !.
 seval(Term, Ret) :-
         compound(Term),
         !,
