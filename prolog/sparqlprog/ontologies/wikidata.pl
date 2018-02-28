@@ -47,7 +47,8 @@ user:term_expansion(pname_wid(P,Id),
 
         % e.g. p9 ==> P9
         upcase_atom(Id,Frag),
-
+        
+        
         % Truthy assertions about the data, links entity to value directly
         % wd:Q2  wdt:P9 <http://acme.com/> ==> P9(Q2,"...")
         Head =.. [P,S,O],
@@ -82,8 +83,10 @@ user:term_expansion(cname_wid(C,Id),
                     [Rule,
                      RuleInf,
                      RuleIsa,
+                     (   Head_iri :- true),
                      (:- initialization(export(InfC/1), now)),
                      (:- initialization(export(SubC/1), now)),
+                     (:- initialization(export(C_iri/1), now)),
                      (:- initialization(export(C/1), now))
                      ]) :-
         upcase_atom(Id,Frag),
@@ -92,6 +95,9 @@ user:term_expansion(cname_wid(C,Id),
         Head =.. [C,I],
         Body = rdf(I,'http://www.wikidata.org/prop/direct/P31',Cx),
         Rule = (Head :- Body),
+
+        atom_concat(C,'_iri',C_iri),
+        Head_iri =.. [C_iri,Cx],
         
         atom_concat(C,'_inf',InfC),
         Head2 =.. [InfC,I],
@@ -189,6 +195,10 @@ cname_wid(city, q515).
 cname_wid(cancer, q12078).
 cname_wid(disease, q12136).
 cname_wid(infectious_disease, q18123741).
+
+cname_wid(symptom, q169872).
+cname_wid(medical_finding, q639907).
+cname_wid(trait, q1211967).
 
 % random
 cname_wid(power_station, q159719).
