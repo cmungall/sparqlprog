@@ -33,8 +33,8 @@ IM = cmungall/sparqlprog
 pe: pe-clean pe-build pe-run
 
 pe-clean:
-	docker kill sparqlprog || echo not running ;
-	docker rm sparqlprog || echo not made 
+	docker kill $(IM) || echo not running ;
+	docker rm $(IM) || echo not made 
 
 pe-build:
 	@docker build -t $(IM):$(VERSION) . \
@@ -42,11 +42,19 @@ pe-build:
 
 
 pe-run:
-	docker run -p 9083:9083 --name sparqlprog sparqlprog
+	docker run -p 9083:9083 -e PORT=9083 --name sparqlprog $(IM)
 
 pe-publish: pe-build
 	@docker push $(IM):$(VERSION) \
 	&& docker push $(IM):latest
+
+# First requires: heroku container:login
+heroku-new-app:
+	heroku create
+
+heroku-deploy:
+	heroku container:push web &&\
+	heroku logs
 
 # --------------------
 # Run SPARQL service inside Docker

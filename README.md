@@ -134,29 +134,29 @@ withOUT executing it remotely
 
 note: indentation and URI shortening are on the cards for future releases.
 
-### Using a sparqlprog service
+### Using a public sparqlprog service
 
-You can start a sparqlprog service running locally:
+Public pengines service: https://evening-falls-87315.herokuapp.com/pengine
 
-`docker run -p 9083:9083 cmungall/sparqlprog`
+Pengines is a framework for running logic program environments as a
+web service. They can be used by clients in any language (client
+libraries in python, javascript seem to be mature; as well as separate
+prolog clients as well).
 
-(requires docker)
+See the docs on the [pengines framework](http://pengines.swi-prolog.org/).
 
-This creates a prolog engine using the awesome [pengines
-framework](http://pengines.swi-prolog.org/), which can be contacted on
-port 9083 on localhost. There is an example of how to contact this
-service in javascript in
+There is an example of how to contact this service in javascript in
 [bin/sprog-client.js](bin/sprog-client.js). You will need to do a `npm
-install pengines`.
+install pengines`, and change the server URL.
 
 Pengines allows the client to send logic programs to the server, and
-then to invoke them. 
+then to invoke them. For example:
 
 ```
 pengines = require('pengines');
 
 peng = pengines({
-    server: "http://localhost:9083/pengine",
+    server: "https://evening-falls-87315.herokuapp.com/pengine",
     ask: "q(X)",
     chunk: 100,
     sourceText: "q(X):- (wd ?? continent(X)).\n"
@@ -188,6 +188,20 @@ compiled.
 
 The `ask` portion of the javascript will simply pass the query to the
 server.
+
+### Using a local sparqlprog service
+
+You can start a sparqlprog service running locally:
+
+`docker run -p 9083:9083 cmungall/sparqlprog`
+
+(requires docker)
+
+This creates a pengines service at localhost:9083/pengine
+
+There is an example of how to contact this service in javascript in
+[bin/sprog-client.js](bin/sprog-client.js). You will need to do a `npm
+install pengines`.
 
 ### SWISH
 

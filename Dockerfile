@@ -7,10 +7,9 @@ WORKDIR /home/myuser
 
 ADD . $HOME
 
-ENV PORT 9083
-EXPOSE 9083
+EXPOSE ${PORT}
 
 ## RUN swipl -g "getenv('HOME',Home),atom_concat('file://',Home,Path),Opts=[interactive(false)],pack_install(Path,Opts),halt"
 RUN swipl -g "Opts=[interactive(false)],pack_install(dcgutils,Opts),halt"
 
-CMD swipl -p library=prolog -g "[bin/sprog_service]" -g 'server(9083),T is 10**10,sleep(T)'
+CMD swipl -p library=prolog -g "[bin/sprog_service]" -g 'server,T is 10**10,sleep(T)'

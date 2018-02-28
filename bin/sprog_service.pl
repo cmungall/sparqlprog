@@ -63,5 +63,10 @@ tobjprop(zzz).
 sandbox:safe_primitive(user:tobjprop(_)).
 
 
+server :-
+        getenv('PORT',PortAtom),
+        atom_number(PortAtom,Port),
+        server(Port).
+
 server(Port) :-
         http_server(http_dispatch, [port(Port)]).
