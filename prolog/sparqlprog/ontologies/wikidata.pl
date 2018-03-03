@@ -199,6 +199,15 @@ cname_wid(infectious_disease, q18123741).
 cname_wid(symptom, q169872).
 cname_wid(medical_finding, q639907).
 cname_wid(trait, q1211967).
+cname_wid(pathway, q4915012).
+cname_wid(macromolecular_complex, qQ22325163).
+cname_wid(gene, qQ7187).
+cname_wid(gene_product, qQ424689).
+cname_wid(sequence_variant, qQ15304597).
+
+cname_wid(therapy, q179661).
+cname_wid(medical_procedure, qQ796194).
+
 
 % random
 cname_wid(power_station, q159719).

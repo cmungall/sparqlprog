@@ -13,8 +13,8 @@
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/rdfs)).
 %:- rdf_attach_library('void.ttl').
-:- use_module(library(rdf_owl/owl), []).
-:- use_module(library(rdf_owl)).
+:- use_module(library(sparqlprog/ontologies/owl), []).
+:- use_module(library(sparqlprog/owl_util)).
 
 :- rdf_set_cache_options([ global_directory('RDF-Cache'),
                            create_global_directory(true)
@@ -129,7 +129,7 @@ main(Argv) :-
         ],
         opt_parse(Spec, Argv, Opts, QueryAtoms, [duplicated_flags(keepall)]),
         handle_opts(Opts),
-        opt_if_call(interactive,prolog,Opts),
+        opt_if_call(interactive,prolog_shell,Opts),
         run(QueryAtoms, Opts).
 
 
@@ -360,16 +360,25 @@ load_default_endpoints :-
         use_module(library(sparqlprog/endpoints)).
 
 
+prolog_shell:-
+        format('% Starting pl2sparql shell~n'),
+        repeat,
+        catch(prolog,
+              E,
+              (format('ERROR:~n~w~n',[E]),fail)),
+        !,
+        format('Come back soon!~n').
+
 
 /*
 
-pl2sparql -u rdf_owl/owl  -q 'subClassOf(X,A),subClassOf(Y,A),X\=Y -> A,X'
+pl2sparql -u sparqlprog/ontologies/owl  -q 'subClassOf(X,A),subClassOf(Y,A),X\=Y -> A,X'
 
-pl2sparql -u rdf_owl -u rdf_owl/owl  -q 'subClassOf(X,R),owl_some(R,P,V)'
+pl2sparql -u sparqlprog/owl_util -u sparqlprog/ontologies/owl  -q 'subClassOf(X,R),owl_some(R,P,V)'
 
-pl2sparql -u obo_ro/ro -u rdf_owl -u rdf_owl/owl  -q 'occurs_in(A,B)'  
+pl2sparql -u obo_ro/ro -u sparqlprog/owl_util -u sparqlprog/ontologies/owl  -q 'occurs_in(A,B)'  
 
-pl2sparql -u obo_ro/ro -u rdf_owl -u rdf_owl/owl  -q 'equivalentClass(X,R),intersectionOf(R,L),rdf_member(X,L)
+pl2sparql -u obo_ro/ro -u sparqlprog/owl_util -u sparqlprog/ontologies/owl  -q 'equivalentClass(X,R),intersectionOf(R,L),rdf_member(X,L)
 
-pl2sparql -U obo_ro/ro -u rdf_owl/owl -v  -i tests/go_nucleus.ttl 'subClassOf(A,R),owl_some(R,P,B),ro:part_of_iri(P)'.  
+pl2sparql -U obo_ro/ro -u sparqlprog/ontologies/owl -v  -i tests/go_nucleus.ttl 'subClassOf(A,R),owl_some(R,P,B),ro:part_of_iri(P)'.  
 */

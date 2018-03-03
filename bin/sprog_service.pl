@@ -12,8 +12,8 @@
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/rdfs)).
 %:- rdf_attach_library('void.ttl').
-:- use_module(library(rdf_owl/owl), []).
-:- use_module(library(rdf_owl)).
+:- use_module(library(sparqlprog/ontologies/owl), []).
+:- use_module(library(sparqlprog/owl_util)).
 
 :- multifile http:location/3.
 :- dynamic   http:location/3.
