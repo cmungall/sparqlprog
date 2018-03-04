@@ -305,12 +305,18 @@ write_result(Term,Opts) :-
         member(format(Fmt),Opts),
         csv_format_separator(Fmt,Sep),
         term_saferow(Term,Term2),
+        debug(row,'ROW: ~q',[Term2]),
         csv_write_stream(current_output, [Term2], [separator(Sep)]),
         !.
 write_result(Term,_Opts) :-
         write_canonical(Term),
         writeln('.').
 
+% translate a prolog term into an object that is suitable to send to csv_write_stream
+%  - translate literals to atoms
+%  - flatten lists
+%  - translate args in a compound term
+term_saferow(T,'?') :- var(T),!.
 term_saferow(T^^_,A) :- !, atom_string(A,T).
 term_saferow(T@_, A) :- !, atom_string(A,T).
 term_saferow(T@_, A) :- !, atom_string(A,T).
@@ -324,6 +330,10 @@ term_saferow(T,T2) :-
         !,
         maplist(term_saferow,Args,Args2),
         T2 =.. [P|Args2].
+term_saferow(T,T2) :-
+        rdf_global_id(Pre:Id,T),
+        !,
+        concat_atom([Pre,Id],:,T2).
 term_saferow(T,T).
 
 

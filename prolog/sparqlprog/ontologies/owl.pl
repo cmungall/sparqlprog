@@ -567,109 +567,109 @@
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#AllDifferent>
 %
-owl:allDifferent(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#AllDifferent').
+owl:allDifferent(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#AllDifferent').
 
 %! owl:annotationProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#AnnotationProperty>
 %
-owl:annotationProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#AnnotationProperty').
+owl:annotationProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#AnnotationProperty').
 
 %! owl:class(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#Class>
 %
-owl:class(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#Class').
+owl:class(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#Class').
 
 %! owl:dataRange(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#DataRange>
 %
-owl:dataRange(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#DataRange').
+owl:dataRange(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#DataRange').
 
 %! owl:datatypeProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#DatatypeProperty>
 %
-owl:datatypeProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#DatatypeProperty').
+owl:datatypeProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#DatatypeProperty').
 
 %! owl:deprecatedClass(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#DeprecatedClass>
 %
-owl:deprecatedClass(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#DeprecatedClass').
+owl:deprecatedClass(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#DeprecatedClass').
 
 %! owl:deprecatedProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#DeprecatedProperty>
 %
-owl:deprecatedProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#DeprecatedProperty').
+owl:deprecatedProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#DeprecatedProperty').
 
 %! owl:functionalProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#FunctionalProperty>
 %
-owl:functionalProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#FunctionalProperty').
+owl:functionalProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#FunctionalProperty').
 
 %! owl:inverseFunctionalProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#InverseFunctionalProperty>
 %
-owl:inverseFunctionalProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#InverseFunctionalProperty').
+owl:inverseFunctionalProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#InverseFunctionalProperty').
 
 %! owl:namedIndividual(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#NamedIndividual>
 %
-owl:namedIndividual(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#NamedIndividual').
+owl:namedIndividual(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#NamedIndividual').
 
 %! owl:nothing(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#Nothing>
 %
-owl:nothing(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#Nothing').
+owl:nothing(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#Nothing').
 
 %! owl:objectProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#ObjectProperty>
 %
-owl:objectProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#ObjectProperty').
+owl:objectProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#ObjectProperty').
 
 %! owl:ontology(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#Ontology>
 %
-owl:ontology(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#Ontology').
+owl:ontology(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#Ontology').
 
 %! owl:ontologyProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#OntologyProperty>
 %
-owl:ontologyProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#OntologyProperty').
+owl:ontologyProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#OntologyProperty').
 
 %! owl:restriction(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#Restriction>
 %
-owl:restriction(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#Restriction').
+owl:restriction(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#Restriction').
 
 %! owl:symmetricProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#SymmetricProperty>
 %
-owl:symmetricProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#SymmetricProperty').
+owl:symmetricProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#SymmetricProperty').
 
 %! owl:thing(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#Thing>
 %
-owl:thing(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#Thing').
+owl:thing(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#Thing').
 
 %! owl:transitiveProperty(_13062)
 %
 %  Any instance of <http://www.w3.org/2002/07/owl#TransitiveProperty>
 %
-owl:transitiveProperty(A):-rdfs_individual_of(A,'http://www.w3.org/2002/07/owl#TransitiveProperty').
+owl:transitiveProperty(A):-rdf(A,rdf:type,'http://www.w3.org/2002/07/owl#TransitiveProperty').
 
 owl:allValuesFrom(A,B):-rdf_has(A,'http://www.w3.org/2002/07/owl#allValuesFrom',B).
 

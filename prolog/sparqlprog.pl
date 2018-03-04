@@ -426,10 +426,10 @@ filter_opts([_|T],T2) :-
 %
 % Add an optional(rdf(X,rdfs:label,XL)) for every variable X in Select
 % TODO: interleave
-inject_label_query(Select, Goal, Select-LabelVars, (Goal,ConjGoal), _Opts) :-
+inject_label_query(Select, Goal, Select2, (Goal,ConjGoal), _Opts) :-
         term_variables(Select,Vars),
-        inject_label_for_vars(Vars,ConjGoal,LabelVars).
-
+        inject_label_for_vars(Vars,ConjGoal,LabelVars),
+        conjoin(Select,LabelVars,Select2).
 
 inject_label_for_vars([Var],Goal,[LabelVar]) :-
         !,
@@ -439,6 +439,19 @@ inject_label_for_vars([Var|Vars],(Goal1,Goal2),[LabelVar|LabelVars]) :-
         inject_label_for_var(Var,Goal1,LabelVar),
         inject_label_for_vars(Vars,Goal2,LabelVars).
 inject_label_for_var(Var,optional(rdf(Var,rdfs:label,VarLabel)),VarLabel).
+
+conjoin(Term,L,T2) :-
+        is_list(Term),
+        !,
+        append(Term,L,T2).
+conjoin(Term,L,[Term|L]) :-
+        \+compound(Term),
+        !.
+conjoin(Term,L,T2) :-
+        Term =.. [P|Args],
+        append(Args,L,Args2),
+        T2 =.. [P|Args2].
+
 
 
        

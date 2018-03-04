@@ -216,19 +216,24 @@ cond(regex(P,V,F)) --> "regex(", expr(V), ",", quote(at(P)),  ",", quote(at(F)),
 cond(regex_str(P,V))   --> "regex(", expr(str(V)), ",", quote(at(P)), ")".
 cond(regex_str(P,V,F)) --> "regex(", expr(str(V)), ",", quote(at(P)),  ",", quote(at(F)), ")".
 cond(bound(V))     --> "bound(", object(V), ")".
-cond(uri(V))       --> "isURI(", object(V), ")".
-cond(blank(V))     --> "isBLANK(", object(V), ")".
+cond(is_uri(V))       --> "isURI(", object(V), ")".
+cond(is_blank(V))     --> "isBLANK(", object(V), ")".
 cond(lang(V))     --> "lang(", object(V), ")".
-cond(literal(V))   --> "isLITERAL(", object(V), ")".
+cond(is_literal(V))   --> "isLITERAL(", object(V), ")".
 cond(G)            --> {throw(cond(G))}.
 
 string_literal_expr(A) --> {atomic(A),atom_string(A,S)},expr(S).
 string_literal_expr(S) --> expr(S).
 
 expr(str_before(Str,Sep)) --> "strBefore(", string_literal_expr(Str), string_literal_expr(Sep), ")".
+expr(str_after(Str,Sep)) --> "strAfter(", string_literal_expr(Str), string_literal_expr(Sep), ")".
+expr(concat(A,B)) --> "concat(", string_literal_expr(A), ", ", string_literal_expr(B), ")".
+expr(ucase(A)) --> "ucase(", string_literal_expr(A), ")".
+expr(lcase(A)) --> "lcase(", string_literal_expr(A), ")".
 expr(S)            --> {string(S)},"\"", at(S), "\"".
 expr('^^'(S,T))    --> "\"", at(S), "\"^^", resource(T).
 expr('@'(S,Lang))    --> "\"", at(S), "\"@", resource(Lang).
+expr(uri(V))       --> "URI(", expr(V), ")".
 expr(str(V))       --> "STR(", object(V), ")".
 expr(lang(V))      --> "LANG(", object(V), ")".
 expr(count(X))     --> "COUNT(", expr(X), ")".
