@@ -8,6 +8,7 @@
 :- begin_tests(bultins_test).
 
 
+
 % string test functions should accept as input: str, atom, lang-literal, str-literal
 test(str_starts1) :- assertion(str_starts("abc","ab")).
 test(str_starts2) :- assertion(str_starts("abc"@en,"ab")).
@@ -22,6 +23,14 @@ test(str_replace) :- assertion(str_replace("abc","ab","x","xc")).
 test(str_replace_eval) :-
         seval(str_replace("ABC DEF GHI"," ","X"),S),
         assertion(S == "ABCXDEFXGHI").
+
+test(reflexive) :- bind("x",X),
+        assertion( X=="x").
+xxtest(nested) :-
+        bind(lcase("X"), X),
+        assertion( X=="x").
+test(nested) :- bind(lcase(ucase(lcase("X"))), X),
+        assertion( X=="x").
 
 test(lcase1) :- assertion(lcase("ABC","abc")).
 test(lcase2) :-

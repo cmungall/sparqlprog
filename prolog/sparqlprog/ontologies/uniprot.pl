@@ -31,6 +31,7 @@
            ]).
 
 :- use_module(library(sparqlprog/ontologies/faldo)).
+:- use_module(library(sparqlprog)).
 
 
 :- rdf_register_prefix(up,'http://purl.uniprot.org/core/').

@@ -2,6 +2,8 @@
 
 /*
 https://www.w3.org/TR/sparql11-query/#expressions
+
+  TODO: regexes
 */
 :- module(emulate_builtins,
           [
@@ -20,6 +22,7 @@ https://www.w3.org/TR/sparql11-query/#expressions
            rdf_path/3,
            rdf_path/4,
            
+           bind/2,
            seval/2
            ]).
 
@@ -52,6 +55,18 @@ lcase(S,V) :-
         ensure_atom(S,S1),
         downcase_atom(S1,V1),
         ensure_string(V1,V).
+ucase(S,V) :-
+        ensure_atom(S,S1),
+        upcase_atom(S1,V1),
+        ensure_string(V1,V).
+
+% 17.4.2.5 str
+str(X,V) :-
+        ensure_atom(X,A),
+        atom_string(A,V).
+
+% 17.4.2.6 lang
+lang(_^^L,L).
 
 
 %! str_starts(+S:strlike, +Sub:strlike) is semidet
@@ -143,6 +158,34 @@ ensure_number(S^^_, N) :- !, atom_string(A,S), atom_number(A,N). % todo: fail if
 ensure_number(literal(type(_,S)), N) :- !, atom_string(A,S), atom_number(A,N). % todo: fail if incorrect datatype?
 ensure_number(S, N) :- string(S), !, atom_string(A,S), atom_number(A,N).
 ensure_number(A, N) :- atom(A), !, atom_number(A,N).
+
+% 17.4.1.1 bound
+bound(Expr) :- nonvar(Expr).
+
+% 17.4.1.2 IF
+if(E1, E2, E3, R) :-
+        (   E1
+        ->  bind(E2, R)
+        ;   bind(E3, R)).
+
+% 17.4.1.3 COALESCE
+coalesce([H|_],R) :-
+        bind(H, R),
+        nonvar(R),
+        !.
+coalesce([_|T],R) :-
+        coalesce(T,R).
+
+exists(E) :- \+ \+ E.
+
+% 17.4.1.8 sameTerm : use ==
+
+% 17.4.1.9 IN : use member/2
+
+% 17.4.2.1 isIRI : use rdf_is_iri
+
+bind(Expr,Result) :-
+        seval(Expr, Result).
 
 
 %! seval(+FunctionTerm,?ReturnValue)

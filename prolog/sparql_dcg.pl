@@ -208,6 +208,8 @@ cond(X@=<Y)   --> p expr(X), " <= ", expr(Y).
 cond(X@>Y)   --> p expr(X), " > ", expr(Y).
 cond(X@>=Y)   --> p expr(X), " >= ", expr(Y).
 cond(between(L,U,X)) --> cond((L=<X,X=<U)).
+
+% 17.4.1.9 IN
 cond(in(X,Ys))     --> p expr(X), " in ", (p seqmap_with_sep(", ",expr,Ys)).
 cond(str_starts(X,Y))   --> p "strStarts(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
 cond(str_ends(X,Y))   --> p "strEnds(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
@@ -216,10 +218,23 @@ cond(regex(P,V,F)) --> "regex(", expr(V), ",", quote(at(P)),  ",", quote(at(F)),
 cond(regex_str(P,V))   --> "regex(", expr(str(V)), ",", quote(at(P)), ")".
 cond(regex_str(P,V,F)) --> "regex(", expr(str(V)), ",", quote(at(P)),  ",", quote(at(F)), ")".
 cond(bound(V))     --> "bound(", object(V), ")".
+
+% 17.4.2.1 isIRI
+% defined in rdf11
+cond(rdf_is_iri(V))       --> "isIRI(", object(V), ")".
 cond(is_uri(V))       --> "isURI(", object(V), ")".
+
+% 17.4.2.2 isBlank
+% defined in rdf11
+cond(rdf_bnode(V))     --> "isBLANK(", object(V), ")".
 cond(is_blank(V))     --> "isBLANK(", object(V), ")".
-cond(lang(V))     --> "lang(", object(V), ")".
+
+% 17.4.2.3 isLiteral
+% defined in rdf11
+cond(rdf_is_literal(V))   --> "isLITERAL(", object(V), ")".
 cond(is_literal(V))   --> "isLITERAL(", object(V), ")".
+
+cond(lang(V))     --> "lang(", object(V), ")".
 cond(G)            --> {throw(cond(G))}.
 
 string_literal_expr(A) --> {atomic(A),atom_string(A,S)},expr(S).
@@ -242,6 +257,7 @@ expr(datatype(V))  --> "DATATYPE(", object(V), ")".
 expr(quote(V))     --> quote(at(V)).
 
 expr(max(X))   --> "max(", expr(X), ")".
+expr(count(X))   --> "count(", expr(X), ")".
 expr(+X) -->  p "+ ", expr(X), ")".
 expr(-X) -->  p "- ", expr(X), ")".
 expr(X+Y) --> p expr(X), " + ", expr(Y).

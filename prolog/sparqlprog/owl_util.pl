@@ -12,7 +12,7 @@
 :- use_module(library(sparqlprog/ontologies/owl), []).
 :- use_module(library(regex)).
 
-:- reexport(library(sparqlprog/ontologies/owl), [ label/2 ]).
+:- reexport(library(sparqlprog/ontologies/owl), [ label/2, subClassOf/2 ]).
 
 :-op(300,xfy,some).
 :-op(300,xfy,all).
