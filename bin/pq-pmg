@@ -1,0 +1,2 @@
+#!/bin/sh
+pl2sparql -u sparqlprog/endpoints  -s pmg  -u sparqlprog/ontologies/pubmedgraph -u sparqlprog/ontologies/monarch "$@"
