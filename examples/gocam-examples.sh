@@ -15,3 +15,8 @@ pq-go "kinase_activity(A),part_of(A,P),signal_transduction(P),enabled_by(A,G)"
 # ---
 pq-go "kinase_activity(A),regulates(A,A2),enabled_by(A,G)"
 
+# ---
+# user to model
+# ---
+pq-go -C "rdf(X,dc:contributor,Y),rdf(X,rdf:type,owl:'Ontology')"
+
