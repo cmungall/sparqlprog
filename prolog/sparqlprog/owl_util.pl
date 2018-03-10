@@ -4,7 +4,9 @@
            owl_equivalent_class/2,
 
            common_ancestor/3,
-           mrca/3
+           mrca/3,
+           common_descendant/3,
+           mrcd/3
           ]).
 
 :- use_module(library(semweb/rdf11)).
@@ -53,5 +55,14 @@ mrca(X,Y,A) :-
              rdf_path(A2,oneOrMore(rdfs:subClassOf),A))).
 
 
+common_descendant(X,Y,D) :-
+        rdfs_subclass_of(D,X),
+        rdfs_subclass_of(D,Y),
+        X\=Y.
+
+mrcd(X,Y,D) :-
+        common_descendant(X,Y,D),
+        \+ ((common_descendant(X,Y,D2),
+             rdf_path(D,oneOrMore(rdfs:subClassOf),D2))).
 
 
