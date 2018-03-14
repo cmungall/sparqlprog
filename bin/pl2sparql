@@ -142,6 +142,33 @@ handle_opts(Opts) :-
         opt_forall(consult(X),consult(X),Opts),
         opt_forall(input(X),rdf_load(X),Opts).
 
+a2t(A,T) :-
+        atom_chars(A,Chars),
+        forall(member(C,Chars),
+               C='.'),
+        !,
+        member(_,Chars),
+        T='_'.
+        
+a2t(A,T) :-
+        atom_chars(A,[C|_]),
+        (   (   C = '_'
+            ;   C @>= 'A', C @=< 'Z')
+        ->  T='_'
+        ;   sformat(T,'~q',[A])).
+
+run(['/',Pred|Args], Opts) :-
+        !,
+        % shorthand syntax for terms: / Pred Args
+        % each Arg is either: a variable (upper case or '_) or an atom or a list of variables ('..')
+        findall(T,
+               (   member(A,Args),
+                   a2t(A,T)),
+               Terms),
+        concat_atom(Terms, ', ', ArgsAtom),
+        sformat(Q,'~w(~w)',[Pred,ArgsAtom]),
+        debug(sparqlprog, 'Q=~q', [Q]),
+        run([Q],Opts).
 run([QueryAtom,SelectAtom], Opts) :-
         !,
         % USER SPECIFIES SELECT
