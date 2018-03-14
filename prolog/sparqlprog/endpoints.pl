@@ -11,6 +11,8 @@
 :- sparql_endpoint( uniprot, 'http://sparql.uniprot.org/sparql').
 :- sparql_endpoint( dbpedia, 'http://dbpedia.org/sparql/').
 :- sparql_endpoint( ontobee, 'http://sparql.hegroup.org/sparql').
+:- sparql_endpoint( nextprot, 'https://api.nextprot.org/sparql').
+:- sparql_endpoint( disgenet, 'http://rdf.disgenet.org/sparql/').
 :- sparql_endpoint( wikipathways, 'http://sparql.wikipathways.org').
 :- sparql_endpoint( local, 'http://127.0.0.1:8889/bigdata/sparql').
     

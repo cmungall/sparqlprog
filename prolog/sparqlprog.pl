@@ -106,9 +106,9 @@ service_query_all(_,_,_,[]).
 %  the current bindings were obtained.
 ??(EP,Spec) :-
    rewrite_goal(Spec,SpecRewrite),
-   debug(sparqlprog,'Rewritten goal: ~w',[SpecRewrite]),
+   debug(sparqlprog,'Rewritten goal: ~q',[SpecRewrite]),
    spec_goal_opts(SpecRewrite,Goal,Opts),
-   debug(sparqlprog,'Opts: ~w',[Opts0]),
+   debug(sparqlprog,'Opts: ~q',[Opts0]),
    setting(select_options,Opts0),
    merge_options(Opts,Opts0,Opts1),
    query_goal(EP,Goal,Opts1).
@@ -281,12 +281,12 @@ sparql_endpoint(EP,Url,Options) :-
    url_endpoint(Url,Host,Port,Path),
    !,
    retract_declared_endpoint(EP,Url),     
-   debug(sparqlprog,'Asserting SPARQL end point ~w: ~w ~w ~w ~w.',[EP,Host,Port,Path,Options]),
+   debug(sparqlprog,'Asserting SPARQL end point ~q: ~q ~q ~q ~q.',[EP,Host,Port,Path,Options]),
    assert(sparql_endpoint(EP,Host,Port,Path,Options)).
 
 retract_declared_endpoint(EP,Url) :-
    sparql_endpoint(EP,Host,Port,Path,_),
-   format('% WARNING: Updating already registered SPARQL end point ~w.\n',[Url]),
+   format('% WARNING: Updating already registered SPARQL end point ~q.\n',[Url]),
    retractall(sparql_endpoint(EP,Host,Port,Path,_)),
    !.
 retract_declared_endpoint(_,_).
@@ -300,7 +300,7 @@ sparql_endpoint_url(EP,Url) :- sparql_endpoint(EP,Url,_,_,_).
 
 
 endpoint_declaration(EP,Url,Options, sparqlprog:sparql_endpoint(EP,Host,Port,Path,Options)) :-
-	debug(sparqlprog,'Declaring SPARQL end point ~w: ~w ~w ~w ~w.',[EP,Host,Port,Path,Options]),
+	debug(sparqlprog,'Declaring SPARQL end point ~q: ~q ~q ~q ~q.',[EP,Host,Port,Path,Options]),
    url_endpoint(Url,Host,Port,Path).
 
 url_endpoint(Url,Host,Port,Path) :-
@@ -364,7 +364,7 @@ query_goal(EP,Goal,Opts) :-
                      cons(limit(Limit))
                   ) 
                ), Opts, Opts1),
-      debug(sparqlprog,'DCG: ~w ~w ~w',[Vars,Goal,Opts1]),
+      debug(sparqlprog,'DCG: ~q ~q ~q',[Vars,Goal,Opts1]),
       phrase_to_sparql(select(Vars,Goal,Opts1),SPARQL),
       parallel_query(Query,EPs,EP-Result)
    ).
@@ -394,9 +394,9 @@ create_sparql_select(Select,Goal,SPARQL,Opts) :-
 create_sparql_select(Select,Goal,SPARQL,Opts) :-
         filter_opts(Opts,OptsFiltered),
         rewrite_goal(Goal,Goal2),
-        debug(sparqlprog,'Rewritten goal2: ~w',[Goal2]),
+        debug(sparqlprog,'Rewritten goal2: ~q',[Goal2]),
         term_variables(Select,Vars),
-        debug(sparqlprog,'Vars: ~w',[Vars]),        
+        debug(sparqlprog,'Vars: ~q',[Vars]),        
         (   Vars = [] % if no variables, do an ASK query, otherwise, SELECT
         ->  phrase_to_sparql(ask(Goal2),SPARQL)
         ;   setting(limit,DefaultLimit),
@@ -475,7 +475,7 @@ create_sparql_construct(Head,Goal,SPARQL) :-
 create_sparql_construct(Head,Goal,SPARQL,Opts) :-
    rewrite_goal(Goal,Goal2),
    rewrite_goal(Head,Head2),
-   debug(sparqlprog,'Rewritten: ~w <- ~w',[Head2,Goal2]),        
+   debug(sparqlprog,'Rewritten: ~q <- ~q',[Head2,Goal2]),        
    phrase_to_sparql(construct(Head2,Goal2,Opts),SPARQL).
 
 
@@ -580,6 +580,6 @@ downcase_first_char(A,A2) :-
 %  endpoints will be tried sequentially. 
 query_sparql(EP,SPARQL,Result) :-
    sparql_endpoint(EP,Host,Port,Path,EPOpts),
-   debug(sparqlprog,'Querying endpoint http://~w:~w~w',[Host,Port,Path]),
+   debug(sparqlprog,'Querying endpoint http://~q:~q~q',[Host,Port,Path]),
    sparql_query(SPARQL,Result,[host(Host),port(Port),path(Path)|EPOpts]).
 

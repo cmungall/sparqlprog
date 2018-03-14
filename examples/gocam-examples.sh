@@ -20,3 +20,16 @@ pq-go "kinase_activity(A),regulates(A,A2),enabled_by(A,G)"
 # ---
 pq-go -C "rdf(X,dc:contributor,Y),rdf(X,rdf:type,owl:'Ontology')"
 
+# ---
+# search: classes with label ending in morphogenesis
+# ---
+pq-go 'label(C,L),regex(str(L),"morphogenesis$")' "x(C,L)"
+
+# with flags (case insensitive)
+pq-go 'label(C,L),regex(str(L),"morphogenesis$","i")' "x(C,L)"
+
+# same, using owl_util lsearch/4
+pq-go 'lsearch("morphogenesis$",C,L,"i")'
+
+# same, using shorthand syntax
+pq-go / lsearch morphogenesis$ .. i

@@ -5,6 +5,9 @@
 
 :- module(monarch,
           [
+
+           protein_coding_gene/1,
+           human_gene/1,
            disease_to_phenotype_SD/2,
            disease_to_phenotype_EE/4,
            disease_to_phenotype_EE/2,
@@ -27,7 +30,7 @@ id_uri(ID,URI) :-
         concat_atom([Pre,Frag],':',ID),
         concat_atom(['http://purl.obolibrary.org/obo/',Pre,'_',Frag],URI).
 
-
+% Each property declared with pname_id generates a binary predicate
 user:term_expansion(pname_id(P,Id),
                     [(   Head :- Body),
                      (:- initialization(export(P/2), now))
@@ -36,6 +39,10 @@ user:term_expansion(pname_id(P,Id),
         id_uri(Id,Px),
         Body = rdf(S,Px,O).
 
+% Each class name declared with cname_id generates
+%  - A unary predicate cname(Inst)
+%  - A unary predicate cname_inf(Ins) [inferred]
+%  - A unary predicate isa_cname(C) [inferred]
 user:term_expansion(cname_id(C,Id),
                     [Rule,
                      RuleInf,
@@ -61,6 +68,11 @@ user:term_expansion(cname_id(C,Id),
         RuleIsa = (Head3 :- Body3).
 
 
+%! disease_to_phenotype_EE(?D,?P) is nondet
+%
+% true if D has P, 
+% and where the assertion may be anything equivalent to D
+% or anything equivalent to P
 disease_to_phenotype_EE(D,P) :-
         disease_to_phenotype_EE(D,P,_,_).
 disease_to_phenotype_EE(D,P,Dx,Px) :-
@@ -68,10 +80,20 @@ disease_to_phenotype_EE(D,P,Dx,Px) :-
         has_phenotype(Dx,Px),
         owl_equivalent_class(Px,P).
 
+%! disease_to_phenotype_ED(?D,?P) is nondet
+%
+% true if D has P, 
+% and where the assertion may be anything equivalent to D
+% and directly to P
 disease_to_phenotype_ED(D,P) :-
         owl_equivalent_class(D,Dx),
         has_phenotype(Dx,P).
 
+%! disease_to_phenotype_ED(?D,?P) is nondet
+%
+% true if D has P, 
+% and where the assertion may be any subclass of D
+% and directly to P
 disease_to_phenotype_SD(D,P) :-
         rdfs_subclass_of(Ds,D),
         owl_equivalent_class(Ds,Dx),
@@ -83,8 +105,13 @@ disease_to_phenotype_SX(D,P,Dx,Px) :-
         has_phenotype(Dx,Px),
         owl_equivalent_class(Px,P).
 
+
+protein_coding_gene(G) :- rdfs_subclass_of(G,obo:'SO_0001217').
+human_gene(G) :-     protein_coding_gene(G), in_taxon(G,obo:'NCBITaxon_9606').
+
         
-        
+% in RO        
+%pname_id(has_phenotype, 'RO:0002200').
 
 
 % cut -f1,2 biolink-model.tsv | grep : | perl -npe 's@\|SIO:\d+@@' | tbl2p -p cname_id
@@ -116,3 +143,7 @@ cname_id('biological_process', 'GO:0008150').
 cname_id('cellular_component', 'GO:0005575').
 cname_id('cell', 'GO:0005623').
 
+/*
+
+
+*/

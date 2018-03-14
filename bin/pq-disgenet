@@ -1,0 +1,2 @@
+#!/bin/sh
+pl2sparql  -s disgenet  -u sparqlprog/ontologies/disgenet "$@"

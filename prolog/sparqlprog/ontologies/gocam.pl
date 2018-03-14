@@ -9,6 +9,7 @@
            model_title/2,
            model_state/2,
            production_model/1,
+           model_gene/2,
            
            gene_to_function/2,
            gene_to_process/2,
@@ -66,6 +67,9 @@ model_title(M,T) :- model(M),rdf(M,dc:title,T).
 model_state(M,X) :- model(M),rdf(M,lego:modelstate,X).
 production_model(M) :- model_state(M,"production").
 
-%model_gene(M,G) :-
+model_gene(M,GC) :-
+        ro:enabled_by(_,G,M),
+        rdf(G,rdf:type,GC).
+
         
 

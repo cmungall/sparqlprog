@@ -5,7 +5,9 @@
            in_ontology/2,
            in_ontology/3,
 
-           graph_ontology/2
+           graph_ontology/2,
+
+           ontsearch/4
            ]).
 
 :- use_module(library(sparqlprog)).
@@ -31,3 +33,5 @@ in_ontology(X,O,T) :-
 graph_ontology(G,O) :-
         G == uri(concat('http://purl.obolibrary.org/obo/merged/',ucase(O))).    
 
+ontsearch(O,P,C,L) :- graph_ontology(G,O),rdf(C,rdfs:label,L,G),regex(str(L),P).
+    

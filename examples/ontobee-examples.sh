@@ -21,3 +21,11 @@ pq-ontobee  'rdf(C,P,V),is_literal(V),str_ends(str(V)," ")'
 
 # all redundant subclass assertions
 pq-ontobee -l  "subClassOf(A,B),subClassOf(B,C),subClassOf(A,C)" 
+
+# --------
+# SEARCH
+# --------
+# The '/' indicates that all subsequent arguments are to be assembled into a query term, in this case `ontsearch("uberon","limb$",_,_)`
+# The ontobee module defines ontsearch/4 as a search within an ontology, using the mapping from the obo id (e.g. 'uberon') to
+# the graph in which this is stored in ontobee
+pq-ontobee / ontsearch uberon limb$ _ _

@@ -21,6 +21,14 @@ t-%:
 	$(SWIPL) -l tests/$*_test.pl -g run_tests,halt
 
 
+
+# --------------------
+# Schemas
+# --------------------
+biopax-level3.owl:
+	wget http://www.biopax.org/release/biopax-level3.owl -O $@
+
+
 # --------------------
 # Run pengine
 # --------------------

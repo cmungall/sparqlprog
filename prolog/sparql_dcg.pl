@@ -213,10 +213,10 @@ cond(between(L,U,X)) --> cond((L=<X,X=<U)).
 cond(in(X,Ys))     --> p expr(X), " in ", (p seqmap_with_sep(", ",expr,Ys)).
 cond(str_starts(X,Y))   --> p "strStarts(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
 cond(str_ends(X,Y))   --> p "strEnds(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
-cond(regex(P,V))   --> "regex(", expr(V), ",", quote(at(P)), ")".
-cond(regex(P,V,F)) --> "regex(", expr(V), ",", quote(at(P)),  ",", quote(at(F)), ")".
-cond(regex_str(P,V))   --> "regex(", expr(str(V)), ",", quote(at(P)), ")".
-cond(regex_str(P,V,F)) --> "regex(", expr(str(V)), ",", quote(at(P)),  ",", quote(at(F)), ")".
+cond(regex(S,P))   --> p "regex(", expr(S), ",", quote(at(P)), ")".
+cond(regex(S,P,F)) --> p "regex(", expr(S), ",", quote(at(P)),  ",", quote(at(F)), ")".
+cond(regex_str(S,P))   --> "regex(", expr(str(S)), ",", quote(at(P)), ")".
+cond(regex_str(S,P,F)) --> "regex(", expr(str(S)), ",", quote(at(P)),  ",", quote(at(F)), ")".
 cond(bound(V))     --> "bound(", object(V), ")".
 
 % 17.4.2.1 isIRI
@@ -242,6 +242,7 @@ string_literal_expr(S) --> expr(S).
 
 expr(str_before(Str,Sep)) --> "strBefore(", string_literal_expr(Str), string_literal_expr(Sep), ")".
 expr(str_after(Str,Sep)) --> "strAfter(", string_literal_expr(Str), string_literal_expr(Sep), ")".
+expr(replace(S,P,R)) --> "replace(", string_literal_expr(S), ", ", string_literal_expr(P), ", ", string_literal_expr(R), ")".
 expr(concat(A,B)) --> "concat(", string_literal_expr(A), ", ", string_literal_expr(B), ")".
 expr(ucase(A)) --> "ucase(", string_literal_expr(A), ")".
 expr(lcase(A)) --> "lcase(", string_literal_expr(A), ")".
