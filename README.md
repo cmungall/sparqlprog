@@ -71,7 +71,7 @@ Consult the appropriate section below:
 
 ### Running queries from the command line
 
-First [install][INSTALL.md], making sure the [bin](bin) directory is
+First [install](INSTALL.md), making sure the [bin](bin) directory is
 in your path. This will give you access to the the pl2sparql script.
 
 For full options, run:
@@ -84,7 +84,7 @@ Note you should also have a number of convenience scripts in your
 path. For example the `pq-wd` script is simply a shortcut for
 
 ```
-pl2sparql -s wikidata -u sparqlprog/ontologies/wikidata -s dbpedia ARGS
+pl2sparql -s wikidata -u sparqlprog/ontologies/wikidata  ARGS
 ```
 
 This will give you access to a number of convenience predicates such
