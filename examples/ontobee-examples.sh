@@ -22,6 +22,9 @@ pq-ontobee  'rdf(C,P,V),is_literal(V),str_ends(str(V)," ")'
 # all redundant subclass assertions
 pq-ontobee -l  "subClassOf(A,B),subClassOf(B,C),subClassOf(A,C)" 
 
+# class labels that match exact synonyms of other classes
+pq-ontobee -l -u obo_metadata/oio  'has_exact_synonym(C1,N),label(C2,N),C1\=C2'
+
 # --------
 # SEARCH
 # --------
