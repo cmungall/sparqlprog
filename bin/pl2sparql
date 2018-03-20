@@ -157,6 +157,11 @@ a2t(A,T) :-
         ->  T='_'
         ;   sformat(T,'~q',[A])).
 
+run([describe,X|_Args], Opts) :-
+        !,
+        Q=owl_node_info(X,P,O,G),
+        exec_query(Q, Q, ['P'=P,'O'=O,'G'=G], Opts).
+
 run(['/',Pred|Args], Opts) :-
         !,
         % shorthand syntax for terms: / Pred Args

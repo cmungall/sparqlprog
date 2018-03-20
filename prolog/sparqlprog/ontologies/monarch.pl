@@ -8,6 +8,12 @@
 
            protein_coding_gene/1,
            human_gene/1,
+           disease_to_gene/2,
+           is_marker_for/2,
+           association/4,
+           association/5,
+           has_phenotype_association/3,
+           has_phenotype_association/4,
            disease_to_phenotype_SD/2,
            disease_to_phenotype_EE/4,
            disease_to_phenotype_EE/2,
@@ -20,6 +26,7 @@
 
 %:- sparql_endpoint( monarch, 'http://rdf.monarchinitiative.org/sparql').
 
+:- rdf_register_prefix(oban,'http://purl.org/oban/').
 :- rdf_register_prefix(foaf,'http://xmlns.com/foaf/0.1/').
 :- rdf_register_prefix(obo,'http://purl.obolibrary.org/obo/').
 :- rdf_register_prefix(mondo,'http://purl.obolibrary.org/obo/MONDO_').
@@ -68,6 +75,24 @@ user:term_expansion(cname_id(C,Id),
         RuleIsa = (Head3 :- Body3).
 
 
+association(A,S,P,O) :-
+        rdf(A,oban:association_has_subject,S),
+        rdf(A,oban:association_has_object,O),
+        rdf(A,oban:association_has_predicate,P).
+
+association(A,S,P,O,Src) :-
+        association(A,S,P,O),
+        rdf(A,dc:source,Src).
+
+has_phenotype_association(A,S,O) :-
+        has_phenotype_iri(P),
+        association(A,S,P,O).
+
+has_phenotype_association(A,S,O,Src) :-
+        has_phenotype_association(A,S,O),
+        rdf(A,dc:source,Src).
+
+
 %! disease_to_phenotype_EE(?D,?P) is nondet
 %
 % true if D has P, 
@@ -104,6 +129,11 @@ disease_to_phenotype_SX(D,P,Dx,Px) :-
         owl_equivalent_class(Ds,Dx),
         has_phenotype(Dx,Px),
         owl_equivalent_class(Px,P).
+
+
+d2v(D,V) :- is_marker_for(V,D).
+disease_to_gene(D,G) :- is_marker_for(V,D),rdf(V,obo:'GENO_0000418',G).
+
 
 
 protein_coding_gene(G) :- rdfs_subclass_of(G,obo:'SO_0001217').

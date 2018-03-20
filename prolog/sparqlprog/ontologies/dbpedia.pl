@@ -12,6 +12,7 @@ expose a subclass of dbpedia for demo purposes
           [person/1,
            musical_artist/1,
            photographer/1,
+           disease/1,
 
            child/2,
            has_director/2,
@@ -44,3 +45,5 @@ related_to(S,O) :- child(O,S).
 
 photographer(X) :- rdf(X,rdf:type,dbont:'Photographer').
 musical_artist(X) :- rdf(X,rdf:type,dbont:'MusicalArtist').
+
+disease(X) :- rdf(X,rdf:type,dbont:'Disease').

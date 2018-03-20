@@ -7,7 +7,7 @@ pl2sparql  -u sparqlprog/ontologies/ebi -u sparqlprog/ontologies/faldo  -s ebi "
   protein_coding_gene(G), \
   location(G,L,B,E,grcm38:'11'), \
   B >= 101100523,E =< 101190725, \
-  homologous_to(G,H),in_taxon(H,taxon:'9606')" \
+  orthologous_to(G,H),in_taxon(H,taxon:'9606')" \
   "h(G,H)"
 ```
 

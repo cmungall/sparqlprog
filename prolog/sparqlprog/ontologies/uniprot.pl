@@ -15,7 +15,10 @@
 
            in_taxon/2,
            in_human/1,
+
+           reviewed/1,
            annotation/2,
+           database/2,
 
            substitution/2,
 
@@ -23,7 +26,9 @@
            xref_interpro/2,
            xref_panther/2,
            xref_pro/2,
-           
+           is_interpro/1,
+           is_panther/1,
+           is_pro/1,
            has_full_name/2,
 
            pref_label/2,
@@ -35,6 +40,7 @@
 
 
 :- rdf_register_prefix(up,'http://purl.uniprot.org/core/').
+:- rdf_register_prefix(updb,'http://purl.uniprot.org/database/').
 :- rdf_register_prefix(uniprot,'http://purl.uniprot.org/uniprot/').
 :- rdf_register_prefix(uptaxon,'http://purl.uniprot.org/taxonomy/').
 :- rdf_register_prefix(skos, 'http://www.w3.org/2004/02/skos/core#').
@@ -67,7 +73,9 @@ pref_label(E,N) :- rdf(E,skos:prefLabel,N).
 in_taxon(P,T) :- rdf(P,up:organism,T).
 
 annotation(P,A) :- rdf(P,up:annotation,A).
+database(X,D) :- rdf(X,up:database,D).
 
+    
 ann_range(P,B,E,R) :-
         rdf(P,up:range,I),
         begin_coord(I,B,R),
@@ -82,14 +90,31 @@ xref(P,X) :- rdf(P,rdfs:seeAlso,X).
 
 :- srule(xref_interpro,[protein:uniprotPurl, xref:interproPurl ],
          'Maps protein to domain').
+
+/*
+
+  too slow
+  
 xref_interpro(P,D) :- xref(P,D),str_starts(str(D),'http://purl.uniprot.org/interpro/').
 xref_panther(P,F) :- xref(P,F),str_starts(str(F),'http://purl.uniprot.org/panther/').
 xref_pro(P,X) :- xref(P,X),str_starts(str(X),'http://purl.obolibrary.org/obo/PR_').
+*/
+
+xref_interpro(P,X) :- xref(P,X),is_interpro(X).
+xref_panther(P,X) :- xref(P,X),is_panther(X).
+xref_pro(P,X) :- xref(P,X),is_pro(X).
+
+is_interpro(X) :- database(X,updb:'InterPro').
+is_panther(X) :- database(X,updb:'PANTHER').
+is_pro(X) :- database(X,updb:'PRO').
 
 
 
 % convenience
 in_human(P) :- rdf(P,up:organism,uptaxon:'9606').
+
+reviewed(P) :- rdf(P,up:reviewed,true^^xsd:boolean).
+
 
 /*
 

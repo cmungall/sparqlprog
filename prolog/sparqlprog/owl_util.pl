@@ -62,6 +62,10 @@ owl_restriction(R, all(P,O)) :-
         owl:onProperty(R,P),
         owl:someValuesFrom(R,O).
 
+owl_node_info(S,P,O,E) :-
+        rdf(S,P,O),
+        bind(S,E).
+
 owl_node_info(S,P,O,Equiv) :-
         owl_equivalent_class(S,Equiv),
         rdf(Equiv,P,O),

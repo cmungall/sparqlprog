@@ -1,7 +1,11 @@
 :- module(ebi,
           [
-           protein_coding_gene/1,
            identifier/2,
+           see_also/2,
+           alt_label/2,
+           protein_coding_gene/1,
+           paralogous_to/2,
+           orthologous_to/2,
            homologous_to/2,
            in_taxon/2,
            transcribed_from/2
@@ -11,6 +15,7 @@
 
 :- sparql_endpoint( ebi, 'https://www.ebi.ac.uk/rdf/services/sparql').
 
+:- rdf_register_prefix(skos, 'http://www.w3.org/2004/02/skos/core#').
 :- rdf_register_prefix(ensembl,'http://rdf.ebi.ac.uk/resource/ensembl/').
 :- rdf_register_prefix(dcterms,'http://purl.org/dc/terms/').
 :- rdf_register_prefix(so, 'http://purl.obolibrary.org/obo/SO_').
@@ -23,7 +28,12 @@
 :- rdf_register_prefix(grcm38, 'http://rdf.ebi.ac.uk/resource/ensembl/90/mus_musculus/GRCm38/').
 
 
-homologous_to(A,B) :- rdf(A,sio:'000558',B).
+
+% B seems to always be identifiers.org
+see_also(A,B) :- rdf(A,rdfs:seeAlso,B).
+
+alt_label(A,B) :- rdf(A,skos:altLabel,B).
+
 in_taxon(A,B) :- rdf(A,ro:'0002162',B).
 
 identifier(A,X) :- rdf(A,dcterms:identifier,X).
@@ -31,3 +41,8 @@ transcribed_from(T,G) :- rdf(T,so:transcribed_from,G).
 
 protein_coding_gene(G) :- rdf(G,rdf:type,so:'0001217').
 
+homologous_to(A,B) :- orthologous_to(A,B).
+homologous_to(A,B) :- paralogous_to(A,B).
+
+orthologous_to(A,B) :- rdf(A,sio:'000558',B).
+paralogous_to(A,B) :- rdf(A,'http://semanticscience.org/resource/SIO:000630',B).  % EBI uses incorrect PURL
