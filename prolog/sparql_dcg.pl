@@ -240,8 +240,8 @@ cond(G)            --> {throw(cond(G))}.
 string_literal_expr(A) --> {atomic(A),atom_string(A,S)},expr(S).
 string_literal_expr(S) --> expr(S).
 
-expr(str_before(Str,Sep)) --> "strBefore(", string_literal_expr(Str), string_literal_expr(Sep), ")".
-expr(str_after(Str,Sep)) --> "strAfter(", string_literal_expr(Str), string_literal_expr(Sep), ")".
+expr(str_before(Str,Sep)) --> "strBefore(", string_literal_expr(Str), ", ", string_literal_expr(Sep), ")".
+expr(str_after(Str,Sep)) --> "strAfter(", string_literal_expr(Str), ", ", string_literal_expr(Sep), ")".
 expr(replace(S,P,R)) --> "replace(", string_literal_expr(S), ", ", string_literal_expr(P), ", ", string_literal_expr(R), ")".
 expr(concat(A,B)) --> "concat(", string_literal_expr(A), ", ", string_literal_expr(B), ")".
 expr(ucase(A)) --> "ucase(", string_literal_expr(A), ")".
