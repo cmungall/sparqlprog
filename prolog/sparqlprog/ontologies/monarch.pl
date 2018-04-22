@@ -14,6 +14,9 @@
            association/5,
            has_phenotype_association/3,
            has_phenotype_association/4,
+           has_phenotype_freq/3,
+
+           phenotype_rel/3,
            disease_to_phenotype_SD/2,
            disease_to_phenotype_EE/4,
            disease_to_phenotype_EE/2,
@@ -23,6 +26,7 @@
 
 :- use_module(library(sparqlprog)).
 :- use_module(library(semweb/rdf11)).
+:- use_module(library(sparqlprog/ontologies/oban)).
 
 %:- sparql_endpoint( monarch, 'http://rdf.monarchinitiative.org/sparql').
 
@@ -32,6 +36,12 @@
 :- rdf_register_prefix(mondo,'http://purl.obolibrary.org/obo/MONDO_').
 :- rdf_register_prefix(so,'http://purl.obolibrary.org/obo/SO_').
 :- rdf_register_prefix(bds,'http://www.bigdata.com/rdf/search#').
+:- rdf_register_prefix(monarch,'https://monarchinitiative.org/').
+
+% TODO
+:- rdf_register_prefix(mgi,'http://www.informatics.jax.org/accession/MGI:').
+:- rdf_register_prefix(orphanet,'http://www.orpha.net/ORDO/Orphanet_').
+
 
 id_uri(ID,URI) :-
         concat_atom([Pre,Frag],':',ID),
@@ -75,14 +85,6 @@ user:term_expansion(cname_id(C,Id),
         RuleIsa = (Head3 :- Body3).
 
 
-association(A,S,P,O) :-
-        rdf(A,oban:association_has_subject,S),
-        rdf(A,oban:association_has_object,O),
-        rdf(A,oban:association_has_predicate,P).
-
-association(A,S,P,O,Src) :-
-        association(A,S,P,O),
-        rdf(A,dc:source,Src).
 
 has_phenotype_association(A,S,O) :-
         has_phenotype_iri(P),
@@ -91,6 +93,10 @@ has_phenotype_association(A,S,O) :-
 has_phenotype_association(A,S,O,Src) :-
         has_phenotype_association(A,S,O),
         rdf(A,dc:source,Src).
+
+has_phenotype_freq(X,P,F) :-
+        has_phenotype_association(X,P,A),
+        rdf(A,monarch:frequencyOfPhenotype,F).
 
 
 %! disease_to_phenotype_EE(?D,?P) is nondet
@@ -139,6 +145,17 @@ disease_to_gene(D,G) :- is_marker_for(V,D),rdf(V,obo:'GENO_0000418',G).
 protein_coding_gene(G) :- rdfs_subclass_of(G,obo:'SO_0001217').
 human_gene(G) :-     protein_coding_gene(G), in_taxon(G,obo:'NCBITaxon_9606').
 
+
+phenotype_rel(Ph,Pr,Y) :-
+        rdf(Ph,owl:equivalentClass,EP),
+        has_part_iri(HasPart),
+        owl_some(EP,HasPart,I),
+        intersection_member(I,M),
+        owl_some(M,Pr,Y).
+
+
+        
+        
         
 % in RO        
 %pname_id(has_phenotype, 'RO:0002200').

@@ -7,6 +7,7 @@
 
            graph_ontology/2,
 
+           searchall/4,
            ontsearch/4
            ]).
 
@@ -14,6 +15,8 @@
 :- use_module(library(semweb/rdf11)).
 
 :- rdf_register_prefix(obmerged,'http://purl.obolibrary.org/obo/merged/').
+
+:- rdf_register_prefix('MONDO','http://purl.obolibrary.org/obo/MONDO_').
 
 typed_in_graph(X,G) :-
         typed_in_graph(X,G,_).
@@ -34,4 +37,5 @@ graph_ontology(G,O) :-
         G == uri(concat('http://purl.obolibrary.org/obo/merged/',ucase(O))).    
 
 ontsearch(O,P,C,L) :- graph_ontology(G,O),rdf(C,rdfs:label,L,G),regex(str(L),P).
+searchall(G,P,C,L) :- rdf(C,rdfs:label,L,G),regex(str(L),P).
     

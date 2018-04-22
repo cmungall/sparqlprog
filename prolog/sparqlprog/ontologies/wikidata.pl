@@ -10,6 +10,9 @@ Note: this module uses macros to generate predicates. For every pname_wid/2 and 
 
 :- module(wikidata,
           [
+
+           property_constraint_pv/4,
+           
            var_drug_condition/4,
            
            enlabel/2,
@@ -39,10 +42,14 @@ user:term_expansion(pname_wid(P,Id),
                      (   Head_s :- Body_s),
                      (   Head_ps :- Body_ps),
                      (   Head_q :- Body_q),
-                     (:- initialization(export(P_s/2), now)),
-                     (:- initialization(export(P_ps/2), now)),
-                     (:- initialization(export(P_q/2), now)),
-                     (:- initialization(export(P/2), now))
+                     (   Head_iri :- true),
+                     (   Head_eiri :- true),
+                     (   :- initialization(export(P_s/2), now)),
+                     (   :- initialization(export(P_ps/2), now)),
+                     (   :- initialization(export(P_q/2), now)),
+                     (   :- initialization(export(P_iri/1), now)),
+                     (   :- initialization(export(P_eiri/1), now)),
+                     (   :- initialization(export(P/2), now))
                     ]) :-
 
         % e.g. p9 ==> P9
@@ -61,6 +68,13 @@ user:term_expansion(pname_wid(P,Id),
         Head_s =.. [P_s,S,O],
         atom_concat('http://www.wikidata.org/prop/',Frag,Px_s),
         Body_s = rdf(S,Px_s,O),
+
+        atom_concat(P,'_iri',P_iri),
+        Head_iri =.. [P_iri,Px],
+
+        atom_concat('http://www.wikidata.org/entity/',Frag,Pe),        
+        atom_concat(P,'_eiri',P_eiri),
+        Head_eiri =.. [P_eiri,Pe],
         
         % ps: Links value from statement
         % wds:Q3-24bf3704-4c5d-083a-9b59-1881f82b6b37 ps:P8 "-13000000000-01-01T00:00:00Z"^^xsd:dateTime
@@ -132,7 +146,7 @@ enlabel(E,N) :- label(E,N),lang(N)="en".
 
 % meta
 subproperty_of(S,O) :- rdf(S,'http://www.wikidata.org/prop/direct/P1647',O).
-exact_match(S,O) :- rdf(S,'http://www.wikidata.org/prop/direct/P2888',O).
+%exact_match(S,O) :- rdf(S,'http://www.wikidata.org/prop/direct/P2888',O).
 
 % info
 %author(S,O) :- rdf(S,'http://www.wikidata.org/prop/direct/P50',O).
@@ -147,9 +161,17 @@ exact_match(S,O) :- rdf(S,'http://www.wikidata.org/prop/direct/P2888',O).
 % meta
 pname_wid(instance_of, p31).
 pname_wid(subclass_of, p279).
+pname_wid(equivalent_property, p1628).
+pname_wid(property_constraint, p2302).
+
+property_constraint_pv(P,C,PP,V) :-
+        property_constraint_e2s(P,S),
+        rdf(S,PP,V),
+        property_constraint_s2v(S,C).
 
 % general
 pname_wid(author, p50).
+pname_wid(exact_match, p2888).
 
 % geo
 pname_wid(coordinate_location, p625).
@@ -164,6 +186,7 @@ pname_wid(uniprot_id, p352).
 pname_wid(ncbigene_id, p351).
 pname_wid(ipr_id, p2926).
 pname_wid(civic_id, p3329).
+pname_wid(ro_id, p3590).
 
 % rels
 pname_wid(encodes, p688).
@@ -184,6 +207,26 @@ pname_wid(positive_prognostic_predictor, p3358).
 pname_wid(negative_prognostic_predictor, p3359).
 pname_wid(medical_condition_treated, p2175).
 
+% beacon
+pname_wid(physically_interacts_with, p129).
+pname_wid(location, p276).
+pname_wid(manifestation_of, p1557).
+pname_wid(part_of, p361).
+pname_wid(followed_by, p156).
+pname_wid(product_or_material_produced, p1056).
+pname_wid(uses, p2283).
+pname_wid(has_effect, p1542).
+pname_wid(drug_used_for_treatment, p2176).
+pname_wid(found_in_taxon, p703).
+pname_wid(ortholog, p684).
+pname_wid(biological_process, p682).
+pname_wid(cell_component, p681).
+pname_wid(molecular_function, p680).
+pname_wid(has_quality, p1552).
+pname_wid(regulates, p128).
+
+
+    
 % CLASSES
 
 % geo
@@ -214,6 +257,7 @@ cname_wid(power_station, q159719).
 
 % TODO
 nary(ptp_var_drug_condition, positive_therapeutic_predictor, medical_condition_treated).
+
 
 
 var_drug_condition(V,D,C,positive_therapeutic_predictor) :-
