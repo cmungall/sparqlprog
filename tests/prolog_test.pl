@@ -6,13 +6,12 @@
 
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(sparqlprog)).
-:- use_module(library(rdf_owl/owl)).
-
-:- use_module(library(sparqlprog)).
 :- use_module(library(sparqlprog/emulate_builtins)).
+:- use_module(library(sparqlprog/owl_util)).
+:- use_module(library(sparqlprog/ontologies/owl)).
 
 % run docker
-:- sparql_endpoint( local, 'http://127.0.0.1:8889/bigdata/sparql').
+%:- sparql_endpoint( local, 'http://127.0.0.1:8889/bigdata/sparql').
 
 :- begin_tests(prolog_test,
                [setup(load_test_file),
@@ -70,9 +69,9 @@ wl(L) :-
                format('~w ~w~n', [X,N])).
 
 
-test(z) :-
-        label(C,"intracellular"),
-        run_test_query(foo,D,rdf(_,_,_),_,_).
+%test(z) :-
+%        label(C,"intracellular"),
+%        run_test_query(foo,D,rdf(_,_,_),_,_).
 
 
 test(path) :-

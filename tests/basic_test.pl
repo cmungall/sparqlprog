@@ -134,13 +134,13 @@ test(rdf_path2) :-
                      "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#subClassOf>* <http://example.org/c1>}").
 
 test(nofilter) :-
-        test_select( (rdf(X,rdfs:label,L),
+        test_select( (rdf(_X,rdfs:label,L),
                       rdf(L,'http://www.bigdata.com/rdf/search#search',"foo")),
                      "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . ?v1 <http://www.bigdata.com/rdf/search#search> \"foo\"}").
 
 test(arith) :-
-        test_select( (rdf(X,'':v,V),
-                      V2 is V/2),
+        test_select( (rdf(_X,'':v,V),
+                      _V2 is V/2),
                      "SELECT ?v0 ?v1 ?v2 WHERE {?v0 <http://example.org/v> ?v1 . BIND( (?v1 / 2) AS ?v2 )}").
 
 %:- debug(sparqlprog).
