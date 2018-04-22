@@ -1,0 +1,159 @@
+@prefix : <http://purl.obolibrary.org/obo/lexmap_test.owl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://purl.obolibrary.org/obo/lexmap_test.owl> .
+
+<http://purl.obolibrary.org/obo/lexmap_test.owl> rdf:type owl:Ontology .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://www.geneontology.org/formats/oboInOwl#hasDbXref
+<http://www.geneontology.org/formats/oboInOwl#hasDbXref> rdf:type owl:AnnotationProperty ;
+                                                         rdfs:label "database_cross_reference"^^xsd:string .
+
+
+###  http://www.geneontology.org/formats/oboInOwl#hasExactSynonym
+<http://www.geneontology.org/formats/oboInOwl#hasExactSynonym> rdf:type owl:AnnotationProperty ;
+                                                               rdfs:label "has_exact_synonym"^^xsd:string .
+
+
+###  http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym
+<http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym> rdf:type owl:AnnotationProperty ;
+                                                                 rdfs:label "has_related_synonym"^^xsd:string .
+
+
+###  http://www.geneontology.org/formats/oboInOwl#id
+<http://www.geneontology.org/formats/oboInOwl#id> rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2000/01/rdf-schema#label
+rdfs:label rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2002/07/owl#deprecated
+owl:deprecated rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://purl.obolibrary.org/obo/lexmap_test#has_participant
+<http://purl.obolibrary.org/obo/lexmap_test#has_participant> rdf:type owl:ObjectProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://purl.obolibrary.org/obo/A_1
+<http://purl.obolibrary.org/obo/A_1> rdf:type owl:Class ;
+                                     <http://www.geneontology.org/formats/oboInOwl#hasDbXref> "X:1"^^xsd:string ;
+                                     <http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym> "skin"^^xsd:string ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "A:1"^^xsd:string ;
+                                     rdfs:label "a1"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/B_1
+<http://purl.obolibrary.org/obo/B_1> rdf:type owl:Class ;
+                                     <http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym> "skin"^^xsd:string ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "B:1"^^xsd:string ;
+                                     rdfs:label "b1"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/OBS_1
+<http://purl.obolibrary.org/obo/OBS_1> rdf:type owl:Class ;
+                                       <http://www.geneontology.org/formats/oboInOwl#id> "OBS:1"^^xsd:string ;
+                                       rdfs:label "heart"^^xsd:string ;
+                                       owl:deprecated "true"^^xsd:boolean .
+
+
+###  http://purl.obolibrary.org/obo/X_0
+<http://purl.obolibrary.org/obo/X_0> rdf:type owl:Class ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "X:0"^^xsd:string ;
+                                     <http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym> "BAD SYNONYM"^^xsd:string ;
+                                     rdfs:label "organ"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/X_1
+<http://purl.obolibrary.org/obo/X_1> rdf:type owl:Class ;
+                                     rdfs:subClassOf <http://purl.obolibrary.org/obo/X_0> ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "X:1"^^xsd:string ;
+                                     <http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym> "BAD SYNONYM"^^xsd:string ;
+                                     rdfs:label "heart"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/X_2
+<http://purl.obolibrary.org/obo/X_2> rdf:type owl:Class ;
+                                     rdfs:subClassOf <http://purl.obolibrary.org/obo/X_0> ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "X:2"^^xsd:string ;
+                                     rdfs:label "lung"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/X_3
+<http://purl.obolibrary.org/obo/X_3> rdf:type owl:Class ;
+                                     rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                                       owl:onProperty <http://purl.obolibrary.org/obo/lexmap_test#has_participant> ;
+                                                       owl:someValuesFrom <http://purl.obolibrary.org/obo/X_1>
+                                                     ] ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "X:3"^^xsd:string ;
+                                     rdfs:label "heart development"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/Y_0
+<http://purl.obolibrary.org/obo/Y_0> rdf:type owl:Class ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "Y:0"^^xsd:string ;
+                                     rdfs:label "organ"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/Y_1
+<http://purl.obolibrary.org/obo/Y_1> rdf:type owl:Class ;
+                                     rdfs:subClassOf <http://purl.obolibrary.org/obo/Y_0> ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "Y:1"^^xsd:string ;
+                                     rdfs:label "heart"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/Y_2
+<http://purl.obolibrary.org/obo/Y_2> rdf:type owl:Class ;
+                                     rdfs:subClassOf <http://purl.obolibrary.org/obo/Y_0> ;
+                                     <http://www.geneontology.org/formats/oboInOwl#hasDbXref> "X:2"^^xsd:string ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "Y:2"^^xsd:string ;
+                                     rdfs:label "LUNG"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/Y_3
+<http://purl.obolibrary.org/obo/Y_3> rdf:type owl:Class ;
+                                     rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                                       owl:onProperty <http://purl.obolibrary.org/obo/lexmap_test#has_participant> ;
+                                                       owl:someValuesFrom <http://purl.obolibrary.org/obo/Y_1>
+                                                     ] ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "Y:3"^^xsd:string ;
+                                     rdfs:label "development of heart"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/ZZ_2
+<http://purl.obolibrary.org/obo/ZZ_2> rdf:type owl:Class ;
+                                      <http://www.geneontology.org/formats/oboInOwl#id> "ZZ:2"^^xsd:string ;
+                                      rdfs:label "z II"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/Z_1
+<http://purl.obolibrary.org/obo/Z_1> rdf:type owl:Class ;
+                                     <http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym> "heart"^^xsd:string ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "Z:1"^^xsd:string ;
+                                     rdfs:label "z 1"^^xsd:string .
+
+
+###  http://purl.obolibrary.org/obo/Z_2
+<http://purl.obolibrary.org/obo/Z_2> rdf:type owl:Class ;
+                                     <http://www.geneontology.org/formats/oboInOwl#hasExactSynonym> "lung"^^xsd:string ;
+                                     <http://www.geneontology.org/formats/oboInOwl#id> "Z:2"^^xsd:string ;
+                                     rdfs:label "z 2"^^xsd:string .
+
+
+###  Generated by the OWL API (version 4.5.0) https://github.com/owlcs/owlapi
