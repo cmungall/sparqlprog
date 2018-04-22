@@ -14,5 +14,6 @@
 :- sparql_endpoint( nextprot, 'https://api.nextprot.org/sparql').
 :- sparql_endpoint( disgenet, 'http://rdf.disgenet.org/sparql/').
 :- sparql_endpoint( wikipathways, 'http://sparql.wikipathways.org').
-:- sparql_endpoint( local, 'http://127.0.0.1:8889/bigdata/sparql').
+:- sparql_endpoint( local, 'http://127.0.0.1:8921/bigdata/sparql').
+:- sparql_endpoint( local2, 'http://127.0.0.1:8922/bigdata/sparql').
     
