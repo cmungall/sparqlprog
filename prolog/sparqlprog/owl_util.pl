@@ -2,10 +2,20 @@
           [owl_some/3,
            owl_all/3,
            owl_equivalent_class/2,
-
+           owl_equivalent_class_asserted/2,
+           thing_class/1,
+           not_thing_class/1,
+           deprecated/1,           
            subclass_of_some/3,
 
            owl_node_info/4,
+
+           eq_intersection_member/2,
+           intersection_member/2,
+           rdflist_member/2,
+
+           class_genus/2,
+           class_differentia/3,
            
            common_ancestor/3,
            mrca/3,
@@ -32,7 +42,18 @@
 :-op(300,xfy,some).
 :-op(300,xfy,all).
 
-owl_equivalent_class(A,B) :- rdf(A,zeroOrMore( (owl:equivalentClass)| \(owl:equivalentClass)),B).
+
+thing_class(owl:'Thing').
+not_thing_class(X) :- X \= owl:'Thing'.
+not_thing_class(X) :- X \= owl:'Thing'.
+
+deprecated(X) :- rdf(X,owl:deprecated,"true"^^xsd:boolean).
+
+
+owl_equivalent_class(A,B) :- rdf_path(A,zeroOrMore( (owl:equivalentClass)| \(owl:equivalentClass)),B).
+owl_equivalent_class_asserted(A,B) :- rdf(A,owl:equivalentClass,B).
+owl_equivalent_class_asserted(A,B) :- rdf(B,owl:equivalentClass,A).
+
 
 
 %! owl_some(?Restr, ?Property, ?Obj) is nondet.
@@ -74,7 +95,24 @@ owl_node_info(S,P,O,Equiv) :-
         owl_equivalent_class(S,Equiv),
         subclass_of_some(Equiv,P,O).
 
+class_genus(C,G) :-
+        eq_intersection_member(C,G),
+        \+ is_blank(G).
+class_differentia(C,P,Y) :-
+        eq_intersection_member(C,R),
+        owl_some(R,P,Y).
 
+eq_intersection_member(C,M) :-
+        rdf(C,owl:equivalentClass,E),
+        intersection_member(E,M).
+
+intersection_member(I,M) :-
+        rdf(I,owl:intersectionOf,L),
+        rdflist_member(L,M).
+
+rdflist_member(L,M) :-
+        rdf_path(L,(zeroOrMore(rdf:rest)/(rdf:first)),M).
+        
 
 common_ancestor(X,Y,A) :-
         rdfs_subclass_of(X,A),
