@@ -21,3 +21,6 @@ pq-wd   "power_station_inf(X),coordinate_location(X,Loc),enlabel(X,XL)"
 # concepts with an exact match to something in SO
 pq-wd  'exact_match(X,URI),str_starts(str(URI),"http://purl.obolibrary.org/obo/SO_")'  
 
+# properties mapped to RO
+pq-wd  'ro_id(P,X)'
+
