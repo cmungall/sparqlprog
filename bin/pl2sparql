@@ -12,10 +12,10 @@
 :- use_module(library(semweb/rdf_cache)).
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/rdfs)).
-%:- rdf_attach_library('void.ttl').
 :- use_module(library(sparqlprog/ontologies/owl), []).
 :- use_module(library(sparqlprog/owl_util)).
 
+% TODO: make configurable
 :- rdf_set_cache_options([ global_directory('RDF-Cache'),
                            create_global_directory(true)
                          ]).
@@ -66,6 +66,11 @@ main(Argv) :-
           longflags([debug]),
           shortflags([d]),
           help('term passed to debug/1')
+         ],
+         [opt(attach), type(atom),
+          longflags([attach]),
+          shortflags(['A']),
+          help('rdf_attach_library - path to void.ttl')
          ],
          [opt(service), type(atom),
           longflags([service]),
@@ -118,7 +123,7 @@ main(Argv) :-
           type(boolean),
           default(false),
           longflags([execute]),
-          shortflags(['e']),
+          shortflags([e]),
           help('Executes query directly in prolog')
          ],
          [opt(query), type(term),
@@ -136,11 +141,20 @@ main(Argv) :-
 handle_opts(Opts) :-
         opt_if_call(verbose,debug(sparqlprog),Opts),
         opt_if_call(stacktrace,use_module(library(sparqlprog/stacktrace)),Opts),
+        opt_forall(attach(X),rdf_attach_library(X),Opts),
+        opt_forall(goal(X),X,Opts),
         opt_forall(debug(X),debug(X),Opts),
         opt_forall(use(X),use_module(library(X)),Opts),
         opt_forall(use_no_import(X),use_module(library(X),[]),Opts),
         opt_forall(consult(X),consult(X),Opts),
-        opt_forall(input(X),rdf_load(X),Opts).
+        opt_forall(input(X),rdf_load_wrap(X),Opts).
+
+rdf_load_wrap(X) :-
+        catch(rdf_load(X),
+              _E,
+              rdf_load_library(X)).
+
+
 
 a2t(A,T) :-
         atom_chars(A,Chars),
@@ -157,9 +171,18 @@ a2t(A,T) :-
         ->  T='_'
         ;   sformat(T,'~q',[A])).
 
+atom_uri(A,U) :-
+        atom(A),
+        concat_atom([Pre,Frag],':',A),
+        rdf_current_prefix(Pre,_),
+        rdf_global_id(Pre:Frag,U),
+        !.
+atom_uri(A,A).
+
 run([describe,X|_Args], Opts) :-
         !,
-        Q=owl_node_info(X,P,O,G),
+        atom_uri(X,X2),
+        Q=owl_node_info(X2,P,O,G),
         exec_query(Q, Q, ['P'=P,'O'=O,'G'=G], Opts).
 
 run(['/',Pred|Args], Opts) :-
@@ -249,6 +272,7 @@ exec_query_direct(Select, Query, _Bindings, Opts) :-
         option(execute(true),Opts),
         % execute in prolog
         !,
+        ensure_loaded(library(sparqlprog/emulate_builtins)),
         (   option(inject_labels(true),Opts)
         ->  Opts2=[dynlabel(true)|Opts]
         ;   Opts2=Opts),
