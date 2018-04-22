@@ -12,6 +12,7 @@ https://www.w3.org/TR/sparql11-query/#expressions
            str_starts/2,
            str_ends/2,
            str_before/3,
+           str_after/3,
 
            str_replace/4,
 
@@ -90,6 +91,14 @@ str_before(S,Sep,Sub) :-
         ->  atom_string(Sub1,Sub)
         ;   ensure_atom(Sub,Sub1)).
 
+%! str_after(+S:strlike, +Sep:strlike,  ?Sub:strlike) is det
+str_after(S,Sep,Sub) :-
+        ensure_atom(S,S1),
+        ensure_atom(Sep,Sep1),
+        atomic_list_concat([_|Toks],Sep1,S1),
+        atomic_list_concat(Toks,Sep1,Sub1),
+        ensure_atom(Sub,Sub1).
+
 %! str_replace(+S:strlike, +Match:strlike, +Replace:strlike,  ?NewStr:strlike) is det
 str_replace(S,In,Out,NewS) :-
         ensure_atom(S,S1),
@@ -128,6 +137,8 @@ rdf_path(A,oneOrMore(P),B,G) :-  rdf_path(A,P,B,G).
 rdf_path(A,oneOrMore(P),B,G) :-  rdfx(A,P,Z,G),rdf_path(Z,oneOrMore(P),B,G).
 rdf_path(A,P,B,G) :- rdfx(A,P,B,G).
 
+% true if there is a triple A-P-B in G
+% where P is either a URI or an atom representation of a CURIE
 rdfx(A,P,B,G) :-
         ground(P),
         rdf_global_id(P,Px),
