@@ -203,10 +203,10 @@ cond(X=<Y)  --> p expr(X), " <= ", expr(Y).
 cond(X>=Y)  --> p expr(X), " >= ", expr(Y).
 cond(X>Y)   --> p expr(X), " > ", expr(Y).
 cond(X<Y)   --> p expr(X), " < ", expr(Y).
-cond(X@<Y)   --> p expr(X), " < ", expr(Y).
-cond(X@=<Y)   --> p expr(X), " <= ", expr(Y).
-cond(X@>Y)   --> p expr(X), " > ", expr(Y).
-cond(X@>=Y)   --> p expr(X), " >= ", expr(Y).
+cond(X@<Y)   --> p expr(str(X)), " < ", expr(str(Y)).
+cond(X@=<Y)   --> p expr(str(X)), " <= ", expr(str(Y)).
+cond(X@>Y)   --> p expr(str(X)), " > ", expr(str(Y)).
+cond(X@>=Y)   --> p expr(str(X)), " >= ", expr(str(Y)).
 cond(between(L,U,X)) --> cond((L=<X,X=<U)).
 
 % 17.4.1.9 IN
@@ -298,6 +298,6 @@ uri(U) --> {atom(U)}, "<", at(U), ">".
 quote(P) --> "\"", escape_with(0'",0'\\,P), "\"".
 variable(v(V))  --> "?", at(V).
 variable(V)  --> {var_number(V,N)}, "?v", at(N).
-variable(@V) --> "_:", {atomic(V) -> N=V; var_number(V,N)}, at(N).
+variable('@'(V)) --> "_:", {atomic(V) -> N=V; var_number(V,N)}, at(N).
 variable(@)  --> "[]".
 

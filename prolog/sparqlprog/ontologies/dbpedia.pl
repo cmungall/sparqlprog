@@ -14,7 +14,9 @@ expose a subclass of dbpedia for demo purposes
            photographer/1,
            disease/1,
 
-           child/2,
+           has_child/2,
+           child_of/2,
+           descendant_of/2,
            has_director/2,
            directed/2,
            band_member/2,
@@ -34,13 +36,19 @@ has_name(S,L) :- rdf(S,foaf:'Name',L).
 
 has_director(S,O) :- rdf(S,dbont:director,O).
 directed(S,O) :- rdf(O,dbont:director,S).
-child(S,O) :- rdf(S,dbont:child,O).
+has_child(S,O) :- rdf(S,dbont:child,O).
+child_of(S,O) :- rdf(O,dbont:child,S).
+descendant_of(S,O) :- rdf_path(O,oneOrMore(dbont:child),S).
 
 band_member(S,O) :- rdf(S,dbont:bandMember,O).
 
 
-related_to(S,O) :- child(S,O).
-related_to(S,O) :- child(O,S).
+related_to(S,O) :- has_child(S,O).
+related_to(S,O) :- has_child(O,S).
+
+grandchild_of(S,O) :- child_of(S,Z),child_of(Z,O).
+
+
 
 
 photographer(X) :- rdf(X,rdf:type,dbont:'Photographer').

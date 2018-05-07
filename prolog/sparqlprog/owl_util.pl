@@ -7,7 +7,7 @@
            not_thing_class/1,
            deprecated/1,           
            subclass_of_some/3,
-
+           subclass_cycle/1,
            owl_node_info/4,
 
            eq_intersection_member/2,
@@ -35,7 +35,6 @@
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/rdfs)).
 :- use_module(library(sparqlprog/ontologies/owl), []).
-:- use_module(library(regex)).
 
 :- reexport(library(sparqlprog/ontologies/owl), [ label/2, subClassOf/2 ]).
 
@@ -53,6 +52,10 @@ deprecated(X) :- rdf(X,owl:deprecated,"true"^^xsd:boolean).
 owl_equivalent_class(A,B) :- rdf_path(A,zeroOrMore( (owl:equivalentClass)| \(owl:equivalentClass)),B).
 owl_equivalent_class_asserted(A,B) :- rdf(A,owl:equivalentClass,B).
 owl_equivalent_class_asserted(A,B) :- rdf(B,owl:equivalentClass,A).
+
+
+
+subclass_cycle(A) :- rdf_path(A,oneOrMore(rdfs:subClassOf),A).
 
 
 

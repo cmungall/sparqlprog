@@ -131,14 +131,10 @@ enlabel(E,N) :- label(E,N),lang(N)="en".
 % --------------------
 
 % geography
-%continent(I) :- rdf(I,instance_of:'',wd:'Q5107').
-%country(I) :- rdf(I,instance_of:'',wd:'Q6256').
-%city(I) :- rdf(I,instance_of:'',wd:'Q515').
 
 % disease
 %cancer(I) :- rdf(I,instance_of:'',wd:'Q12078').
-
-:- initialization(export(cancer/1), now).
+%:- initialization(export(cancer/1), now).
 
 % --------------------
 % predicates
@@ -187,6 +183,11 @@ pname_wid(ncbigene_id, p351).
 pname_wid(ipr_id, p2926).
 pname_wid(civic_id, p3329).
 pname_wid(ro_id, p3590).
+pname_wid(mesh_id, p486).
+pname_wid(go_id, p686).
+pname_wid(ncbitaxon_id, p685).
+pname_wid(uberon_id, p1554).
+pname_wid(umls_id, p2892).
 
 % rels
 pname_wid(encodes, p688).
@@ -233,11 +234,18 @@ pname_wid(regulates, p128).
 cname_wid(continent, q5107).
 cname_wid(country, q6256).
 cname_wid(city, q515).
+pname_wid(population, p1082).
+pname_wid(part_of_continent, p30).
+
 
 % bio
 cname_wid(cancer, q12078).
 cname_wid(disease, q12136).
 cname_wid(infectious_disease, q18123741).
+
+cname_wid(chemical_compound, q11173).
+cname_wid(chemical_element, q11344).
+cname_wid(drug, q12140).
 
 cname_wid(symptom, q169872).
 cname_wid(medical_finding, q639907).
