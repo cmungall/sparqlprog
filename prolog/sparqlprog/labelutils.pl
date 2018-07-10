@@ -13,6 +13,7 @@ label_atom(S,A) :-
         atom_string(A,S).
 label_atom(X,A) :-
         \+ compound(X),
+        atom(X),
         rdf(X,rdfs:label,S^^_),
         atom_string(A,S).
 

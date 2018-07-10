@@ -7,4 +7,6 @@ maintainer('Chris Mungall','cjmungall@lbl.gov').
 packager('Chris Mungall','cjmungall@lbl.gov').
 download('https://github.com/cmungall/sparqlprog/releases/*.zip' ).
 requires(dcgutils).
+requires(regex).
+
 

@@ -3,6 +3,7 @@
            owl_all/3,
            owl_equivalent_class/2,
            owl_equivalent_class_asserted/2,
+           owl_equivalent_class_asserted_symm/2,
            thing_class/1,
            not_thing_class/1,
            deprecated/1,           
@@ -16,20 +17,20 @@
 
            class_genus/2,
            class_differentia/3,
+
+           owl_edge/3,
+           owl_edge/4,
+           owl_subgraph/4,
+
+           quads_dict/2,
            
            common_ancestor/3,
            mrca/3,
            common_descendant/3,
            mrcd/3,
 
-           psearch/5,
-           psearch/4,
-           psearch/3,
-           
-           lsearch/2,
-           lsearch/3,
-           lsearch/4,
-           lsearch/5
+           simj_by_subclass/3,
+           simj_by_subclass/5
           ]).
 
 :- use_module(library(semweb/rdf11)).
@@ -53,6 +54,10 @@ owl_equivalent_class(A,B) :- rdf_path(A,zeroOrMore( (owl:equivalentClass)| \(owl
 owl_equivalent_class_asserted(A,B) :- rdf(A,owl:equivalentClass,B).
 owl_equivalent_class_asserted(A,B) :- rdf(B,owl:equivalentClass,A).
 
+owl_equivalent_class_asserted_symm(A,B) :-
+        (   rdf(A,owl:equivalentClass,B)
+        ;    rdf(B,owl:equivalentClass,A)).
+
 
 
 subclass_cycle(A) :- rdf_path(A,oneOrMore(rdfs:subClassOf),A).
@@ -66,6 +71,9 @@ owl_some(R,P,O) :-
         owl:onProperty(R,P),
         owl:someValuesFrom(R,O).
 
+%! subclass_of_some(?Cls, ?Property, ?Obj) is nondet.
+%
+% true if Cls is a subclass of the expression SomeValuesFrom(Property,Obj)
 subclass_of_some(C,P,O) :-
         owl:subClassOf(C,R),
         owl_some(R,P,O).
@@ -113,6 +121,7 @@ intersection_member(I,M) :-
         rdf(I,owl:intersectionOf,L),
         rdflist_member(L,M).
 
+% use rdfs_member/2 ?
 rdflist_member(L,M) :-
         rdf_path(L,(zeroOrMore(rdf:rest)/(rdf:first)),M).
         
@@ -127,7 +136,7 @@ mrca(X,Y,A) :-
         \+ ((common_ancestor(X,Y,A2),
              rdf_path(A2,oneOrMore(rdfs:subClassOf),A))).
 
-
+% NOTE: some of these may move to a utility library
 common_descendant(X,Y,D) :-
         rdfs_subclass_of(D,X),
         rdfs_subclass_of(D,Y),
@@ -138,16 +147,98 @@ mrcd(X,Y,D) :-
         \+ ((common_descendant(X,Y,D2),
              rdf_path(D,oneOrMore(rdfs:subClassOf),D2))).
 
-% ----------------------------------------
-% lexical
-% ----------------------------------------
+:- rdf_meta owl_edge(r,r,r,o).
+:- rdf_meta owl_edge(r,r,r).
 
-lsearch(P,C,L,F,G) :-   rdf(C,rdfs:label,L,G),regex(str(L),P,F).
-lsearch(P,C,L,F) :-   label(C,L),regex(str(L),P,F).
-lsearch(P,C,L) :-   label(C,L),regex(str(L),P).
-lsearch(P,C) :-   label(C,L),regex(str(L),P).
+%! owl_edge(?S,?P,?O,?G) is nondet.
+%! owl_edge(?S,?P,?O) is nondet.
+%
+% An edge in an existential graph
+owl_edge(S,P,O) :-
+        owl_edge(S,P,O,_).
 
-psearch(P,C,R,L,F) :-   rdf(C,R,L),regex(str(L),P,F).
-psearch(P,C,R,L) :-   rdf(C,R,L),regex(str(L),P).
-psearch(P,C,R) :-   rdf(C,R,L),regex(str(L),P).
+owl_edge(S,P,O,G) :-
+        rdf(S,rdfs:subClassOf,R,G),
+        owl_some(R,P,O).
+owl_edge(S,rdfs:subClassOf,O,G) :-
+        rdf(S,rdfs:subClassOf,O,G),
+        owl:class(O).
 
+%! node_ancestor_graph_edge(?Node,?S,?P,?O,?G) is nondet.
+%
+%  true if S is a reflexive superclass ancestor of Node,
+%  and SPO is a triple in G
+node_ancestor_graph_edge(Node,S,P,O,G) :-
+        rdfs_subclass_of(Node,S),
+        rdf(S,P,O,G).
+
+%! owl_subgraph(+Nodes:list, +Preds:list, ?Triples:list, +Opts:list) is det.
+%
+%  traverses owl edge graph starting from a predefined set of nodes
+owl_subgraph(Nodes,Preds,Triples,Opts) :-
+        owl_subgraph(Nodes,Preds,[],Triples,[],Opts).
+
+%! owl_subgraph(+Nodes:list, +Preds:list, +Triples:list, ?FinalTriples:list, +Visited:list, +Opts:list) is det.
+owl_subgraph([],_,Triples,Triples,_,_).
+owl_subgraph([Node|Nodes],Preds,Triples,FinalTriples,Visited,Opts) :-
+        \+ member(Node,Visited),
+        setof(rdf(Node,P,O,G),(owl_edge(Node,P,O,G),opt_member(P,Preds)),NewTriples),
+        !,
+        setof(O,S^P^G^member(rdf(S,P,O,G),NewTriples),NewNodes),
+        ord_union(Triples,NewTriples,AccTriples),
+        append(Nodes,NewNodes,NextNodes),
+        owl_subgraph(NextNodes,Preds,AccTriples,FinalTriples,[Node|Visited],Opts).
+owl_subgraph([_|Nodes],Preds,Triples,FinalTriples,Visited,Opts) :-
+        owl_subgraph(Nodes,Preds,Triples,FinalTriples,Visited,Opts).
+
+opt_member(_,L) :- var(L),!.
+opt_member(X,L) :- member(X,L).
+
+quads_object(Quads,E) :-
+        member(rdf(S,P,O,_),Quads),
+        (   E=S
+        ;   E=P
+        ;   E=O).
+
+quads_dict(Quads, Dict) :-
+        setof(E,quads_object(Quads,E),Es),
+        maplist(owl_object_dict, Es,  Nodes),
+        maplist(quad_dict, Quads,  Edges),
+        Dict = graph{nodes:Nodes, edges:Edges}.
+
+quad_dict(rdf(S,P,O,_), Dict) :-
+        ensure_curie(S, Sx),
+        ensure_curie(P, Px),
+        ensure_curie_or_atom(O, Ox),
+        Dict = edge{sub:Sx, pred:Px, obj:Ox}. 
+owl_object_dict(C, Dict) :-
+        ensure_curie(C, Id),
+        (   label(C,N1)
+        ->  true
+        ;   N1=C),
+        ensure_curie_or_atom(N1, N),
+        Meta = meta{},
+        Dict = node{id:Id, lbl:N, meta:Meta}.
+
+ensure_curie_or_atom(R ^^ _, R) :- !.
+ensure_curie_or_atom(R @ _, R) :- !.
+ensure_curie_or_atom(R, Id) :-
+        ensure_curie(R, Id).
+
+ensure_curie(In, Id) :-
+        rdf_global_id(In, Uri),
+        rdf_global_id(Id1, Uri),
+        sformat(Id,'~w',[Id1]).
+
+% TODO: move to other module
+simj_by_subclass(C1,C2,S) :-
+        simj_by_subclass(C1,C2,S,_,_).
+simj_by_subclass(C1,C2,S,N1,N2) :-
+        owl:class(C1),
+        owl:class(C2),
+        aggregate(count,X,(rdfs_subclass_of(X,C1) , rdfs_subclass_of(X,C2)),N1),
+        aggregate(count,X,(rdfs_subclass_of(X,C1) ; rdfs_subclass_of(X,C2)),N2),
+        N2 > 0,
+        S is N1/N2.
+
+        

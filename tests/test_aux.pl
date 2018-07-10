@@ -4,6 +4,8 @@
            unify_with_iri/1,
            a/1,
            b/1,
+           mammal/1,
+           is_mammal/1,
            refl/2,
            recursive_subclass_of/2]).
 
@@ -34,4 +36,9 @@ refl(A,B) :- a(A),B=A.
 
 %% TODO: allow this
 %% refl(A,A) :- a(A).
+
+mammal('':cat).
+mammal('':dog).
+
+is_mammal(X) :- mammal(T),rdf(X,rdf:type,T).
 

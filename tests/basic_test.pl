@@ -143,6 +143,16 @@ test(arith) :-
                       _V2 is V/2),
                      "SELECT ?v0 ?v1 ?v2 WHERE {?v0 <http://example.org/v> ?v1 . BIND( (?v1 / 2) AS ?v2 )}").
 
+% rdf11 preds
+test(substring) :-
+        test_select( ({substring(L,foo)},rdf(_,rdfs:label,L)),
+                     "SELECT ?v0 ?v1 WHERE {FILTER (contains(?v0,\"foo\")) . ?v1 <http://www.w3.org/2000/01/rdf-schema#label> ?v0}").
+test(like1) :-
+        test_select( ({like(L,'foo*')},rdf(_,rdfs:label,L)),
+                     "SELECT ?v0 ?v1 WHERE {FILTER (regex(?v0,\"^foo.*\",\"i\")) . ?v1 <http://www.w3.org/2000/01/rdf-schema#label> ?v0}").
+
+
+
 %:- debug(sparqlprog).
 
 %xxxtest(refl) :-
@@ -157,6 +167,10 @@ test(agg) :-
         format(' Query ==> ~w~n',[ SPARQL ]),
         assertion( SPARQL = "SELECT ?v0 WHERE {SELECT max(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}}" ).
 
+% TODO
+test(disj) :-
+        test_select( is_mammal(_X),
+                     "SELECT ?v0 WHERE {{?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/cat>} UNION {?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/dog>}}").
 
 :- end_tests(basic_test).
 

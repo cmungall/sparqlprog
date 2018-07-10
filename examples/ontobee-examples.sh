@@ -32,3 +32,6 @@ pq-ontobee -l -u obo_metadata/oio  'has_exact_synonym(C1,N),label(C2,N),C1\=C2'
 # The ontobee module defines ontsearch/4 as a search within an ontology, using the mapping from the obo id (e.g. 'uberon') to
 # the graph in which this is stored in ontobee
 pq-ontobee / ontsearch uberon limb$ _ _
+
+# also searches synonyms
+pq-ontobee -l / tsearch ^hippocamp _ _

@@ -211,6 +211,7 @@ cond(between(L,U,X)) --> cond((L=<X,X=<U)).
 
 % 17.4.1.9 IN
 cond(in(X,Ys))     --> p expr(X), " in ", (p seqmap_with_sep(", ",expr,Ys)).
+cond(contains(X,Y))   --> p "contains(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
 cond(str_starts(X,Y))   --> p "strStarts(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
 cond(str_ends(X,Y))   --> p "strEnds(", string_literal_expr(X), ",", string_literal_expr(Y), ")".
 cond(regex(S,P))   --> p "regex(", expr(S), ",", quote(at(P)), ")".

@@ -10,6 +10,6 @@ ADD . $HOME
 EXPOSE ${PORT}
 
 ## RUN swipl -g "getenv('HOME',Home),atom_concat('file://',Home,Path),Opts=[interactive(false)],pack_install(Path,Opts),halt"
-RUN swipl -g "Opts=[interactive(false)],pack_install(dcgutils,Opts),halt"
+RUN swipl -g "Opts=[interactive(false)],pack_install(dcgutils,Opts),pack_install(regex,Opts),halt"
 
 CMD swipl -p library=prolog -g "[bin/sprog_service]" -g 'server,T is 10**10,sleep(T)'

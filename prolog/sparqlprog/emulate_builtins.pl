@@ -1,14 +1,23 @@
 % * -*- Mode: Prolog -*- */
 
-/*
-https://www.w3.org/TR/sparql11-query/#expressions
+/** <module> emulate builtins
 
-  TODO: regexes
+  This module allows you to write programs that can be executed on a triplestore or directly on the in-memory
+  SWI-Prolog rdf database.
+
+  Sparqlprog defines predicates such as rdf_path/3 and str_starts/2. These are usually compiled down to SPARQL queries.
+  This module provides prolog implementations for these predicates using predicates such as rdf/3
+
+  Many of the predicates here take an argument strlike - this can be either an atom or a string.
+  
 */
+
 :- module(emulate_builtins,
           [
            ensure_atom/2,
            lcase/2,
+           regex/2,
+           regex/3,
            str_starts/2,
            str_ends/2,
            str_before/3,
@@ -22,24 +31,23 @@ https://www.w3.org/TR/sparql11-query/#expressions
            optional/1,
            rdf_path/3,
            rdf_path/4,
+
+           if/4,
            
            bind/2,
            seval/2
            ]).
 
 :- use_module(library(semweb/rdf11)).
-
-/*
 :- use_module(library(regex)).
 
-% TODO
-regex_str(R,X) :-
-        regex_str(R,X,'').
-regex_str(R,X,Flag) :-
-        X = S^^_,
-        atom_string(S,A),
-        A =~ R/Flag.
+
+/*
+https://www.w3.org/TR/sparql11-query/#expressions
+
+  TODO: regexes
 */
+
 
 /* ----------
  https://www.w3.org/TR/sparql11-query/#func-strings
@@ -70,19 +78,36 @@ str(X,V) :-
 lang(_^^L,L).
 
 
-%! str_starts(+S:strlike, +Sub:strlike) is semidet
+%! regex(?String, +Pattern, +Flag) is nondet.
+% 
+% regex is incomplete; see https://github.com/mndrix/regex/issues/7
+% but pcre does not seem to come installed on OS-X...
+regex(S,P) :-
+        regex(S,P,"").
+regex(S,P,Flag) :-
+        eval_to_atom(S,S1),
+        eval_to_atom(P,P1),
+        eval_to_atom(Flag,Flag1),
+        S1 =~ P1/Flag1.
+
+eval_to_atom(X,A) :-
+        seval(X,Y),
+        ensure_atom(Y,A).
+
+
+%! str_starts(+S:strlike, +Sub:strlike) is semidet.
 str_starts(S,Sub) :-
         ensure_atom(S,S1),
         ensure_atom(Sub,Sub1),
         atom_concat(Sub1,_,S1).
 
-%! str_ends(+S:strlike, +Sub:strlike) is semidet
+%! str_ends(+S:strlike, +Sub:strlike) is semidet.
 str_ends(S,Sub) :-
         ensure_atom(S,S1),
         ensure_atom(Sub,Sub1),
         atom_concat(_,Sub1,S1).
 
-%! str_before(+S:strlike, +Sep:strlike,  ?Sub:strlike) is det
+%! str_before(+S:strlike, +Sep:strlike,  ?Sub:strlike) is det.
 str_before(S,Sep,Sub) :-
         ensure_atom(S,S1),
         ensure_atom(Sep,Sep1),
@@ -91,7 +116,7 @@ str_before(S,Sep,Sub) :-
         ->  atom_string(Sub1,Sub)
         ;   ensure_atom(Sub,Sub1)).
 
-%! str_after(+S:strlike, +Sep:strlike,  ?Sub:strlike) is det
+%! str_after(+S:strlike, +Sep:strlike,  ?Sub:strlike) is det.
 str_after(S,Sep,Sub) :-
         ensure_atom(S,S1),
         ensure_atom(Sep,Sep1),
@@ -99,7 +124,7 @@ str_after(S,Sep,Sub) :-
         atomic_list_concat(Toks,Sep1,Sub1),
         ensure_atom(Sub,Sub1).
 
-%! str_replace(+S:strlike, +Match:strlike, +Replace:strlike,  ?NewStr:strlike) is det
+%! str_replace(+S:strlike, +Match:strlike, +Replace:strlike,  ?NewStr:strlike) is det.
 str_replace(S,In,Out,NewS) :-
         ensure_atom(S,S1),
         ensure_atom(In,In1),
@@ -123,6 +148,14 @@ group_concat(L, Sep, V) :-
 %:- rdf_meta rdf_path(r,r,r).
 %:- rdf_meta rdf_path(r,r,r,g).
 
+%! rdf_path(?S, +Path, ?O, ?G) is nondet.
+%! rdf_path(?S, +Path, ?O) is nondet.
+%
+%  Evaluate an rdf path expression in terms of rdf/3.
+%                                
+%  See https://www.w3.org/TR/sparql11-query/#propertypaths
+%                                
+%  Path = Pred OR \Path OR P|Q OR P\Q OR zeroOrMore(Path) OR oneOrMore(Path) OR inverseOf(Path)
 rdf_path(A,P,B) :-  rdf_path(A,P,B,_).
 
 rdf_path(A,(\P),B,G) :-  rdf_path(B,P,A,G).
@@ -155,7 +188,7 @@ optional(_).
 
 % convert strlike to atom
 ensure_atom(S@_, A) :- !, atom_string(A,S).
-ensure_atom(S^^_, A) :- !, atom_string(A,S).
+ensure_atom(S^^_, A) :- !, string(S), atom_string(A,S).
 ensure_atom(A, A) :- atom(A), !.
 ensure_atom(S, A) :- string(S), !, atom_string(A,S).
 
