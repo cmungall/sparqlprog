@@ -1,5 +1,6 @@
 # sparqlprog - programming with SPARQL
 
+[![Build Status](https://travis-ci.org/cmungall/sparqlprog.svg?branch=master)](https://travis-ci.org/cmungall/sparqlprog)
 [![Join the chat at https://gitter.im/sparqlprog/Lobby](https://badges.gitter.im/sparqlprog/Lobby.svg)](https://gitter.im/sparqlprog/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Example of use (command line):
