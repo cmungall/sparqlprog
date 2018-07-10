@@ -105,6 +105,7 @@ service_query_all(_,_,_,[]).
 %  IF EP is unbound on entry, it is bound to the endpoint from which
 %  the current bindings were obtained.
 ??(EP,Spec) :-
+   debug(sparqlprog,'Rewriting goal: ~q',[Spec]),
    rewrite_goal(Spec,SpecRewrite),
    debug(sparqlprog,'Rewritten goal: ~q',[SpecRewrite]),
    spec_goal_opts(SpecRewrite,Goal,Opts),
@@ -117,8 +118,43 @@ spec_goal_opts(Opts ?? Goal, Goal, Opts) :- !.
 spec_goal_opts(Goal,Goal,[]).
 
 :- multifile rewrite_goal_hook/2.
-rewrite_goal(In,Out) :- rewrite_goal(In,Out,1).
 
+%% rewrite_goal(+InGoal, ?OutGoalDisjunction) is semidet
+%
+% non-deterministic top-level goal rewrite
+% if multiple goals possible, return a disjunction of goals (G1;G2;...;Gn)
+% TODO: may be nondet if select variables in In...
+rewrite_goal(In,OutDisj) :-
+        debug(sparqlprog,'XXX: Rewriting goal: ~q',[In]),
+        setof(Out,rewrite_goal(In,Out,1),Outs),
+        list_to_disj(Outs,OutDisj).
+
+% deterministic version
+xxxrewrite_goal(In,OutDisj) :-
+        debug(sparqlprog,'XXX: Rewriting goal: ~q',[In]),
+        setof(In-Out,rewrite_goal(In,Out,1),InOuts),
+        debug(sparqlprog,'YYY: Rewritten goal: ~q -> ~q',[In,InOuts]),
+        unify_keys(In,InOuts),
+        plist_to_disj(InOuts,OutDisj),
+        !.
+
+
+plist_to_disj([_-X],X) :- !.
+plist_to_disj([_-X|T],(X;T2)) :- plist_to_disj(T,T2).
+
+unify_keys(_,[]).
+unify_keys(Term,[TermX-_ | T]) :-
+        term_variables(Term, Vars),
+        term_variables(TermX, Vars),
+        unify_keys(Term,T).
+
+
+
+
+%% rewrite_goal(+InGoal, ?OutGoal, +Depth) is semidet
+%
+% typically deterministic, but non-deterministic if 
+% multiple possible paths
 rewrite_goal(In,Out,N) :-
         debug(sparqlprog,'rewriting: ~q',[In]),
         rewrite_goal_hook(In,X), !,
@@ -144,8 +180,12 @@ rewrite_goal(aggregate_group(A,GVs,G,V), aggregate_group(A,GVs,G2,V), D) :- !, r
 
 
 % rdfs terminals
-rewrite_goal(rdf_where(Q), rdf_where(Q), _) :- !.
-rewrite_goal({Q}, {Q}, _) :- !.
+rewrite_goal(rdf_where(Q), rdf_where(Q2), D) :-
+        !,
+        rewrite_goal(Q, Q2, D).
+rewrite_goal({Q}, {Q2}, D) :-
+        !,
+        rewrite_goal(Q, Q2, D).
 rewrite_goal(optional(Q), optional(Q2), _) :-
         !,
         rewrite_goal(Q,Q2).
@@ -155,6 +195,16 @@ rewrite_goal(rdfs_individual_of(I,C), (rdf(I,rdf:type,X),rdf(X,zeroOrMore(rdfs:s
 rewrite_goal(a(I,C), rdf(I,rdf:type,C),_) :- !.
 %rewrite_goal(rdf_member(X,L), rdf(L,oneOrMore(rdf:rest)/rdf:last,X),_) :- !.
 rewrite_goal(rdf_member(X,L), rdf(L,(zeroOrMore(rdf:rest)/(rdf:first)),X),_) :- !.
+
+% rdf11 rules
+rewrite_goal(substring(S,P), contains(S,P), _) :- !.
+rewrite_goal(prefix(S,P), str_starts(S,P), _) :- !.
+
+% Match any literal that matches Pattern case insensitively, where the `*' character in Pattern matches zero or more characters
+rewrite_goal(like(S,P1), regex(S,P2,i), _) :- !, like_to_regex(P1,P2).
+
+% TODO
+%rewrite_goal(word(S,P1), regex(S,P2,i), _) :- !, like_to_regex(P1,P2).
 
 
 % ------
@@ -173,14 +223,16 @@ rewrite_goal(\+A, \+A2, D) :-
         !,
         rewrite_goal(A,A2,D).
 
+% EXPERIMENTING WITH NONDET
 rewrite_goal(A,A2,D) :-
         % TODO: see refl/2 test in test_aux
-        setof(Clause,safe_clause(A,Clause),Clauses),
+        setof(A-Clause,safe_clause(A,Clause),Clauses),
         !,
         debug(sparqlprog,' ~q CLAUSES==> ~q',[A,Clauses,A]),
         increase_depth(D,D2),
-        list_to_disj(Clauses,X),
-        rewrite_goal(X,A2,D2).
+        %list_to_disj(Clauses,X),
+        member(A-Clause,Clauses),
+        rewrite_goal(Clause,A2,D2).
 rewrite_goal(A,A,_).
 
 % for certain predicates, do not use replace_string_unification(T,T3)
@@ -191,18 +243,30 @@ nofilter(P) :-
         atomic(Px),
         atom_concat('http://www.bigdata.com/rdf/search#',_,Px).
 
-replace_string_unification(T,T) :-
-        (   T=rdf(_,P,_)
-        ;   T=rdf(_,P,_,_)),
-        nofilter(P),
-        !.
+% rdf11 'like' construct
+like_to_regex(Like,Re) :-
+        concat_atom(Parts,'*',Like),
+        (   Parts=[''|_]
+        ->  Init=''
+        ;   Init='^'),
+        (   reverse(Parts,[''|_])
+        ->  Last=''
+        ;   Last='$'),
+        concat_atom(Parts,'.*',Re1),
+        concat_atom([Init,Re1,Last],Re).
 
+        
 
 % We avoid translation rdf(X,rdf:label,"foo") to a direct
 % triple in the SPARQL query, since this may fail to
 % match (e.g. if xsd:string is the actual type)
 % instead we translate to  (rdf(X,rdf:label,VAR),VAR=="foo")
 % because this yields a FILTER in the SPARQL giving desired results
+replace_string_unification(T,T) :-
+        (   T=rdf(_,P,_)
+        ;   T=rdf(_,P,_,_)),
+        nofilter(P),
+        !.
 replace_string_unification(T,T3) :-
         debug(sparqlprog,'replacing string unification: ~q',[T]),
         T =.. [P|Args],
