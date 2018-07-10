@@ -4,5 +4,6 @@ before_script:
   - sudo apt-add-repository ppa:swi-prolog/devel -y
   - sudo apt-get update -q
   - sudo apt-get install swi-prolog-nox
+  - swipl -g "Opts=[interactive(false)],pack_install(dcgutils,Opts),pack_install(regex,Opts),halt"
 
 script: make test
