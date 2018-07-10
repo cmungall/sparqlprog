@@ -34,7 +34,10 @@ biopax-level3.owl:
 # --------------------
 
 # TODO: get from pack
-VERSION = "v0.0.2" 
+VERSION = v$(shell swipl -l pack.pl -g "version(V),writeln(V),halt.")
+
+show-version:
+	echo $(VERSION)
 
 IM = cmungall/sparqlprog
 
