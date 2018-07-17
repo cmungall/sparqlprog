@@ -1,6 +1,6 @@
 name('sparqlprog').
 title('Logic programming with SPARQL').
-version('0.0.8').
+version('0.0.9').
 author('Chris Mungall','cjmungall@lbl.gov').
 author('Samer Abdallah','s.abdallah@ucl.ac.uk').
 maintainer('Chris Mungall','cjmungall@lbl.gov').
