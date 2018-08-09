@@ -35,7 +35,8 @@
            if/4,
            
            bind/2,
-           seval/2
+           seval/2,
+           eval_to_atom/2
            ]).
 
 :- use_module(library(semweb/rdf11)).
@@ -182,7 +183,28 @@ rdfx(A,P,B,G) :-
 optional(G) :- G,!.
 optional(_).
 
+entailed(G,AssertedG) :-
+        entailed(G,AssertedG,_,[]).
+entailed(G,AssertedG,Goals,_Opts) :-
+        G =.. [P|Args],
+        map_args_to_equiv(Args,Args2,Goals),
+        % TODO: query optimization
+        all_succeed(Goals),
+        AssertedG =.. [P|Args2],
+        AssertedG.
 
+map_args_to_equiv([],[],[]).
+map_args_to_equiv([A|L],[A2|L],[G|GL]) :-
+        G=owl_equivalent_class(A,A2),
+        map_args_to_equiv(L,L,GL).
+
+all_succeed([]).
+all_succeed([G|L]) :-
+        G,
+        all_succeed(L).
+
+
+        
 
 
 

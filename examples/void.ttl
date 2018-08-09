@@ -1,0 +1,19 @@
+@prefix    void: <http://rdfs.org/ns/void#> .
+@prefix	    lib: <http://www.swi-prolog.org/rdf/library/> .
+@prefix     owl: <http://www.w3.org/2002/07/owl#> .
+@prefix     rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix    rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix	dcterms: <http://purl.org/dc/terms/> .
+@prefix	   foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix        : <http://purl.obolibrary.org/obo/> .
+
+<uberon>
+    a void:Dataset ;
+    dcterms:title "uberon" ;
+    void:dataDump <data/uberon.owl> ;
+    lib:source :uberon.owl .
+<goslim_generic>
+    a void:Dataset ;
+    dcterms:title "goslim for testing" ;
+    void:dataDump <data/goslim_generic.ttl.gz> ;
+    lib:source :go.owl .

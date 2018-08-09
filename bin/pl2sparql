@@ -100,6 +100,13 @@ main(Argv) :-
           default(false),
           longflags([interactive]),
           shortflags(['I']),
+          help('sparqlprog REPL')
+         ],
+         [opt(prolog),
+          type(boolean),
+          default(false),
+          longflags([prolog]),
+          shortflags(['P']),
           help('Interactive prolog')
          ],
          [opt(compile),
@@ -138,7 +145,8 @@ main(Argv) :-
         ],
         opt_parse(Spec, Argv, Opts, QueryAtoms, [duplicated_flags(keepall)]),
         handle_opts(Opts),
-        opt_if_call(interactive,prolog_shell,Opts),
+        opt_if_call(interactive,sparqlprog_shell(Opts),Opts),
+        opt_if_call(prolog,prolog_shell(Opts),Opts),
         run(QueryAtoms, Opts).
 
 
@@ -417,12 +425,18 @@ find_arity(Pred,Arity) :-
         find_arity(Pred,Arity,1).
 find_arity(Pred,Arity,Arity) :-
         functor(T,Pred,Arity),
-        clause(T,_),
+        catch(clause(T,_),
+            _E,
+            fail),
         !.
-find_arity(Pred,_,N) :-
+%find_arity(Pred,_,N) :-
+%        N > 99,
+%        !,
+%        throw(no_clause_with_pred(Pred)).
+find_arity(Pred,0,N) :-
         N > 99,
-        !,
-        throw(no_clause_with_pred(Pred)).
+        debug(sparqlprog, 'Assuming ~w has arity zero',[Pred]),
+        !.
 find_arity(Pred,Arity,N) :-
         N2 is N+1,
         find_arity(Pred,Arity,N2).
@@ -432,15 +446,40 @@ load_default_endpoints :-
         use_module(library(sparqlprog/endpoints)).
 
 
-prolog_shell:-
+sparqlprog_shell(Opts):-
         format('% Starting pl2sparql shell~n'),
-        set_prolog_flag(history,9999),
+        current_input(IO),
+        HFile='.sparqlprog_history',
+        (   exists_file(HFile)
+        ->  rl_read_history(HFile)
+        ;   true),
         repeat,
-        catch(prolog,
-              E,
-              (format('ERROR:~n~w~n',[E]),fail)),
-        !,
-        format('Come back soon!~n').
+        read_line_to_codes(IO,Codes),
+        (   Codes=end_of_file
+        ->  !
+        ;   atom_codes(A,Codes),
+            rl_add_history(A),
+            format('Cmd: ~w~n',[A]),
+            concat_atom(L,' ',A),
+            catch(run(L,Opts),
+                  E,
+                  (   format('ERROR:~n~w~n',[E]),fail)),
+            format('SUCCESS!~n'),
+            rl_write_history(HFile),
+            fail).
+
+prolog_shell(_Opts):-
+        format('% Starting prolog shell~n'),
+        HFile='.plhistory',
+        (   exists_file(HFile)
+        ->  rl_read_history(HFile)
+        ;   true),
+        prolog,
+        format('% Bye!~n'),
+        rl_write_history(HFile),
+        halt.
+
+
 
 
 /*

@@ -229,6 +229,7 @@ cond(is_uri(V))       --> "isURI(", object(V), ")".
 % defined in rdf11
 cond(rdf_bnode(V))     --> "isBLANK(", object(V), ")".
 cond(is_blank(V))     --> "isBLANK(", object(V), ")".
+cond(rdf_is_bnode(V))     --> "isBLANK(", object(V), ")".
 
 % 17.4.2.3 isLiteral
 % defined in rdf11

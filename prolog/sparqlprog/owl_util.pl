@@ -63,10 +63,11 @@ owl_equivalent_class_asserted_symm(A,B) :-
 subclass_cycle(A) :- rdf_path(A,oneOrMore(rdfs:subClassOf),A).
 
 
-
+    
 %! owl_some(?Restr, ?Property, ?Obj) is nondet.
 %
 % true if Restr is an OWL expression SomeValuesFrom(Property,Obj)
+:- rdf_meta owl_some(r,r,r).
 owl_some(R,P,O) :-
         owl:onProperty(R,P),
         owl:someValuesFrom(R,O).
@@ -74,6 +75,7 @@ owl_some(R,P,O) :-
 %! subclass_of_some(?Cls, ?Property, ?Obj) is nondet.
 %
 % true if Cls is a subclass of the expression SomeValuesFrom(Property,Obj)
+:- rdf_meta subclass_of_some(r,r,r).
 subclass_of_some(C,P,O) :-
         owl:subClassOf(C,R),
         owl_some(R,P,O).

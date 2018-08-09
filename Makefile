@@ -11,6 +11,10 @@ SWIPL = swipl  -L0 -G0 -T0  -p library=prolog
 
 all: test
 
+check:
+install:
+clean:
+
 test:
 	$(SWIPL) -l tests/tests.pl -g run_tests,halt
 
