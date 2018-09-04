@@ -57,11 +57,6 @@ http:location(pldoc, root(documentation), [priority(100)]).
 :- initialization debug(sparqlprog).
 :- initialization debug.
 
-tobjprop(X) :- writeln( hhhhii), debug( sparqlprog,'FOO',[]), '??'(go, rdf(X,rdf:type,owl:'ObjectProperty')).
-tobjprop(zzz).
-
-sandbox:safe_primitive(user:tobjprop(_)).
-
 
 server :-
         getenv('PORT',PortAtom),

@@ -95,6 +95,13 @@ main(Argv) :-
           shortflags(['S']),
           help('Show SPARQL query')
          ],
+         [opt(distinct),
+          type(boolean),
+          default(false),
+          longflags([distinct]),
+          shortflags(['Q']),
+          help('UniQue results - forces SELECT DISTINCT')
+         ],
          [opt(interactive),
           type(boolean),
           default(false),
@@ -152,14 +159,21 @@ main(Argv) :-
 
 handle_opts(Opts) :-
         opt_if_call(verbose,debug(sparqlprog),Opts),
+        opt_if_call(distinct,force_distinct,Opts),
         opt_if_call(stacktrace,use_module(library(sparqlprog/stacktrace)),Opts),
+        opt_if_call(execute,ensure_loaded(library(sparqlprog/emulate_builtins)),Opts),
         opt_forall(attach(X),rdf_attach_library(X),Opts),
-        opt_forall(debug(X),debug(X),Opts),
+        opt_forall(debug(X),debug(X),Opts),        
         opt_forall(use(X),use_module(library(X)),Opts),
         opt_forall(use_no_import(X),use_module(library(X),[]),Opts),
         opt_forall(consult(X),consult(X),Opts),
         opt_forall(input(X),rdf_load_wrap(X),Opts),
         opt_forall(goal(X),X,Opts).
+
+force_distinct :-
+        setting(sparqlprog:select_options, Opts),
+        select(distinct(_),Opts,Opts2),
+        set_setting(sparqlprog:select_options, [distinct(true)|Opts2]).
 
 
 
@@ -358,6 +372,7 @@ tr_opts([_|T],T2) :-
         tr_opts(T,T2).
 
 is_pass_thru(inject_labels).
+is_pass_thru(distinct).
 
 
 write_result(Term,Opts) :-
