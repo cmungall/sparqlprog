@@ -126,7 +126,8 @@ intersection_member(I,M) :-
 % use rdfs_member/2 ?
 rdflist_member(L,M) :-
         rdf_path(L,(zeroOrMore(rdf:rest)/(rdf:first)),M).
-        
+
+
 
 common_ancestor(X,Y,A) :-
         rdfs_subclass_of(X,A),

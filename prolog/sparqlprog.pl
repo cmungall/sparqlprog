@@ -443,7 +443,7 @@ query_goal(EP,Goal,Opts) :-
 % rdf/3 or rdf/4 statements, filters, or terms
 % that can be rewritten in this way
 create_sparql_select(Goal,SPARQL) :-
-   create_sparql_select(Goal,SPARQL,[]).
+        create_sparql_select(Goal,SPARQL,[]).
 
 create_sparql_select(Goal,SPARQL,Opts) :-
         create_sparql_select(Goal,Goal,SPARQL,Opts).

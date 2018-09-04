@@ -6,7 +6,9 @@
 
 :- module(pubmedgraph,
           [references/2,
-           coreference/3]).
+           coreference/3,
+
+           subclass_axiom_validation/3]).
 
 :- use_module(library(sparqlprog)).
 :- use_module(library(semweb/rdf11)).
@@ -18,4 +20,8 @@
 
 references(P,T) :- rdf(P,dcterm:references,T).
 coreference(P1,P2,T) :- references(P1,T),references(P2,T).
+
+subclass_axiom_validation(A,B,P) :-
+        owl:subClassOf(A,B),
+        pmg ?? (references(P,A),references(P,B)).
 
