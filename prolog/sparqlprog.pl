@@ -388,7 +388,7 @@ current_sparql_endpoint(EP,Host,Port,Path,Options) :-
 %% query_goal(+EP,+Goal:sparql_goal,+Opts) is nondet.
 %% query_goal(-EP,+Goal:sparql_goal,+Opts) is nondet.
 %
-%  Runs a SPARQL query against one or more SPARLQ endpoints.
+%  Runs a SPARQL query against one or more SPARQL endpoints.
 %  Goal is converted into a textual SPARQL query using the DCG
 %  defined in sparql_dcg.pl. 
 %
@@ -405,7 +405,7 @@ current_sparql_endpoint(EP,Host,Port,Path,Options) :-
 %        Begin returning bindings from the Oth result on.
 %     *  autopage(Auto:bool)
 %        If false, a single SPARQL call is made using any limit and offset
-%        options if supplied. If true, the the offset option is ignored
+%        options if supplied. If true, then the offset option is ignored
 %        and multiple SPARQL queries are made as necessary to supply
 %        results, using the limit option to determine the number of results
 %        retrieved from the endpoint at a time.
@@ -430,6 +430,7 @@ query_goal(EP,Goal,Opts) :-
                ), Opts, Opts1),
       debug(sparqlprog,'DCG: ~q ~q ~q',[Vars,Goal,Opts1]),
       phrase_to_sparql(select(Vars,Goal,Opts1),SPARQL),
+      debug(sparqlprog,'Executing parallel query: ~w // ~w // ~w',[SPARQL,Query,EPs]),
       parallel_query(Query,EPs,EP-Result)
    ).
 
@@ -644,6 +645,6 @@ downcase_first_char(A,A2) :-
 %  endpoints will be tried sequentially. 
 query_sparql(EP,SPARQL,Result) :-
    sparql_endpoint(EP,Host,Port,Path,EPOpts),
-   debug(sparqlprog,'Querying endpoint http://~q:~q~q',[Host,Port,Path]),
+   debug(sparqlprog,'Querying endpoint http://~q:~q~q - ~w',[Host,Port,Path,SPARQL]),
    sparql_query(SPARQL,Result,[host(Host),port(Port),path(Path)|EPOpts]).
 
