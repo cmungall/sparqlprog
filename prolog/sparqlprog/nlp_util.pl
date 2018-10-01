@@ -1,3 +1,7 @@
+/*
+
+  Deprecated - use rdf_matcher now
+*/
 :- module(nlp_util,
           [rdf_nliteral/3,
            rdf_nliteral/4,
