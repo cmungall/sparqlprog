@@ -40,13 +40,11 @@
            ]).
 
 :- use_module(library(semweb/rdf11)).
-:- use_module(library(regex)).
 
 
 /*
 https://www.w3.org/TR/sparql11-query/#expressions
 
-  TODO: regexes
 */
 
 
@@ -81,19 +79,21 @@ lang(_^^L,L).
 
 %! regex(?String, +Pattern, +Flag) is nondet.
 % 
-% regex is incomplete; see https://github.com/mndrix/regex/issues/7
-% but pcre does not seem to come installed on OS-X...
 regex(S,P) :-
         regex(S,P,"").
 regex(S,P,Flag) :-
-        eval_to_atom(S,S1),
-        eval_to_atom(P,P1),
+        eval_to_string(S,S1),
+        eval_to_string(P,P1),
         eval_to_atom(Flag,Flag1),
-        S1 =~ P1/Flag1.
+        re_match(P1/Flag1, S1).
 
 eval_to_atom(X,A) :-
         seval(X,Y),
         ensure_atom(Y,A).
+
+eval_to_string(X,A) :-
+        seval(X,Y),
+        ensure_string(Y,A).
 
 
 %! str_starts(+S:strlike, +Sub:strlike) is semidet.
