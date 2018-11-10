@@ -23,7 +23,9 @@
 
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/rdfs)).
-:- use_module(library(sparqlprog/ontologies/owl), []).
+:- use_module(library(sparqlprog/owl_util)).
+%:- use_module(library(sparqlprog/ontologies/owl), [label/2]).
+:- use_module(library(sparqlprog/emulate_builtins)).
 
 %! lmatch(+Pattern:atom, ?Object) is nondet
 %

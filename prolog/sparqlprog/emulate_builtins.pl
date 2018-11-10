@@ -40,6 +40,7 @@
            ]).
 
 :- use_module(library(semweb/rdf11)).
+:- use_module(library(pcre)).
 
 
 /*

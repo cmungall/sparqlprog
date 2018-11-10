@@ -1,12 +1,17 @@
 
 :- use_module(library(semweb/rdf11)).
-:- use_module(library(sparqlprog)).
 :- use_module(test_aux).
+:- use_module(library(sparqlprog)).
 
 :- rdf_register_prefix(foaf,'http://xmlns.com/foaf/0.1/').
 :- rdf_register_prefix('','http://example.org/').
 
 :- begin_tests(basic_test).
+
+test(clause) :-
+        % TODO: possible bug in 7.6.x swi?
+        % this may not be visible depending on order of execution
+        assertion(text_aux:clause(my_unary_pred(_X),_Body,_Ref)).
 
 
 test_select(Q,ExpectedSPARQL) :-

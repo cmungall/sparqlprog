@@ -16,7 +16,7 @@ pq-ontobee  "rdf(Restr,owl:onProperty,P,G),label(P,PN)" "x(Restr,P,PN,G)"
 # similar to above, but instead load RO triples into memory, loop over all OP directly in prolog engine,
 # executing separate sparql query for each
 pq-ontobee -e -i ro.owl  "owl:objectProperty(P), (ontobee ?? rdf(Restr,owl:onProperty,P,G),label(P,PN))" "x(P,PN,G,Restr)"
-pq-ontobee -e -i ro.owl  "owl:objectProperty(P), label(P,PN), (ontobee ?? aggregate_group(count(Restr),[P,G],rdf(Restr,owl:onProperty,P,G),Num))" "x(P,PN,G,Restr)"
+pq-ontobee -e -i ro.owl  "owl:objectProperty(P), label(P,PN), (ontobee ?? aggregate_group(count(Restr),[P,G],rdf(Restr,owl:onProperty,P,G),Num))" "x(P,PN,G,Num)"
 
 # also:
 pq-ontobee  "aggregate_group(count(P),[P,G],rdf(_,owl:onProperty,P,G),Num)" 

@@ -9,11 +9,14 @@
            refl/2,
            recursive_subclass_of/2]).
 
-:- use_module(library(semweb/rdf_db)).
+:- use_module(library(semweb/rdf11)).
+:- use_module(library(sparqlprog)).
 :- rdf_register_prefix('','http://example.org/').
 
-:- srule(my_unary_pred, [instance], 'demo predicate').
+%:- srule(my_unary_pred, [instance], 'demo predicate').
 my_unary_pred(X) :- rdf(X,rdf:type,'':c1).
+my_unary_pred(foo).
+
 
 :- srule(recursive_subclass_of, [sub, super]).
 recursive_subclass_of(X,Y) :- rdf(X,rdfs:subClassOf,Y).

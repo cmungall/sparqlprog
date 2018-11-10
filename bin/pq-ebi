@@ -1,2 +1,2 @@
 #!/bin/sh
-pl2sparql  -u sparqlprog/ontologies/ebi  -u sparqlprog/ontologies/ebi/reactome -u sparqlprog/ontologies/biopax3 -u sparqlprog/ontologies/faldo  -s ebi "$@"
+pl2sparql  -u sparqlprog/ontologies/ebi  -u sparqlprog/ontologies/chembl  -u sparqlprog/ontologies/ebi/reactome -u sparqlprog/ontologies/biopax3 -u sparqlprog/ontologies/faldo  -s ebi "$@"

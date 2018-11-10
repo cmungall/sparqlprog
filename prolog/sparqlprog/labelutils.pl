@@ -6,6 +6,7 @@
           ]).
 
 :- use_module(library(semweb/rdf11)).
+:- use_module(library(sparqlprog/emulate_builtins)).
 
 label_atom(S,A) :-
         string(S),
@@ -14,8 +15,8 @@ label_atom(S,A) :-
 label_atom(X,A) :-
         \+ compound(X),
         atom(X),
-        rdf(X,rdfs:label,S^^_),
-        atom_string(A,S).
+        rdf(X,rdfs:label,Literal),
+        ensure_atom(Literal,A).
 
 term_labelify(V,V) :-
         var(V),
@@ -43,6 +44,10 @@ term_labelify(T,T).
 % add an extra argument for the label for each
 row_labelify(X,X2) :-
         X = _^^_,
+        !,
+        label_atom(X,X2).
+row_labelify(X,X2) :-
+        X = _@_,
         !,
         label_atom(X,X2).
 row_labelify(Row,Row2) :-

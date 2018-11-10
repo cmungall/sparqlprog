@@ -13,6 +13,10 @@
 :- use_module(library(semweb/rdf_zlib_plugin)).
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/rdfs)).
+:- use_module(library(semweb/rdf_turtle)).
+:- use_module(library(semweb/rdf_ntriples)).
+:- use_module(library(sparqlprog)).
+:- use_module(library(sparqlprog/labelutils)).
 :- use_module(library(sparqlprog/ontologies/owl), []).
 :- use_module(library(sparqlprog/owl_util)).
 :- use_module(library(sparqlprog/owl_search_viz)).
@@ -24,8 +28,6 @@
                            create_global_directory(true)
                          ]).
 
-:- use_module(library(sparqlprog)).
-:- use_module(library(sparqlprog/labelutils)).
 
 
 main(Argv) :-
@@ -154,7 +156,12 @@ main(Argv) :-
         handle_opts(Opts),
         opt_if_call(interactive,sparqlprog_shell(Opts),Opts),
         opt_if_call(prolog,prolog_shell(Opts),Opts),
-        run(QueryAtoms, Opts).
+        catch(run(QueryAtoms, Opts),
+              E,
+              (   format(user_error,'~q~n',[E]),
+                  halt(1))),
+        halt.
+
 
 
 handle_opts(Opts) :-
@@ -413,7 +420,8 @@ term_saferow(T,T2) :-
         T =.. [P|Args],
         Args = [_|_],
         !,
-        maplist(term_saferow,Args,Args2),
+        maplist([A,A2]>>(term_saferow(A,A1),sformat(S,'~w',[A1]),atom_string(A2,S)),Args,Args2),
+        %maplist([A,A2]>>(term_saferow(A,A2)),Args,Args2),
         T2 =.. [P|Args2].
 term_saferow(T,T2) :-
         rdf_global_id(Pre:Id,T),

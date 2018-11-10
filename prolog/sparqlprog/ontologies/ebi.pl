@@ -1,6 +1,7 @@
 :- module(ebi,
           [
            identifier/2,
+           description/2,
            see_also/2,
            alt_label/2,
            protein_coding_gene/1,
@@ -37,6 +38,7 @@ alt_label(A,B) :- rdf(A,skos:altLabel,B).
 in_taxon(A,B) :- rdf(A,ro:'0002162',B).
 
 identifier(A,X) :- rdf(A,dcterms:identifier,X).
+description(A,X) :- rdf(A,dcterms:description,X).
 transcribed_from(T,G) :- rdf(T,so:transcribed_from,G).
 
 protein_coding_gene(G) :- rdf(G,rdf:type,so:'0001217').

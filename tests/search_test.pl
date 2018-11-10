@@ -14,8 +14,12 @@
                [setup(load_test_file),
                 cleanup(rdf_retractall(_,_,_,_))]).
 
+
 load_test_file :-
-        rdf_load('tests/go_nucleus.ttl').
+        rdf_load('tests/go_nucleus.ttl'),
+        forall(rdf(S,P,O),
+               writeln(x(S,P,O))).
+
 
 test_count(Goal,ExpectedCount) :-
         writeln(t=Goal),
