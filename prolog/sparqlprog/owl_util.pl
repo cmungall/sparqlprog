@@ -1,5 +1,8 @@
 :- module(owl_util,
-          [owl_some/3,
+          [enlabel_of/2,
+           label_of/3,
+           
+           owl_some/3,
            owl_all/3,
            owl_equivalent_class/2,
            owl_equivalent_class_asserted/2,
@@ -41,6 +44,13 @@
 
 :-op(300,xfy,some).
 :-op(300,xfy,all).
+
+enlabel_of(Label,X) :- label_of(Label,X,en).
+
+label_of(Label,X,Lang) :- rdf(X,rdfs:label,Label@Lang).
+label_of(Label,X,_) :- rdf(X,rdfs:label,Label^^xsd:string).
+%label_of(Label,X,Lang) :- rdf(X,rdfs:label,Lit), (Lit == Label@Lang ; Lit == Label^^xsd:string).
+
 
 
 thing_class(owl:'Thing').

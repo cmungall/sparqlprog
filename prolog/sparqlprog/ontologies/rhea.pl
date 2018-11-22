@@ -1,4 +1,4 @@
-:- module(ebi,
+:- module(rhea,
           [
            rhea_status/2,
            is_approved/1,
@@ -17,7 +17,9 @@
            
            ]).
 
-:- use_module(library(sparqlprog/ontologies/faldo)).
+:- use_module(library(semweb/rdf11)).
+
+%:- use_module(library(sparqlprog/ontologies/faldo)).
 
 :- rdf_register_prefix(rh, 'http://rdf.rhea-db.org/').
 :- rdf_register_prefix(chebi, 'http://purl.obolibrary.org/obo/CHEBI_').
@@ -40,8 +42,8 @@ bidirectional_form(R,DR) :- rdf(R,rh:bidirectionalReaction,DR).
 
 rhea_xref(R,X) :- rdf(R,rdfs:seeAlso,X).
 
-rhea_product(R, S) :- rdf(R,rhea:products,S).
-rhea_substrate(R, S) :- rdf(R,rhea:substrate,S).
+rhea_product(R, S) :- rdf(R,rh:products,S).
+rhea_substrate(R, S) :- rdf(R,rh:substrate,S).
 
 
 reaction_side(R,S) :- rdf(R,rh:side,S).

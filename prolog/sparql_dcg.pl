@@ -250,7 +250,7 @@ expr(ucase(A)) --> "ucase(", string_literal_expr(A), ")".
 expr(lcase(A)) --> "lcase(", string_literal_expr(A), ")".
 expr(S)            --> {string(S)},"\"", at(S), "\"".
 expr('^^'(S,T))    --> "\"", at(S), "\"^^", resource(T).
-expr('@'(S,Lang))    --> "\"", at(S), "\"@", resource(Lang).
+expr('@'(S,Lang))    --> "\"", at(S), "\"@", at(Lang).
 expr(uri(V))       --> "URI(", expr(V), ")".
 expr(str(V))       --> "STR(", object(V), ")".
 expr(lang(V))      --> "LANG(", object(V), ")".

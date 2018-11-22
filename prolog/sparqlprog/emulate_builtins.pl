@@ -15,6 +15,7 @@
 :- module(emulate_builtins,
           [
            ensure_atom/2,
+           ensure_string/2,
            lcase/2,
            regex/2,
            regex/3,
@@ -251,6 +252,17 @@ exists(E) :- \+ \+ E.
 
 % 17.4.2.1 isIRI : use rdf_is_iri
 
+%! bind(?ReturnValue,+FunctionTerm)
+%
+% evaluates a function term.
+% The function term can be a:
+%  - SPARQL builtin (e.g. coalesce, regex)
+%  - An arithmetic term (e.g. 1 + (2 / X) )
+%  - An abritrary prolog goal term in which:
+%      - the final argument N is treated as result/output
+%      - the arguments 1..( N-1) are treated as inputs
+%      - inputs should be ground
+%      - determinism or semi-determinism assumed when inputs are ground
 bind(Expr,Result) :-
         seval(Expr, Result).
 

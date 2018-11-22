@@ -105,19 +105,57 @@ service_query_all(_,_,_,[]).
 %  IF EP is unbound on entry, it is bound to the endpoint from which
 %  the current bindings were obtained.
 ??(EP,Spec) :-
-   debug(sparqlprog,'Rewriting goal: ~q',[Spec]),
-   rewrite_goal(Spec,SpecRewrite),
-   debug(sparqlprog,'Rewritten goal: ~q',[SpecRewrite]),
-   spec_goal_opts(SpecRewrite,Goal,Opts),
-   debug(sparqlprog,'Opts: ~q',[Opts0]),
-   setting(select_options,Opts0),
-   merge_options(Opts,Opts0,Opts1),
-   query_goal(EP,Goal,Opts1).
+        debug(sparqlprog,'Finding subqueries: ~q',[Spec]),
+        expand_subqueries(Spec,Spec2,EP),
+        debug(sparqlprog,'Rewriting goal: ~q',[Spec2]),
+        rewrite_goal(Spec2,SpecRewrite),
+        debug(sparqlprog,'Rewritten goal: ~q',[SpecRewrite]),
+        spec_goal_opts(SpecRewrite,Goal,Opts),
+        debug(sparqlprog,'Opts: ~q',[Opts0]),
+        setting(select_options,Opts0),
+        merge_options(Opts,Opts0,Opts1),
+        query_goal(EP,Goal,Opts1).
 
 spec_goal_opts(Opts ?? Goal, Goal, Opts) :- !.
 spec_goal_opts(Goal,Goal,[]).
 
+subq_term(subq(Q),EP,Q,EP).
+subq_term(subq(Q,EP),_,Q,EP).
+subq_term(x:Q,EP,Q,EP).
+
+expand_subqueries(V,V,_) :-
+        var(V),
+        !.
+expand_subqueries(In,Out,EP) :-
+        ground(In),
+        subq_term(In,EP,Q,EP2),
+        !,
+        Q =.. L,
+        append(L,[NewVar],L2),
+        Q2 =.. L2,
+        debug(sparqlprog,'SUBQ: ~q on ~w',[Q2, EP2]),
+        setof(NewVar,??(EP2,Q2),Values),
+        debug(sparqlprog,'>> RESULTS: ~q',[Values]),
+        % TODO: allow cacheing
+        % TODO: allow option of parallelizing this
+        member(Out,Values).
+expand_subqueries([],[],_) :- !.
+expand_subqueries([H|L],[H2|L2],EP) :-
+        !,
+        expand_subqueries(H,H2,EP),
+        expand_subqueries(L,L2,EP).
+expand_subqueries(In,Out,EP) :-
+        compound(In),
+        !,
+        In =.. [P|Args],
+        expand_subqueries(Args,Args2,EP),
+        Out =.. [P|Args2].
+expand_subqueries(X,X,_) :- !.
+
+
+
 :- multifile rewrite_goal_hook/2.
+
 
 %% rewrite_goal(+InGoal, ?OutGoalDisjunction) is semidet
 %
@@ -129,6 +167,7 @@ rewrite_goal(In,OutDisj) :-
         setof(Out,rewrite_goal(In,Out,1),Outs),
         list_to_disj(Outs,OutDisj).
 
+/*
 % deterministic version
 xxxrewrite_goal(In,OutDisj) :-
         debug(sparqlprog,'XXX: Rewriting goal: ~q',[In]),
@@ -137,6 +176,17 @@ xxxrewrite_goal(In,OutDisj) :-
         unify_keys(In,InOuts),
         plist_to_disj(InOuts,OutDisj),
         !.
+*/
+
+%% rewrite_goal(+InGoal, ?OutGoal, +Depth) is semidet
+%
+% typically deterministic, but non-deterministic if 
+% multiple possible paths
+rewrite_goal(In,Out,N) :-
+        debug(sparqlprog,'rewriting: ~q',[In]),
+        rewrite_goal_hook(In,X), !,
+        debug(sparqlprog,'Using hook to transform ~q -> ~q',[In,X]),
+        rewrite_goal(X,Out,N).
 
 
 plist_to_disj([_-X],X) :- !.
@@ -151,15 +201,6 @@ unify_keys(Term,[TermX-_ | T]) :-
 
 
 
-%% rewrite_goal(+InGoal, ?OutGoal, +Depth) is semidet
-%
-% typically deterministic, but non-deterministic if 
-% multiple possible paths
-rewrite_goal(In,Out,N) :-
-        debug(sparqlprog,'rewriting: ~q',[In]),
-        rewrite_goal_hook(In,X), !,
-        debug(sparqlprog,'Using hook to transform ~q -> ~q',[In,X]),
-        rewrite_goal(X,Out,N).
 
 % ------
 % terminals

@@ -88,7 +88,8 @@ flatten_row([V|Row],Row2,[K|Keys],Specs,SpecOpts,Opts) :-
         select(entity(K),SpecOpts,SpecOpts2),
         !,
         get_labels(V,Ns,Opts),
-        flatten_row([V,Ns|Row],Row2,[K|Keys],Specs,SpecOpts2,Opts).
+        contract_uri(V,V2,Opts),
+        flatten_row([V2,Ns|Row],Row2,[K|Keys],Specs,SpecOpts2,Opts).
 flatten_row([V|Row],[V2|Row2],[_K|Keys],Specs,SpecOpts,Opts) :-
         serialize_value(V,V2,Opts),
         flatten_row(Row,Row2,Keys,Specs,SpecOpts,Opts).
@@ -100,13 +101,16 @@ get_labels(L,Vs,Opts) :-
         maplist({Opts}/[X,X2]>>get_labels(X,X2,Opts),L,L2),
         flatten(L2,Vs).
 get_labels(X,V,_Opts) :-
+        rdf_is_iri(X),
         rdf(X,rdfs:label,V),
         !.
 get_labels(_,'',_).
 
+contract_uri(A,B,_) :- rdf_is_iri(A),rdf_global_id(Pre:Local,A),!,concat_atom([Pre,Local],':',B).
+contract_uri(A,A,_).
 
 
-serialize_value(V,V,_) :-
+serialize_value(V,'_',_) :-
         var(V),
         !.
 serialize_value(L,V,Opts) :-

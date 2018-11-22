@@ -57,7 +57,7 @@ term_saferow1(T@_, A) :- !, atom_string(A,T).
 term_saferow1(literal(type(_,A)), A) :- !.
 term_saferow1(literal(lang(_,A)), A) :- !.
 term_saferow1(literal(A), A) :- !.
-term_saferow1(L,A) :- is_list(L), !, maplist(term_saferow1,L,L2),concat_atom(L2,',',A).
+term_saferow1(L,A) :- is_list(L), !, maplist(term_saferow1,L,L2),maplist(atomize,L2,L3),concat_atom(L3,',',A).
 term_saferow1(T,T2) :-
         T =.. [P|Args],
         Args = [_|_],
