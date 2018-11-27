@@ -84,12 +84,13 @@ spec_bindings_goal(Bs-G,Bs,G).
 
 
 flatten_row([],[],_,_,_,_).
-flatten_row([V|Row],Row2,[K|Keys],Specs,SpecOpts,Opts) :-
+flatten_row([V|Row],Row2,Keys,Specs,SpecOpts,Opts) :-
+        Keys=[K|_],
         select(entity(K),SpecOpts,SpecOpts2),
         !,
         get_labels(V,Ns,Opts),
-        contract_uri(V,V2,Opts),
-        flatten_row([V2,Ns|Row],Row2,[K|Keys],Specs,SpecOpts2,Opts).
+        contract_uris(V,V2,Opts),
+        flatten_row([V2,Ns|Row],Row2,Keys,Specs,SpecOpts2,Opts).
 flatten_row([V|Row],[V2|Row2],[_K|Keys],Specs,SpecOpts,Opts) :-
         serialize_value(V,V2,Opts),
         flatten_row(Row,Row2,Keys,Specs,SpecOpts,Opts).
@@ -106,6 +107,8 @@ get_labels(X,V,_Opts) :-
         !.
 get_labels(_,'',_).
 
+contract_uris(L,L2,Opts) :- is_list(L),!,maplist({Opts}/[A,B]>>contract_uri(A,B,Opts),L,L2).
+contract_uris(A,B,Opts) :- contract_uri(A,B,Opts).
 contract_uri(A,B,_) :- rdf_is_iri(A),rdf_global_id(Pre:Local,A),!,concat_atom([Pre,Local],':',B).
 contract_uri(A,A,_).
 
