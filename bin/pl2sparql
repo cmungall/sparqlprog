@@ -220,6 +220,10 @@ run([describe,X|_Args], Opts) :-
         Q=owl_node_info(X2,P,O,G),
         exec_query(Q, Q, ['P'=P,'O'=O,'G'=G], Opts).
 
+run([q,SearchTerm,PredTerm,PostTerm,Rels,DispTerm|_Args], Opts) :-
+        !,
+        owl_search_and_display(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, _, Opts).
+
 run(['/',Pred|Args], Opts) :-
         !,
         % shorthand syntax for terms: / Pred Args

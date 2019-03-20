@@ -25,7 +25,9 @@
            str_after/3,
 
            str_replace/4,
-
+           concat/3,
+           concat/4,
+           
            count/2,
            group_concat/3,
 
@@ -135,6 +137,17 @@ str_replace(S,In,Out,NewS) :-
         atomic_list_concat(Toks,In1,S1),
         atomic_list_concat(Toks,Out1,NewS1),
         ensure_string(NewS1,NewS).
+
+concat(S1,S2,S) :-
+        concatl([S1,S2],S).
+concat(S1,S2,S3,S) :-
+        concatl([S1,S2,S3],S).
+
+
+concatl(L,S) :-
+        maplist(ensure_atom,L,LA),
+        concat_atom(LA,SA),
+        ensure_string(SA,S).        
 
 % for compat
 count(L,N) :- length(L,N).

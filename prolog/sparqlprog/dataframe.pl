@@ -147,8 +147,19 @@ dataframe_to_csv(Name, Stream, Opts) :-
         option(separator(Sep), Opts, 0'\t),
         HTerm =.. [row|Header],
         csv_write_stream(Stream, [HTerm], [separator(Sep)]),
-        forall((dataframe_row(Name, Row, Opts), RTerm =.. [row|Row]),
-               csv_write_stream(Stream, [RTerm], [separator(Sep)])).
+        dataframe_specs_opts(Name,_Specs,SpecOpts),
+        (   member(sort(_),SpecOpts)
+        ->  findall(Row,dataframe_row(Name, Row, Opts),Rows),
+            % TODO sort by key
+            sort(Rows,RowsSorted),
+            forall((member(Row,RowsSorted), RTerm =.. [row|Row]),
+                   csv_write_stream(Stream, [RTerm], [separator(Sep)]))
+        ;   forall((dataframe_row(Name, Row, Opts), RTerm =.. [row|Row]),
+                   csv_write_stream(Stream, [RTerm], [separator(Sep)]))),
+        !.
+dataframe_to_csv(Name, Stream, Opts) :-
+        throw(exception(no_dataframe(Name, Stream, Opts))).
+
 
                
                

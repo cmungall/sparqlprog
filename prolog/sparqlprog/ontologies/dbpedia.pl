@@ -28,7 +28,7 @@ expose a subclass of dbpedia for demo purposes
 :- sparql_endpoint( dbp, 'http://dbpedia.org/sparql/').
 
 :- rdf_register_prefix(foaf,'http://xmlns.com/foaf/0.1/').
-:- rdf_register_prefix(dbo,'http://dbpedia.org/ontology/').
+:- rdf_register_prefix(dbont,'http://dbpedia.org/ontology/').
 :- rdf_register_prefix(dbr,'http://dbpedia.org/resource/').
 
 person(Person) :- rdf(Person,rdf:type,foaf:'Person').

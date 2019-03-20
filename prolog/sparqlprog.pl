@@ -153,6 +153,11 @@ expand_subqueries(In,Out,EP) :-
 expand_subqueries(X,X,_) :- !.
 
 
+% convert a prolog list [A,B,..] to a disjunctive term A;B;...
+plist_to_disj([_-X],X) :- !.
+plist_to_disj([_-X|T],(X;T2)) :- plist_to_disj(T,T2).
+
+
 
 :- multifile rewrite_goal_hook/2.
 
@@ -176,6 +181,13 @@ xxxrewrite_goal(In,OutDisj) :-
         unify_keys(In,InOuts),
         plist_to_disj(InOuts,OutDisj),
         !.
+
+unify_keys(_,[]).
+unify_keys(Term,[TermX-_ | T]) :-
+        term_variables(Term, Vars),
+        term_variables(TermX, Vars),
+        unify_keys(Term,T).
+  
 */
 
 %% rewrite_goal(+InGoal, ?OutGoal, +Depth) is semidet
@@ -189,14 +201,6 @@ rewrite_goal(In,Out,N) :-
         rewrite_goal(X,Out,N).
 
 
-plist_to_disj([_-X],X) :- !.
-plist_to_disj([_-X|T],(X;T2)) :- plist_to_disj(T,T2).
-
-unify_keys(_,[]).
-unify_keys(Term,[TermX-_ | T]) :-
-        term_variables(Term, Vars),
-        term_variables(TermX, Vars),
-        unify_keys(Term,T).
 
 
 

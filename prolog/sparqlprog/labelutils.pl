@@ -1,4 +1,4 @@
-:- module(label_utils,
+:- module(labelutils,
           [
            label_atom/2,
            row_labelify/2,
@@ -15,8 +15,17 @@ label_atom(S,A) :-
 label_atom(X,A) :-
         \+ compound(X),
         atom(X),
-        rdf(X,rdfs:label,Literal),
+        atom_iri(X,IRI),
+        rdf(IRI,rdfs:label,Literal),
         ensure_atom(Literal,A).
+
+atom_iri(X,I) :-
+        concat_atom([Pre,Local],:,X),
+        \+ \+ rdf_current_prefix(Pre,_),
+        rdf_global_id(Pre:Local,I),
+        !.
+atom_iri(X,X).
+
 
 term_labelify(V,V) :-
         var(V),

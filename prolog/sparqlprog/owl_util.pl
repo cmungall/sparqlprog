@@ -26,6 +26,9 @@
            owl_subgraph/4,
 
            quads_dict/2,
+
+           ensure_uri/2,
+           ensure_curie/2,
            
            common_ancestor/3,
            mrca/3,
@@ -172,10 +175,12 @@ owl_edge(S,P,O) :-
 
 owl_edge(S,P,O,G) :-
         rdf(S,rdfs:subClassOf,R,G),
-        owl_some(R,P,O).
+        owl_some(R,P,O),
+        \+ rdf_is_bnode(O).
 owl_edge(S,rdfs:subClassOf,O,G) :-
         rdf(S,rdfs:subClassOf,O,G),
-        owl:class(O).
+        \+ rdf_is_bnode(O).
+
 
 %! node_ancestor_graph_edge(?Node,?S,?P,?O,?G) is nondet.
 %
@@ -185,24 +190,24 @@ node_ancestor_graph_edge(Node,S,P,O,G) :-
         rdfs_subclass_of(Node,S),
         rdf(S,P,O,G).
 
-%! owl_subgraph(+Nodes:list, +Preds:list, ?Triples:list, +Opts:list) is det.
+%! owl_subgraph(+Nodes:list, +Preds:list, ?Quads:list, +Opts:list) is det.
 %
 %  traverses owl edge graph starting from a predefined set of nodes
-owl_subgraph(Nodes,Preds,Triples,Opts) :-
-        owl_subgraph(Nodes,Preds,[],Triples,[],Opts).
+owl_subgraph(Nodes,Preds,Quads,Opts) :-
+        owl_subgraph(Nodes,Preds,[],Quads,[],Opts).
 
-%! owl_subgraph(+Nodes:list, +Preds:list, +Triples:list, ?FinalTriples:list, +Visited:list, +Opts:list) is det.
-owl_subgraph([],_,Triples,Triples,_,_).
-owl_subgraph([Node|Nodes],Preds,Triples,FinalTriples,Visited,Opts) :-
+%! owl_subgraph(+Nodes:list, +Preds:list, +Quads:list, ?FinalQuads:list, +Visited:list, +Opts:list) is det.
+owl_subgraph([],_,Quads,Quads,_,_).
+owl_subgraph([Node|Nodes],Preds,Quads,FinalQuads,Visited,Opts) :-
         \+ member(Node,Visited),
-        setof(rdf(Node,P,O,G),(owl_edge(Node,P,O,G),opt_member(P,Preds)),NewTriples),
+        setof(rdf(Node,P,O,G),(owl_edge(Node,P,O,G),opt_member(P,Preds)),NewQuads),
         !,
-        setof(O,S^P^G^member(rdf(S,P,O,G),NewTriples),NewNodes),
-        ord_union(Triples,NewTriples,AccTriples),
+        setof(O,S^P^G^member(rdf(S,P,O,G),NewQuads),NewNodes),
+        ord_union(Quads,NewQuads,AccQuads),
         append(Nodes,NewNodes,NextNodes),
-        owl_subgraph(NextNodes,Preds,AccTriples,FinalTriples,[Node|Visited],Opts).
-owl_subgraph([_|Nodes],Preds,Triples,FinalTriples,Visited,Opts) :-
-        owl_subgraph(Nodes,Preds,Triples,FinalTriples,Visited,Opts).
+        owl_subgraph(NextNodes,Preds,AccQuads,FinalQuads,[Node|Visited],Opts).
+owl_subgraph([Root|Nodes],Preds,Quads,FinalQuads,Visited,Opts) :-
+        owl_subgraph(Nodes,Preds,[root(Root)|Quads],FinalQuads,Visited,Opts).
 
 opt_member(_,L) :- var(L),!.
 opt_member(X,L) :- member(X,L).
@@ -212,11 +217,16 @@ quads_object(Quads,E) :-
         (   E=S
         ;   E=P
         ;   E=O).
+quads_object(Quads,N) :-
+        member(root(N), Quads).
 
+
+% transforms quads (triples + graph arg) to obograph JSON dict
 quads_dict(Quads, Dict) :-
-        setof(E,quads_object(Quads,E),Es),
-        maplist(owl_object_dict, Es,  Nodes),
-        maplist(quad_dict, Quads,  Edges),
+        setof(Obj,quads_object(Quads,Obj),Objs),
+        maplist(owl_object_dict, Objs,  Nodes),
+        findall(Q,(member(Q,Quads),Q=rdf(_,_,_,_)),RealQuads),
+        maplist(quad_dict, RealQuads,  Edges),
         Dict = graph{nodes:Nodes, edges:Edges}.
 
 quad_dict(rdf(S,P,O,_), Dict) :-
@@ -229,19 +239,44 @@ owl_object_dict(C, Dict) :-
         (   label(C,N1)
         ->  true
         ;   N1=C),
+        (   rdf(C,rdf:type,Type)
+        ->  true
+        ;   Type=instance),
         ensure_curie_or_atom(N1, N),
         Meta = meta{},
-        Dict = node{id:Id, lbl:N, meta:Meta}.
+        Dict = node{id:Id, type:Type, lbl:N, meta:Meta}.
 
 ensure_curie_or_atom(R ^^ _, R) :- !.
 ensure_curie_or_atom(R @ _, R) :- !.
 ensure_curie_or_atom(R, Id) :-
         ensure_curie(R, Id).
 
+%! ensure_uri(+Uri, ?CurieOrUriTerm) is det
+%
+%  translates URI to a CurieOrUriTerm
 ensure_curie(In, Id) :-
         rdf_global_id(In, Uri),
         rdf_global_id(Id1, Uri),
         sformat(Id,'~w',[Id1]).
+
+%! ensure_uri(+CurieOrUriTerm, ?Uri) is det
+%
+%  translates CurieOrUriTerm to a URI.
+%  CurieOrUriTerm is either:
+%   - a Uri atom
+%   - a Pre:Post CURIE term
+%   - an atom of the form 'Pre:Post'
+ensure_uri(Pre:Post, Uri) :-
+        !,
+        rdf_global_id(Pre:Post,Uri).
+ensure_uri(Id, Uri) :-
+        concat_atom([Pre,Post],:,Id),
+        rdf_current_prefix(Pre,_),
+        !,
+        rdf_global_id(Pre:Post,Uri).
+ensure_uri(X, Uri) :-
+        rdf_global_id(X,Uri).
+
 
 % TODO: move to other module
 simj_by_subclass(C1,C2,S) :-
