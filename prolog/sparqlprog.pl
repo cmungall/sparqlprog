@@ -47,6 +47,7 @@
  
   Samer Abdallah, Dept. of Computer Science, UCL (2014)
   Based on Yves Raimond's swic package, but completely re-written.
+  Adapted by Chris Mungall
 
    This module provides a little language for expressing SPARQL queries
    and a database of known SPARQL endpoints. Queries can be executed
@@ -526,6 +527,7 @@ filter_opts([H|T],[H|T2]) :-
         H=..[P|_],
         P\=inject_labels,
         P\=bindings,
+        P\=label_predicate,
         !,
         filter_opts(T,T2).
 filter_opts([_|T],T2) :-
@@ -536,19 +538,22 @@ filter_opts([_|T],T2) :-
 %
 % Add an optional(rdf(X,rdfs:label,XL)) for every variable X in Select
 % TODO: interleave
-inject_label_query(Select, Goal, Select2, (Goal,ConjGoal), _Opts) :-
+inject_label_query(Select, Goal, Select2, (Goal,ConjGoal), Opts) :-
         term_variables(Select,Vars),
-        inject_label_for_vars(Vars,ConjGoal,LabelVars),
+        option(label_predicate(P),Opts,rdfpred(rdfs:label)),
+        inject_label_for_vars(Vars,ConjGoal,LabelVars,P),
         conjoin(Select,LabelVars,Select2).
 
-inject_label_for_vars([Var],Goal,[LabelVar]) :-
+inject_label_for_vars([Var],Goal,[LabelVar],P) :-
         !,
-        inject_label_for_var(Var,Goal,LabelVar).
-inject_label_for_vars([Var|Vars],(Goal1,Goal2),[LabelVar|LabelVars]) :-
+        inject_label_for_var(Var,Goal,LabelVar,P).
+inject_label_for_vars([Var|Vars],(Goal1,Goal2),[LabelVar|LabelVars],P) :-
         !,
-        inject_label_for_var(Var,Goal1,LabelVar),
-        inject_label_for_vars(Vars,Goal2,LabelVars).
-inject_label_for_var(Var,optional(rdf(Var,rdfs:label,VarLabel)),VarLabel).
+        inject_label_for_var(Var,Goal1,LabelVar,P),
+        inject_label_for_vars(Vars,Goal2,LabelVars,P).
+inject_label_for_var(Var,optional(rdf(Var,P,VarLabel)),VarLabel,rdfpred(P)) :- !.  % e.g. rdfs:label
+inject_label_for_var(Var,optional(Goal),VarLabel,P) :-  Goal =.. [P,Var,VarLabel].  % prolog predicate, e.g. enlabel/2
+
 
 conjoin(Term,L,T2) :-
         is_list(Term),

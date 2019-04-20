@@ -13,15 +13,45 @@ pq-wd  'continent(C),label(C,CN),lang(CN)="en"'
 # as above, using convenience predicate
 pq-wd  'continent(C),enlabel(C,CN)'
 
+# same, passing in enlabel/2 as predicate for fetching labe
+pq-wd -l -L enlabel  'continent(C)'
+
+# same
+pq-wd -l -L enlabel continent
+
+# all countries (direct)
+pq-wd -l -L enlabel country
+
+# all countries (direct and indirect)
+pq-wd -l -L enlabel country_inf
+
+# same, with their types
+pq-wd -f tsv  -l -L enlabel 'country_inf(C),instance_of(C,T)'
+
+# countries and triples linking countries to other things
+# note we use enlabel_any/2 which is capable of labeling wdt:properties
+pq-wd  -l -L enlabel_any 'country(C),rdf(C,P,D),instance_of(D,DT)'
+
+# all transitive superclasses of the class 'country'
+pq-wd  -l -L enlabel 'country_iri(C),subclass_of_transitive(C,D)'
+pq-wd -f tsv  -l -L enlabel 'country_iri(C),subclass_of_transitive(C,D)' 'parent(D)'
+
 # power stations and their locations
 # Note: affixing "_inf" on the end of a class predicate will return inferred classification
 pq-wd   "power_station_inf(X),coordinate_location(X,Loc),enlabel(X,XN)"
 
 # cities with populations over 10m, plus the contininent they are part of
-pq-wd "city_inf(City),part_of_continent(City,Continent),enlabel(City,CityN),enlabel(Continent,ContinentN),population(City,Pop),Pop>10000000"
+pq-wd -l -L enlabel "city_inf(City),part_of_continent(City,Continent),population(City,Pop),Pop>10000000"
 
 # cities in more than one continent
 pq-wd    "city_inf(C),part_of_continent(C,X1),part_of_continent(C,X2),X1@>X2,enlabel(C,CN)"
+
+# --
+# Wikidata schema/ontology
+# --
+
+# is-a links
+pq-wd  -L enlabel -l subclass_of
 
 # --
 # Biology Examples

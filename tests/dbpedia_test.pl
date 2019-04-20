@@ -6,7 +6,7 @@
 :- begin_tests(dbpedia_test).
 
 dbp_artist_child_directed(Artist,Child,Movie) :-
-        dbp ?? musical_artist(Artist),child(Artist,Child),directed(Child,Movie).
+        dbp ?? musical_artist(Artist),has_child(Artist,Child),directed(Child,Movie).
 
 test_q(Q,Expected) :-
         findall(Q,Q,Results),

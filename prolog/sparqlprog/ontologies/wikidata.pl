@@ -1,6 +1,12 @@
 /*
 
+  @Deprecated
+
+  now in its own pack
+  
 expose a subclass of dbpedia for demo purposes
+
+See examples/wikidata-examples.sh
 
   For complete ontology use rdfs2pl
 
@@ -16,6 +22,8 @@ Note: this module uses macros to generate predicates. For every pname_wid/2 and 
            var_drug_condition/4,
            
            enlabel/2,
+           enlabelp/2,
+           enlabel_any/2,
            exact_match/2
 
            ]).
@@ -35,15 +43,19 @@ Note: this module uses macros to generate predicates. For every pname_wid/2 and 
 % https://www.mediawiki.org/wiki/Wikibase/Indexing/RDF_Dump_Format#Prefixes_used
 :- rdf_register_prefix(wd,'http://www.wikidata.org/entity/').
 :- rdf_register_prefix(wdt,'http://www.wikidata.org/prop/direct/').
+:- rdf_register_prefix(wbont,'http://wikiba.se/ontology#').
+
 :- rdf_register_prefix(instance_of,'http://www.wikidata.org/prop/direct/P31').
 
 user:term_expansion(pname_wid(P,Id),
                     [(   Head :- Body),
+                     (   Head_trans :- Body_trans),
                      (   Head_s :- Body_s),
                      (   Head_ps :- Body_ps),
                      (   Head_q :- Body_q),
                      (   Head_iri :- true),
                      (   Head_eiri :- true),
+                     (   :- initialization(export(P_trans/2), now)),
                      (   :- initialization(export(P_s/2), now)),
                      (   :- initialization(export(P_ps/2), now)),
                      (   :- initialization(export(P_q/2), now)),
@@ -61,6 +73,11 @@ user:term_expansion(pname_wid(P,Id),
         Head =.. [P,S,O],
         atom_concat('http://www.wikidata.org/prop/direct/',Frag,Px),
         Body = rdf(S,Px,O),
+
+        atom_concat(P,'_transitive',P_trans),
+        Head_trans =.. [P_trans,S,O],
+        Body_trans = rdf_path(S,zeroOrMore(Px),O),
+        
         
         % p: Links entity to statement
         % wd:Q2 p:P9 wds:Q2-82a6e009 ==> P9_statement(Q2,wds:....)
@@ -125,6 +142,11 @@ user:term_expansion(cname_wid(C,Id),
 
 
 enlabel(E,N) :- label(E,N),lang(N)="en".
+enlabelp(E,N) :- rdf(X,wbont:directClaim,E),enlabel(X,N).
+enlabel_any(E,N) :- enlabel(E,N).
+enlabel_any(E,N) :- enlabelp(E,N).
+
+
 
 % --------------------
 % classes
@@ -231,6 +253,7 @@ pname_wid(regulates, p128).
 % CLASSES
 
 % geo
+cname_wid(geographic_entity, q27096213).
 cname_wid(continent, q5107).
 cname_wid(country, q6256).
 cname_wid(city, q515).

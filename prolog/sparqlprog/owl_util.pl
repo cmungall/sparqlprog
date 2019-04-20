@@ -25,7 +25,11 @@
            owl_edge/4,
            owl_subgraph/4,
 
+           quads_objects/2,
            quads_dict/2,
+
+           assert_named_individuals/0,
+           assert_named_individuals_forall/0,
 
            ensure_uri/2,
            ensure_curie/2,
@@ -176,11 +180,57 @@ owl_edge(S,P,O) :-
 owl_edge(S,P,O,G) :-
         rdf(S,rdfs:subClassOf,R,G),
         owl_some(R,P,O),
-        \+ rdf_is_bnode(O).
+        \+ rdf_is_bnode(O),
+        \+ rdf_is_bnode(S).
 owl_edge(S,rdfs:subClassOf,O,G) :-
         rdf(S,rdfs:subClassOf,O,G),
-        \+ rdf_is_bnode(O).
+        \+ rdf_is_bnode(O),
+        \+ rdf_is_bnode(S).
+owl_edge(S,P,O,G) :-
+        rdf(S,P,O,G),
+        rdf_is_iri(O),
+        rdf(S,rdf:type,owl:'NamedIndividual'),
+        rdf(O,rdf:type,owl:'NamedIndividual').
+owl_edge(S,rdf:type,O,G) :-
+        rdf(S,rdf:type,O,G),
+        rdf_is_iri(O),
+        rdf(S,rdf:type,owl:'NamedIndividual'),
+        \+ rdf_global_id(owl:_,O).
 
+
+owl_edge_query(Preds,S,^(P),O,G) :-
+        nonvar(Preds),
+        member(^(P),Preds),
+        % inverse
+        owl_edge(O,P,S,G).
+owl_edge_query(Preds,S,P,O,G) :-
+        owl_edge(S,P,O,G),
+        opt_member(P,Preds).
+
+
+inferred_named_individual(I,G) :-
+        rdf(I,rdf:type,C,G),
+        rdf_is_iri(C),
+        \+ rdf_global_id(owl:_,C),
+        \+ rdf_global_id(rdfs:_,C).
+
+assert_named_individuals :-
+        inferred_named_individual(I,G),
+        rdf_assert(I,rdf:type,owl:'NamedIndividual',G),
+        debug(owl,'NI: ~w ~w',[I,G]),
+        fail.
+assert_named_individuals.
+
+assert_named_individuals_forall :-
+        rdf_node_graph(I,G),
+        rdf_assert(I,rdf:type,owl:'NamedIndividual',G),
+        debug(owl,'NI: ~w ~w',[I,G]),
+        fail.
+assert_named_individuals_forall.
+
+rdf_node_graph(I,G) :- rdf(I,_,_,G).
+rdf_node_graph(I,G) :- rdf(_,_,I,G), rdf_is_iri(I), \+ rdf_global_id(owl:'NamedIndividual',I).
+        
 
 %! node_ancestor_graph_edge(?Node,?S,?P,?O,?G) is nondet.
 %
@@ -197,10 +247,13 @@ owl_subgraph(Nodes,Preds,Quads,Opts) :-
         owl_subgraph(Nodes,Preds,[],Quads,[],Opts).
 
 %! owl_subgraph(+Nodes:list, +Preds:list, +Quads:list, ?FinalQuads:list, +Visited:list, +Opts:list) is det.
-owl_subgraph([],_,Quads,Quads,_,_).
+owl_subgraph([],_,Quads,NQuads,_,_) :-
+        maplist(normalize_quad,Quads,NQuads).
 owl_subgraph([Node|Nodes],Preds,Quads,FinalQuads,Visited,Opts) :-
         \+ member(Node,Visited),
-        setof(rdf(Node,P,O,G),(owl_edge(Node,P,O,G),opt_member(P,Preds)),NewQuads),
+        debug(owl_graph,'Query node: ~w; PredQ=~w',[Node,Preds]),
+        setof(rdf(Node,P,O,G),(owl_edge_query(Preds,Node,P,O,G)),NewQuads),
+        debug(owl_graph,'  Quads: ~w',[NewQuads]),
         !,
         setof(O,S^P^G^member(rdf(S,P,O,G),NewQuads),NewNodes),
         ord_union(Quads,NewQuads,AccQuads),
@@ -208,6 +261,10 @@ owl_subgraph([Node|Nodes],Preds,Quads,FinalQuads,Visited,Opts) :-
         owl_subgraph(NextNodes,Preds,AccQuads,FinalQuads,[Node|Visited],Opts).
 owl_subgraph([Root|Nodes],Preds,Quads,FinalQuads,Visited,Opts) :-
         owl_subgraph(Nodes,Preds,[root(Root)|Quads],FinalQuads,Visited,Opts).
+
+normalize_quad(rdf(S,^(P),O,G),rdf(O,P,S,G)) :- !.
+normalize_quad(X,X).
+
 
 opt_member(_,L) :- var(L),!.
 opt_member(X,L) :- member(X,L).
@@ -219,6 +276,9 @@ quads_object(Quads,E) :-
         ;   E=O).
 quads_object(Quads,N) :-
         member(root(N), Quads).
+
+quads_objects(Quads,Objs) :-
+        setof(Obj,quads_object(Quads,Obj),Objs).
 
 
 % transforms quads (triples + graph arg) to obograph JSON dict
@@ -239,12 +299,44 @@ owl_object_dict(C, Dict) :-
         (   label(C,N1)
         ->  true
         ;   N1=C),
-        (   rdf(C,rdf:type,Type)
-        ->  true
-        ;   Type=instance),
+        rdf_node_type(C,Type1),
+        upcase_atom(Type1,Type),
         ensure_curie_or_atom(N1, N),
-        Meta = meta{},
+        findall(PV, object_property_value(C,_,_,PV),PVs),
+        Meta = meta{ basicPropertyValues: PVs },
         Dict = node{id:Id, type:Type, lbl:N, meta:Meta}.
+
+object_property_value(C,P,V,pv{pred:P,val:V}) :-
+        rdf(C,P1,V1),
+        ensure_curie(P1,P),
+        rdf_is_literal(V1),
+        literal_atom(V1,V),
+        debug(owl,'~w PV = ~w ~q',[C,P,V]),
+        \+ compound(V).
+
+literal_atom(V@_,V).
+literal_atom(V^^_,V).
+
+        
+
+rdf_node_type(X,class) :- is_class(X),!.
+rdf_node_type(X,property) :- is_property(X),!.
+rdf_node_type(X,instance) :- is_instance(X),!.
+rdf_node_type(_,unknown).
+
+
+is_class(X) :- \+ \+ rdf(_,rdf:type,X).
+is_class(X) :- rdf(X,rdf:type,owl:'Class').
+is_property(X) :- rdf(X,rdf:type,owl:'ObjectProperty').
+is_property(X) :- rdf(X,rdf:type,owl:'DataProperty').
+is_property(X) :- rdf(X,rdf:type,owl:'TransitiveProperty').
+is_property(X) :- rdf(X,rdf:type,owl:'AnnotationProperty').
+is_property(X) :- rdf(X,rdf:type,rdfs:'Property').
+is_property(X) :- \+ \+ rdf(_,X,_).
+is_instance(X) :- rdf(X,rdf:type,C), \+ rdf_global_id(owl:_,C), \+ rdf_global_id(rdfs:_,C).
+
+
+
 
 ensure_curie_or_atom(R ^^ _, R) :- !.
 ensure_curie_or_atom(R @ _, R) :- !.

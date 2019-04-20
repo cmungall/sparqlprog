@@ -1,6 +1,7 @@
 :- module(labelutils,
           [
            label_atom/2,
+           label_atom/3,
            row_labelify/2,
            term_labelify/2
           ]).
@@ -9,14 +10,19 @@
 :- use_module(library(sparqlprog/emulate_builtins)).
 
 label_atom(S,A) :-
+        label_atom(S,A,[]).
+
+label_atom(S,A, _Opts) :-
         string(S),
         !,
         atom_string(A,S).
-label_atom(X,A) :-
+label_atom(X,A, Opts) :-
         \+ compound(X),
         atom(X),
         atom_iri(X,IRI),
-        rdf(IRI,rdfs:label,Literal),
+        (   option(label_predicate(P),Opts)
+        ->  rdf(IRI,P,Literal)
+        ;   rdf(IRI,rdfs:label,Literal)),
         ensure_atom(Literal,A).
 
 atom_iri(X,I) :-
