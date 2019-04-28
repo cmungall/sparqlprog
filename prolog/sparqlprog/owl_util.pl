@@ -1,7 +1,16 @@
 :- module(owl_util,
           [enlabel_of/2,
+           label_of/2,
            label_of/3,
-           
+
+           triple_axiom/2,
+           triple_axiom/4,
+           triple_axiom_annotation/3,
+           triple_axiom_annotation/5,
+           triple_axiom_annotations/4,
+           triple_property_axiom_annotations/5,
+           axiom_annotation/3,
+
            owl_some/3,
            owl_all/3,
            owl_equivalent_class/2,
@@ -54,9 +63,47 @@
 
 enlabel_of(Label,X) :- label_of(Label,X,en).
 
+label_of(Label,X) :- label_of(Label,X,_).
 label_of(Label,X,Lang) :- rdf(X,rdfs:label,Label@Lang).
 label_of(Label,X,_) :- rdf(X,rdfs:label,Label^^xsd:string).
 %label_of(Label,X,Lang) :- rdf(X,rdfs:label,Lit), (Lit == Label@Lang ; Lit == Label^^xsd:string).
+
+
+triple_axiom(rdf(I,P,J),A) :-
+        triple_axiom(I,P,J,A).
+triple_axiom(I,P,J,A) :-
+        rdf(A,owl:annotatedSource,I),
+        rdf(A,owl:annotatedProperty,P),
+        rdf(A,owl:annotatedTarget,J).
+
+:- rdf_meta triple_axiom_annotation(r,r,o).
+triple_axiom_annotation(T,P,V) :-
+        triple_axiom(T,A),
+        axiom_annotation(A,P,V).
+
+:- rdf_meta triple_axiom_annotation(r,r,o,r,o).
+triple_axiom_annotation(I,P1,J,P,V) :-
+        triple_axiom(I,P1,J,A),
+        axiom_annotation(A,P,V).
+
+:- rdf_meta triple_axiom_annotations(r,r,o,-).
+triple_axiom_annotations(I,P,J,L) :-
+        rdf(I,P,J),
+        findall(P1-V1,triple_axiom_annotation(I,P,J,P1,V1),L).
+
+:- rdf_meta triple_property_axiom_annotations(r,r,o,r,-).
+triple_property_axiom_annotations(I,P,J,P1,L) :-
+        rdf(I,P,J),
+        findall(V1,triple_axiom_annotation(I,P,J,P1,V1),L).
+        
+axiom_annotation(A,P,V) :-
+        rdf(A,P,V),
+        rdf(A,rdf:type,owl:'Axiom'),
+        P \= 'http://www.w3.org/2002/07/owl#annotatedProperty',
+        P \= 'http://www.w3.org/2002/07/owl#annotatedSource',
+        P \= 'http://www.w3.org/2002/07/owl#annotatedTarget',
+        \+ ((P='http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+             V='http://www.w3.org/2002/07/owl#Axiom')).
 
 
 

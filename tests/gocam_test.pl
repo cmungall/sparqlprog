@@ -16,12 +16,25 @@ test_q(Q,Expected) :-
 
 :- debug(sparqlprog).
 
+/*
 k2k(A1,A2,G1C,G2C) :-
         go ?? (
                kinase_activity(A1),
                enabled_by(A1,G1),
                part_of(A1,A2),
                signal_transduction(A2),
+               enabled_by(A1,G2),
+               rdf(G1,rdf:type,G1C),
+               rdf(G2,rdf:type,G2C)
+               ).
+*/
+
+k2k(A1,A2,G1C,G2C) :-
+        go ?? (
+               kinase_activity(A1),
+               kinase_activity(A2),
+               enabled_by(A1,G1),
+               rdf(A1,R,A2),
                enabled_by(A1,G2),
                rdf(G1,rdf:type,G1C),
                rdf(G2,rdf:type,G2C)

@@ -274,6 +274,9 @@ display_quads(Objs, _, info, _, Opts) :-
                display_obj(Obj, Opts)).
 display_quads(Objs, _, obo, _, Opts) :-
         !,
+        ensure_loaded(library(sparqlprog/obo_util)),
+        gen_header(user_output,_,Opts),
+        nl,
         forall(member(Obj, Objs),
                display_obo_stanza(Obj, Opts)).
 
@@ -285,13 +288,8 @@ display_obj(Uri, _Opts) :-
         nl.
 
 
-display_obo_stanza(Uri, _Opts) :-
-        format('[Term]~n'),
-        ensure_curie(Uri, Id),
-        format('id: ~w~n',[Id]),
-        forall((rdf(Uri,rdfs:label,Label),ensure_atom(Label,A)),
-               format('name: ~w~n',[A])),
-        nl.
+display_obo_stanza(Uri, Opts) :-
+        gen_stanza(user_output,Uri,Opts).
 
 
         

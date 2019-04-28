@@ -16,9 +16,8 @@
 
 
 load_test_file :-
-        rdf_load('tests/go_nucleus.ttl'),
-        forall(rdf(S,P,O),
-               writeln(x(S,P,O))).
+        % load into a test-specific graph due to cache issue
+        rdf_load('tests/go_nucleus.ttl',[cache(false), graph(search)]).
 
 
 test_count(Goal,ExpectedCount) :-

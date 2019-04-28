@@ -214,6 +214,7 @@ rewrite_goal(T, T2,_) :- T=rdf(_,_,_), !, replace_string_unification(T,T2).
 rewrite_goal(T, T2,_) :- T=rdf(_,_,_,_), !, replace_string_unification(T,T2).
 rewrite_goal(filter(A), filter(A),_) :- !.
 rewrite_goal(rdf_has(S,P,O), T2,_) :- !, replace_string_unification(rdf(S,P,O),T2).
+rewrite_goal(service(S,G), service(S,G2), D) :- !, rewrite_goal(G,G2,D).
 
 % TODO: consider adding semantics
 %rewrite_goal(rdf(S,P,O), rdf_has(S,P,O),_) :- !.
@@ -330,11 +331,14 @@ replace_string_unification_args([A|Args],[A|Args2],T,T2) :-
         replace_string_unification_args(Args,Args2,T,T2).
 
 
-        
+no_rewrite(rdf_graph(_)).
+no_rewrite(rdf_predicate(_)).
+
 
 safe_clause(Goal,Body) :-
         catch(clause(Goal,Body,Ref),_,fail),
         % TODO: come up with a more extensible way to prevent SPARQL builtins being expanded
+        \+ no_rewrite(Goal),
         \+ ((clause_property(Ref,module(Mod)),
              Mod=emulate_builtins)).
 
@@ -507,7 +511,7 @@ create_sparql_select(Select,Goal,SPARQL,Opts) :-
         rewrite_goal(Goal,Goal2),
         debug(sparqlprog,'Rewritten goal2: ~q',[Goal2]),
         term_variables(Select,Vars),
-        debug(sparqlprog,'Vars: ~q',[Vars]),        
+        debug(sparqlprog,'Vars: ~q',[Vars]),
         (   Vars = [] % if no variables, do an ASK query, otherwise, SELECT
         ->  phrase_to_sparql(ask(Goal2),SPARQL)
         ;   setting(limit,DefaultLimit),

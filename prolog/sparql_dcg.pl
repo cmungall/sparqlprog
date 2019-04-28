@@ -152,7 +152,7 @@ goal((G1,G2)) --> goal(G1), " . ", goal(G2).
 goal(conj(GS)) --> seqmap_with_sep(" , ",goal,GS).
 goal(optional(G))     --> "OPTIONAL ", brace(goal(G)).
 
-goal(service(S,G)) --> "SERVICE ",resource(S)," ",brace(G).
+goal(service(S,G)) --> "SERVICE ",resource(S)," ",brace(goal(G)).
 
 goal(rdf_path(S,P,O,G)) --> goal(rdf(S,P,O,G)).
 goal(rdf_path(S,P,O)) --> goal(rdf(S,P,O)).
@@ -167,10 +167,17 @@ goal(rdf(S,P,O)) -->
 
 goal(rdf(S,P,O,G)) --> "GRAPH ", resource(G), " ", brace(goal(rdf(S,P,O))).
 
+% this does not work on many triplestores
+% https://stackoverflow.com/questions/32274562/what-is-the-sparql-query-to-get-the-name-of-all-graphs-existing-in-my-triplestor
+goal(rdf_graph(G)) --> "GRAPH ", resource(G), " {}".
+
+goal(rdf_predicate(P)) --> "SELECT DISTINCT ", expr(P), " ", where(rdf(_,P,_)).
+
 goal(aggregate(Expr,G,Result)) --> "SELECT ", expr(Expr), " AS ", variable(Result), " ", where(G).
 goal(aggregate_group(Expr,GroupVars,G,Result)) --> 
-        "SELECT ", expr(Expr), " AS ", variable(Result), " ",seqmap_with_sep(" ",expr,GroupVars), " ",
-        where(G).
+        "SELECT (", expr(Expr), " AS ", variable(Result), ") ",
+        where(G),
+        " GROUP BY ", seqmap_with_sep(" ",expr,GroupVars), " ".
 
 
 goal(is(V,Expr)) --> goal(bind(Expr,V)).

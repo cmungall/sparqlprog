@@ -18,7 +18,10 @@
                 cleanup(rdf_retractall(_,_,_,_))]).
 
 load_test_file :-
-        rdf_load('tests/go_nucleus.ttl').
+        % load into a test-specific graph due to cache issue
+        rdf_load('tests/go_nucleus.ttl',[cache(false),
+                                         graph(prolog)]).
+
 
 run_test_query(N,X,G,L,L1) :-
         setof(X,G,L1),

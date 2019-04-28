@@ -16,6 +16,7 @@
           [
            ensure_atom/2,
            ensure_string/2,
+           ensure_atoms/2,
            lcase/2,
            regex/2,
            regex/3,
@@ -232,6 +233,8 @@ ensure_atom(S, A) :- string(S), !, atom_string(A,S).
 ensure_string(S,S) :- string(S),!.
 ensure_string(A,S) :- atom(A), !, atom_string(A,S).
 ensure_string(A,_) :- throw(ensure_string(A)).
+
+ensure_atoms(L, L2) :- maplist([A,B]>>ensure_atom(A,B),L,L2).
 
 
 ensure_number(N, N) :- number(N),!.

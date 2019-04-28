@@ -164,13 +164,26 @@ test(like1) :-
 %        test_select( refl(_,_),
 %                     "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . ?v1 <http://www.bigdata.com/rdf/search#search> \"foo\"}").
 
-test(agg) :-
+test(agg_max) :-
         create_sparql_select(MaxVal,
                              aggregate(max(Val),rdf(_,'':v,Val),MaxVal),
                              SPARQL,
                              []),
         format(' Query ==> ~w~n',[ SPARQL ]),
         assertion( SPARQL = "SELECT ?v0 WHERE {SELECT max(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}}" ).
+
+test(agg_count) :-
+        create_sparql_select(Count,
+                             aggregate(count(Val),rdf(_,'':v,Val),Count),
+                             SPARQL,
+                             []),
+        format(' Query ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT ?v0 WHERE {SELECT COUNT(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}}" ).
+
+
+test(rdf_predicate) :-
+        test_select( rdf_predicate(P),
+                     "SELECT ?v0 WHERE {SELECT DISTINCT ?v0 WHERE {[] ?v0 []}}").
 
 % TODO
 test(disj) :-
