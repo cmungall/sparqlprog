@@ -185,6 +185,14 @@ test(rdf_predicate) :-
         test_select( rdf_predicate(P),
                      "SELECT ?v0 WHERE {SELECT DISTINCT ?v0 WHERE {[] ?v0 []}}").
 
+test(member) :-
+        test_select( member(A,[1,2,3]),
+                     "SELECT ?v0 WHERE {VALUES ?v0 {1 2 3 }}").
+test(member) :-
+        test_select( member([A,B],[["a",1],["b",2],["c",3]]),
+                     "SELECT ?v0 ?v1 WHERE {VALUES (?v0 ?v1) {(\"a\" 1) (\"b\" 2) (\"c\" 3) }}").
+
+
 % TODO
 test(disj) :-
         test_select( is_mammal(_X),

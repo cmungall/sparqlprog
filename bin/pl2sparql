@@ -360,7 +360,7 @@ exec_query_direct(Select, Query, Bindings, Opts) :-
         (   option(inject_labels(true),Opts)
         ->  inject_label_query(Select,Query,Select2,Query2,Opts)
         ;   Select2=Select, Query2=Query),
-        forall('??'(Service,Query2),
+        forall('??'(Service,Query2,Select2),
                write_result(Select2,Opts)),
         nl.
 

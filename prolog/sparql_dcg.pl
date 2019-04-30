@@ -188,6 +188,19 @@ goal(filter(Cond)) --> "FILTER ", cond(Cond).
 goal({Cond}) --> "FILTER ", cond(Cond).
 goal(rdf_where(Cond)) --> "FILTER ", cond(Cond).
 
+goal(member(Var,Vals)) -->
+        {ground(Vals)},
+        !,
+        goal(values(Var,Vals)).
+goal(values(Var,Vals)) -->
+        {\+ is_list(Var)}, !,
+        "VALUES ",expr(Var)," {",
+        seqmap_with_sep(" ",expr,Vals), " }".
+goal(values(Vars,Tuples)) --> "VALUES (",
+        seqmap_with_sep(" ",expr,Vars), ") {",
+        seqmap_with_sep(" ",tuple,Tuples), " }".
+
+
 goal(true) --> "true" .
 
 % TODO: put this in its own section
@@ -195,6 +208,8 @@ goal(str_before(Str, Sep, Sub)) --> goal(bind(str_before(Str, Sep), Sub)).
 
 % allow conditions not wrapped by rdf_where/1
 goal(G) --> goal(filter(G)).
+
+tuple(Vals) --> "(", seqmap_with_sep(" ",expr,Vals), ")".
 
 
 :- op(1150,fx,p).

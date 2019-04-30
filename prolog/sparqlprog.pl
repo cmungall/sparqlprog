@@ -39,6 +39,7 @@
    ,  service_query_all/4
    ,  (??)/1
    ,  (??)/2
+   ,  (??)/3
    ,  op(1150,fx,??)
    ,  op(1150,xfy,??)
 	]).
@@ -106,6 +107,8 @@ service_query_all(_,_,_,[]).
 %  IF EP is unbound on entry, it is bound to the endpoint from which
 %  the current bindings were obtained.
 ??(EP,Spec) :-
+        ??(EP,Spec,Spec).
+??(EP,Spec,SelectTerm) :-
         debug(sparqlprog,'Finding subqueries: ~q',[Spec]),
         expand_subqueries(Spec,Spec2,EP),
         debug(sparqlprog,'Rewriting goal: ~q',[Spec2]),
@@ -115,7 +118,7 @@ service_query_all(_,_,_,[]).
         debug(sparqlprog,'Opts: ~q',[Opts0]),
         setting(select_options,Opts0),
         merge_options(Opts,Opts0,Opts1),
-        query_goal(EP,Goal,Opts1).
+        query_goal(EP,Goal,SelectTerm,Opts1).
 
 spec_goal_opts(Opts ?? Goal, Goal, Opts) :- !.
 spec_goal_opts(Goal,Goal,[]).
@@ -333,6 +336,8 @@ replace_string_unification_args([A|Args],[A|Args2],T,T2) :-
 
 no_rewrite(rdf_graph(_)).
 no_rewrite(rdf_predicate(_)).
+no_rewrite(rdf_is_iri(_)).
+no_rewrite(member(_,_)).
 
 
 safe_clause(Goal,Body) :-
@@ -462,8 +467,11 @@ current_sparql_endpoint(EP,Host,Port,Path,Options) :-
 %  Other options are passed to phrase_to_sparql/2.
 
 query_goal(EP,Goal,Opts) :- 
+        query_goal(EP,Goal,Goal,Opts).
+
+query_goal(EP,Goal,SelectTerm,Opts) :- 
    findall(EP,sparql_endpoint(EP,_,_,_,_),EPs),
-   term_variables(Goal,Vars),
+   term_variables(SelectTerm,Vars),
    (  Vars = [] % if no variables, do an ASK query, otherwise, SELECT
    -> phrase_to_sparql(ask(Goal),SPARQL),
       parallel_query(simple_query(SPARQL),EPs,EP-true)
