@@ -75,9 +75,15 @@ test(str_eq) :-
                       Label=="foo"),
                      "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . FILTER (?v1 = \"foo\")}").
 
+
 test(str_eq2) :-
         test_select( rdf(_S,rdfs:label,"foo"),
                      "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . FILTER (?v1 = \"foo\")}").
+
+%test(str_eq3) :-
+%        test_select( (label(S,Label),
+%                      Label=="foo"),
+%                     "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . FILTER (?v1 = \"foo\")}").
 
 test(lang_literal_eq) :-
         test_select( rdf(_S,rdfs:label,"foo"@en),
@@ -182,14 +188,14 @@ test(agg_count) :-
 
 
 test(rdf_predicate) :-
-        test_select( rdf_predicate(P),
+        test_select( rdf_predicate(_),
                      "SELECT ?v0 WHERE {SELECT DISTINCT ?v0 WHERE {[] ?v0 []}}").
 
 test(member) :-
-        test_select( member(A,[1,2,3]),
+        test_select( member(_A,[1,2,3]),
                      "SELECT ?v0 WHERE {VALUES ?v0 {1 2 3 }}").
 test(member) :-
-        test_select( member([A,B],[["a",1],["b",2],["c",3]]),
+        test_select( member([_A,_B],[["a",1],["b",2],["c",3]]),
                      "SELECT ?v0 ?v1 WHERE {VALUES (?v0 ?v1) {(\"a\" 1) (\"b\" 2) (\"c\" 3) }}").
 
 

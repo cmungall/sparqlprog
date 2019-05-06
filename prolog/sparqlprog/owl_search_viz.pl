@@ -88,7 +88,10 @@ owl_search_and_display(SearchTerms, Opts) :-
         debug(search, 'SG(~q)',[Rels]),
         owl_subgraph(SeedObjs, Rels, Quads, []),
         quads_objects(Quads, DispObjs),
-        display_quads(DispObjs, Quads, OutFmt, _OutFile, Opts).
+        (   option(output(OutFile),Opts)
+        ->  true
+        ;   OutFile=_),
+        display_quads(DispObjs, Quads, OutFmt, OutFile, Opts).
 
 
 %! owl_search_and_display(+SearchTerm, +PredTerm, +PostTerm, +Rels, +DispTerm, +OutFile, +Opts:list) is det
@@ -168,6 +171,7 @@ normalize_relterm(X,P) :- normalize_rel(X,P1),ensure_uri(P1,P).
 normalize_rel(s,rdfs:subClassOf) :- !.
 normalize_rel(t,rdf:type) :- !.
 normalize_rel(N,R) :- \+ \+ lmatch(N,R), !, lmatch(N,R).
+normalize_rel(N,R) :- concat_atom(L,'_',N), L=[_,_|_], concat_atom(L,' ',N1),!,normalize_rel(N1,R).
 normalize_rel(X,X).
 
 % @Deprecated
@@ -260,11 +264,11 @@ display_quads(Objs, Quads, viz, _, _Opts) :-
         style_file_args(StyleFileArgs),
         sformat(Cmd,'og2dot.js ~w -S \'~w\' -t png ~w',[StyleFileArgs,Style, OgFile]),
         shell(Cmd).
-display_quads(_, Quads, json, _, _Opts) :-
+display_quads(_, Quads, json, Dest, _Opts) :-
         !,
         quads_dict(Quads, Dict),
         atom_json_dict(JsonAtom, Dict, []),
-        writeln(JsonAtom).
+        write_to(JsonAtom, Dest).
 display_quads(Objs, _, ids, _, _Opts) :-
         !,
         maplist(writeln, Objs).
@@ -279,6 +283,13 @@ display_quads(Objs, _, obo, _, Opts) :-
         nl,
         forall(member(Obj, Objs),
                display_obo_stanza(Obj, Opts)).
+display_quads(Objs, _, rdf, File, Opts) :-
+        !,
+        ensure_loaded(library(semweb/turtle)),
+        G=x,
+        extract_subontology(Objs,G,Opts),
+        rdf_save_turtle(File,[graph(G)]).
+
 
 display_obj(Uri, _Opts) :-
         ensure_curie(Uri, Id),
@@ -290,6 +301,21 @@ display_obj(Uri, _Opts) :-
 
 display_obo_stanza(Uri, Opts) :-
         gen_stanza(user_output,Uri,Opts).
+
+write_to(Atom, File) :-
+        var(File),
+        !,
+        write(Atom).
+write_to(Atom, stream(S)) :-
+        !,
+        format(S,Atom,[]).
+write_to(Atom, F) :-
+        !,
+        open(F, write, S, []),
+        format(S,Atom,[]),
+        close(S).
+
+
 
 
         

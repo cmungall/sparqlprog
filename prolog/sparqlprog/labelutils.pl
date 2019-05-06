@@ -72,7 +72,7 @@ row_labelify(Row,Row2) :-
 
 rowargs_labelify([],[]).
 rowargs_labelify([H|T],[H2,Label|T2]) :-
-        (   label_atom(H,Label)
+        (   label_or_list_to_atom(H,Label)
         ->  true
         ;   Label=''),
         compactify_arg(H,H2),
@@ -82,8 +82,29 @@ compactify_arg(H,H2) :-
         rdf_global_id(Curie,H),
         Curie\=H,
         !,
-        sformat(H2,'~w',[Curie]).
+        format(atom(H2),'~w',[Curie]).
+compactify_arg(Var,'_') :-
+        var(Var),
+        !.
 compactify_arg(Str^^_,H2) :-
         atom_string(H2,Str),
         !.
+compactify_arg(L,A) :-
+        is_list(L),
+        !,
+        maplist(compactify_arg,L,L2),
+        concat_atom(L2,'|',A).
 compactify_arg(H,H).
+
+label_atom_det(L,A) :- label_atom(L,A),!.
+label_atom_det(_,'').
+
+label_or_list_to_atom(X,A) :-
+        label_atom(X,A),
+        !.
+label_or_list_to_atom(L,A) :-
+        is_list(L),
+        !,
+        maplist(label_atom_det,L,L2),
+        concat_atom(L2,'|',A).
+

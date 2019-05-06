@@ -66,6 +66,7 @@
 :- use_module(library(sandbox)).
 :- use_module(library(settings)).
 :- use_module(library(semweb/sparql_client)).
+:- use_module(library(semweb/rdf11)).
 :- use_module(library(dcg_core)).
 :- use_module(library(dcg_codes)).
 :- use_module(sparql_dcg).
@@ -78,7 +79,7 @@
 :- multifile sparql_endpoint/5.
 :- set_prolog_flag(double_quotes, codes).
 
-:- setting(limit,integer,100,'Default SPARQL SELECT limit').
+:- setting(limit,integer,1000,'Default SPARQL SELECT limit').
 :- setting(select_options,list,[distinct(true)],'Default select options').
 
 :- meta_predicate query_phrase(+,//,-).

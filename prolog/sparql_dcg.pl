@@ -259,7 +259,8 @@ cond(rdf_is_literal(V))   --> "isLITERAL(", object(V), ")".
 cond(is_literal(V))   --> "isLITERAL(", object(V), ")".
 
 cond(lang(V))     --> "lang(", object(V), ")".
-cond(G)            --> {throw(cond(G))}.
+cond(G)            --> {throw(error(cond(G)))}.
+
 
 string_literal_expr(A) --> {atomic(A),atom_string(A,S)},expr(S).
 string_literal_expr(S) --> expr(S).

@@ -3,6 +3,8 @@
            label_of/2,
            label_of/3,
 
+           declare_shacl_prefixes/0,
+
            triple_axiom/2,
            triple_axiom/4,
            triple_axiom_annotation/3,
@@ -34,6 +36,8 @@
            owl_edge/4,
            owl_subgraph/4,
 
+           extract_subontology/3,
+
            quads_objects/2,
            quads_dict/2,
 
@@ -42,6 +46,7 @@
 
            ensure_uri/2,
            ensure_curie/2,
+           subsumed_prefix_namespace/4,
            
            common_ancestor/3,
            mrca/3,
@@ -67,6 +72,17 @@ label_of(Label,X) :- label_of(Label,X,_).
 label_of(Label,X,Lang) :- rdf(X,rdfs:label,Label@Lang).
 label_of(Label,X,_) :- rdf(X,rdfs:label,Label^^xsd:string).
 %label_of(Label,X,Lang) :- rdf(X,rdfs:label,Lit), (Lit == Label@Lang ; Lit == Label^^xsd:string).
+
+declare_shacl_prefixes :-
+        rdf(X,'http://www.w3.org/ns/shacl#prefix',Prefix1),
+        rdf(X,'http://www.w3.org/ns/shacl#namespace', NS1),
+        ensure_atom(Prefix1,Prefix),
+        ensure_atom(NS1,NS),
+        rdf_register_prefix(Prefix, NS),
+        debug(owl_util,'Registered ~w ~w',[Prefix,NS]),
+        fail.
+declare_shacl_prefixes.
+
 
 
 triple_axiom(rdf(I,P,J),A) :-
@@ -312,6 +328,19 @@ owl_subgraph([Root|Nodes],Preds,Quads,FinalQuads,Visited,Opts) :-
 normalize_quad(rdf(S,^(P),O,G),rdf(O,P,S,G)) :- !.
 normalize_quad(X,X).
 
+extract_subontology(Objs, G, Opts) :-
+        findall(T,(member(Obj,Objs),owl_object_triple(Obj,T,Objs,Opts)),Ts),
+        forall(member(rdf(S,P,O),Ts),
+               rdf_assert(S,P,O,G)).
+
+owl_object_triple(Obj,T,Objs,_Opts) :-
+        T=rdf(Obj,_P,O),
+        T,
+        (   rdf_is_iri(O)
+        ->  member(O,Objs)
+        ;   true).
+
+        
 
 opt_member(_,L) :- var(L),!.
 opt_member(X,L) :- member(X,L).
@@ -329,6 +358,7 @@ quads_objects(Quads,Objs) :-
 
 
 % transforms quads (triples + graph arg) to obograph JSON dict
+% TODO: move this
 quads_dict(Quads, Dict) :-
         setof(Obj,quads_object(Quads,Obj),Objs),
         maplist(owl_object_dict, Objs,  Nodes),
@@ -338,9 +368,13 @@ quads_dict(Quads, Dict) :-
 
 quad_dict(rdf(S,P,O,_), Dict) :-
         ensure_curie(S, Sx),
-        ensure_curie(P, Px),
+        ensure_curie(P, Px1),
         ensure_curie_or_atom(O, Ox),
-        Dict = edge{sub:Sx, pred:Px, obj:Ox}. 
+        (   Px1='rdfs:subClassOf'
+        ->  Px=is_a
+        ;   Px=Px1),
+        Dict = edge{sub:Sx, pred:Px, obj:Ox}.
+
 owl_object_dict(C, Dict) :-
         ensure_curie(C, Id),
         (   label(C,N1)
@@ -350,7 +384,8 @@ owl_object_dict(C, Dict) :-
         upcase_atom(Type1,Type),
         ensure_curie_or_atom(N1, N),
         findall(PV, object_property_value(C,_,_,PV),PVs),
-        Meta = meta{ basicPropertyValues: PVs },
+        findall(xref{val: Xref}, (rdf(C,'http://www.geneontology.org/formats/oboInOwl#hasDbXref',X1),ensure_atom(X1,Xref)), Xrefs),
+        Meta = meta{ basicPropertyValues: PVs, xrefs: Xrefs },
         Dict = node{id:Id, type:Type, lbl:N, meta:Meta}.
 
 object_property_value(C,P,V,pv{pred:P,val:V}) :-
@@ -390,13 +425,25 @@ ensure_curie_or_atom(R @ _, R) :- !.
 ensure_curie_or_atom(R, Id) :-
         ensure_curie(R, Id).
 
-%! ensure_uri(+Uri, ?CurieOrUriTerm) is det
+%! ensure_curie(+Uri, ?CurieOrUriTerm) is det
 %
 %  translates URI to a CurieOrUriTerm
 ensure_curie(In, Id) :-
         rdf_global_id(In, Uri),
         rdf_global_id(Id1, Uri),
-        sformat(Id,'~w',[Id1]).
+        format(atom(Id2),'~w',[Id1]),
+        strip_trailing_colon(Id2,Id).
+
+strip_trailing_colon(A,B) :-        atom_concat(B,':',A),!.
+strip_trailing_colon(A,A).
+
+subsumed_prefix_namespace(Pre, NS, Pre2, NS2) :-
+        rdf_current_prefix(Pre, NS),
+        rdf_current_prefix(Pre2, NS2),
+        NS \= NS2,
+        atom_concat(NS,_,NS2).
+
+        
 
 %! ensure_uri(+CurieOrUriTerm, ?Uri) is det
 %

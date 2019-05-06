@@ -18,15 +18,17 @@ load_test_file :-
                                          graph(labelutils)]).
 
 test(show) :-
-        T=rdf(S,P,O),
+        T=rdf(_,_,_),
         forall(T,
                (   row_labelify(T,X),
                    writeln(X))).
 
 test(labelify) :-
         row_labelify(foo('http://purl.obolibrary.org/obo/GO_0044464',bar),Row),
-        assertion(Row = foo("GO:0044464",'cell part',bar,'')).
-
+        assertion(Row = foo('GO:0044464','cell part',bar,'')).
+test(labelify_list) :-
+        row_labelify(foo(x,['http://purl.obolibrary.org/obo/GO_0044464',y]), Row),
+        assertion(Row = foo(x,'','GO:0044464|y','cell part|')).
 
 
 
