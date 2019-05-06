@@ -121,6 +121,7 @@ main(Argv) :-
         ],
         opt_parse(Spec, Argv, Opts, SearchTerms, [duplicated_flags(keepall)]),
         handle_opts(Opts),
+        declare_shacl_prefixes,
         opt_if_call(prolog,prolog_shell(Opts),Opts),
         catch(owl_search_and_display(SearchTerms, Opts),
               E,

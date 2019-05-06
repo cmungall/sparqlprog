@@ -77,6 +77,11 @@ main(Argv) :-
           shortflags(['A']),
           help('rdf_attach_library - path to void.ttl')
          ],
+         [opt(assign), type(atom),
+          longflags([assign]),
+          shortflags([a]),
+          help('assign a setting')
+         ],
          [opt(service), type(atom),
           longflags([service]),
           shortflags([s]),
@@ -188,13 +193,22 @@ handle_opts(Opts) :-
         opt_forall(input(X),rdf_load_wrap(X),Opts),
         opt_forall(index(_),ensure_loaded(library(index_util)),Opts),
         opt_forall(index(X),materialize_index(X),Opts),
-        opt_forall(goal(X),X,Opts).
+        opt_forall(goal(X),X,Opts),
+        opt_forall(assign(X),assign_setting(X),Opts).
 
 force_distinct :-
         setting(sparqlprog:select_options, Opts),
         select(distinct(_),Opts,Opts2),
         set_setting(sparqlprog:select_options, [distinct(true)|Opts2]).
 
+
+assign_setting(A) :-
+        concat_atom([P,V1],'=',A),
+        concat_atom([M,Pred],':',P),
+        (   setting_property(M:Pred,type(float))
+        ->  atom_number(V1,V)
+        ;   V=V1),
+        set_setting(M:Pred,V).
 
 
 rdf_load_wrap(X) :-
@@ -227,11 +241,14 @@ atom_uri(A,U) :-
         !.
 atom_uri(A,A).
 
-run([describe,X|_Args], Opts) :-
+run([describe|Xs], Opts) :-
         !,
-        atom_uri(X,X2),
-        Q=owl_node_info(X2,P,O,G),
-        exec_query(Q, Q, ['P'=P,'O'=O,'G'=G], Opts).
+        maplist(atom_uri,Xs,Xs2),
+        Goal=owl_node_info(X,P,O,G),
+        Q=(member(X,Xs2),Goal),
+        exec_query(Goal, Q, ['P'=P,'O'=O,'G'=G], Opts).
+        %forall((member(X,Xs2),Q=owl_node_info(X,P,O,G)),
+        %       exec_query(Q, Q, ['P'=P,'O'=O,'G'=G], Opts)).
 
 run([q,SearchTerm,PredTerm,PostTerm,Rels,DispTerm|_Args], Opts) :-
         !,
