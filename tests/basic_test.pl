@@ -89,6 +89,11 @@ test(lang_literal_eq) :-
         test_select( rdf(_S,rdfs:label,"foo"@en),
                      "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> \"foo\"@en}").
 
+test(escape_quotes) :-
+        test_select( rdf(_S,rdfs:label," \"\" "@en),
+                      "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> \" \\\"\\\" \"@en}").
+
+
 test(str_starts) :-
         test_select( (rdf(_S,rdfs:label,Label),
                       str_starts(Label,"foo")),
@@ -198,6 +203,7 @@ test(member) :-
         test_select( member([_A,_B],[["a",1],["b",2],["c",3]]),
                      "SELECT ?v0 ?v1 WHERE {VALUES (?v0 ?v1) {(\"a\" 1) (\"b\" 2) (\"c\" 3) }}").
 
+        
 
 % TODO
 test(disj) :-
