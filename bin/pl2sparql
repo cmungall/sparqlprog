@@ -1,4 +1,4 @@
-#!/usr/bin/env swipl -L0 -G0 -T0
+#!/usr/bin/env swipl
 
 :- initialization main.
 
@@ -265,6 +265,10 @@ run([q,SearchTerm,DispTerm], Opts) :-
 run([q,SearchTerm,Rels,DispTerm], Opts) :-
         !,
         owl_search_and_display(SearchTerm, l, '.', Rels, DispTerm, _, Opts).
+
+run(report, [Name|_], _Opts) :-
+        ensure_loaded(library(sparqlprog/dataframe)),
+        dataframe_to_csv(Name,[]).
 
 run(['/',Pred|Args], Opts) :-
         !,
