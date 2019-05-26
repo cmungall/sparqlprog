@@ -60,6 +60,12 @@ test(agg) :-
         assertion( seval(count(append([a,b],[c])), 3) ).
 test(max) :-
         assertion( seval(max(append([1,2],[3,5])), 5) ).
+
+test(agg_group) :-
+        findall(R,seval( aggregate_group(count(D),[C],isa(C,D),R)),Rs),
+        forall(member(R,Rs),
+               writeln(r=R)).
+
 test(intersects) :-
         X=[a,b,c,d],
         Y=[c,d,e,f],
@@ -76,7 +82,12 @@ test(jac) :-
                     N=0.25)
                    ).
 
-
+isa(a,1).
+isa(a,2).
+isa(a,3).
+isa(b,1).
+isa(b,2).
+isa(c,4).
 
 
 
