@@ -181,7 +181,7 @@ test(agg_max) :-
                              SPARQL,
                              []),
         format(' Query ==> ~w~n',[ SPARQL ]),
-        assertion( SPARQL = "SELECT ?v0 WHERE {SELECT max(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}}" ).
+        assertion( SPARQL = "SELECT max(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}" ).
 
 test(agg_count) :-
         create_sparql_select(Count,
@@ -189,7 +189,7 @@ test(agg_count) :-
                              SPARQL,
                              []),
         format(' Query ==> ~w~n',[ SPARQL ]),
-        assertion( SPARQL = "SELECT ?v0 WHERE {SELECT COUNT(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}}" ).
+        assertion( SPARQL = "SELECT COUNT(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}" ).
 
 test(agg_group1) :-
         create_sparql_select(_,
