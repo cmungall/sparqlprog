@@ -18,7 +18,7 @@ pq-ontobee  "rdf(Restr,owl:onProperty,P,G),label(P,PN)" "x(Restr,P,PN,G)"
 pq-ontobee -e -i ro.owl  "owl:objectProperty(P), (ontobee ?? rdf(Restr,owl:onProperty,P,G),label(P,PN))" "x(P,PN,G,Restr)"
 pq-ontobee -e -i ro.owl  "owl:objectProperty(P), label(P,PN), (ontobee ?? aggregate_group(count(Restr),[P,G],rdf(Restr,owl:onProperty,P,G),Num))" "x(P,PN,G,Num)"
 
-# also:
+# also: usages of property by graph
 pq-ontobee  "aggregate_group(count(P),[P,G],rdf(_,owl:onProperty,P,G),Num)" 
 
 # all triples with a literal with a trailing whitespace

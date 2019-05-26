@@ -187,10 +187,10 @@ goal(rdf_graph_goals(G,Goals)) --> "GRAPH ", resource(G), " ", brace(goal(Goals)
 goal(rdf_predicate(P)) --> "SELECT DISTINCT ", expr(P), " ", where(rdf(_,P,_)).
 
 goal(aggregate(Expr,G,Result)) --> "SELECT ", expr(Expr), " AS ", variable(Result), " ", where(G).
-goal(aggregate_group(Expr, GroupVars, G, WV-AV)) -->
+goal(aggregate_group(Expr, GroupVars, G, Result)) -->
         "SELECT (",
-        expr(Expr), " AS ", variable(AV),") ",
-        variable(WV),
+        expr(Expr), " AS ", variable(Result),") ",
+        seqmap_with_sep(" ",expr,GroupVars),
         " ",
         where(G),
         " GROUP BY ", seqmap_with_sep(" ",expr,GroupVars).
@@ -299,6 +299,8 @@ expr(datatype(V))  --> "DATATYPE(", object(V), ")".
 expr(quote(V))     --> quote(at(V)).
 
 expr(max(X))   --> "max(", expr(X), ")".
+expr(min(X))   --> "min(", expr(X), ")".
+expr(sum(X))   --> "sum(", expr(X), ")".
 expr(count(X))   --> "count(", expr(X), ")".
 expr(+X) -->  p "+ ", expr(X), ")".
 expr(-X) -->  p "- ", expr(X), ")".

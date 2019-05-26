@@ -18,8 +18,16 @@
               name=Name]-person(ID,Name),
              [street=Street,
               city=City]-address(ID,Street,City),
-             ...]
-  
+             ...],
+            [description('person and location report'),
+             entity(city)]).
+
+  TODO
+
+  frame('person location report') <<
+    foo(id=ID :: entity, name=Name) where person(ID,Name),
+    foo(street=Street, city=City :: entity) where address(ID,Street,City).
+
 
 */
 
@@ -91,6 +99,13 @@ flatten_row([V|Row],Row2,Keys,Specs,SpecOpts,Opts) :-
         get_labels(V,Ns,Opts),
         contract_uris(V,V2,Opts),
         flatten_row([V2,Ns|Row],Row2,Keys,Specs,SpecOpts2,Opts).
+flatten_row([V|Row],[V2|Row2],Keys,Specs,SpecOpts,Opts) :-
+        Keys=[K|Keys2],
+        select(iri(K),SpecOpts,SpecOpts2),
+        !,
+        contract_uris(V,V1,Opts),
+        serialize_value(V1,V2,Opts),
+        flatten_row(Row,Row2,Keys2,Specs,SpecOpts2,Opts).
 flatten_row([V|Row],[V2|Row2],[_K|Keys],Specs,SpecOpts,Opts) :-
         serialize_value(V,V2,Opts),
         flatten_row(Row,Row2,Keys,Specs,SpecOpts,Opts).

@@ -266,7 +266,7 @@ run([q,SearchTerm,Rels,DispTerm], Opts) :-
         !,
         owl_search_and_display(SearchTerm, l, '.', Rels, DispTerm, _, Opts).
 
-run(report, [Name|_], _Opts) :-
+run([report, Name|_], _Opts) :-
         ensure_loaded(library(sparqlprog/dataframe)),
         dataframe_to_csv(Name,[]).
 
@@ -494,6 +494,11 @@ create_default_select(Q,Q) :-
         forall(member(A,Args),
                \+ compound(A)),
         !.
+create_default_select(Q,S) :-
+        Q=aggregate_group(_,GroupBys,_,V),
+        !,
+        debug(sparqlprog,'showing results for value: ~q and groups: ~q',[V,GroupBys]),
+        S =.. [row,V|GroupBys].
 create_default_select(Q,S) :-
         term_variables(Q,Vars),
         S =.. [row|Vars].

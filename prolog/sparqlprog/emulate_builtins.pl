@@ -28,9 +28,11 @@
            str_replace/4,
            concat/3,
            concat/4,
-           
+
+           agg_max/2,
            count/2,
            group_concat/3,
+           aggregate_group/4,
 
            optional/1,
            rdf_path/3,
@@ -152,7 +154,7 @@ concatl(L,S) :-
 
 % for compat
 count(L,N) :- length(L,N).
-max(L,N) :- aggregate(max(X),member(X,L),N).
+agg_max(L,N) :- aggregate(max(X),member(X,L),N).
 
 
 % aggregates TODO
@@ -161,6 +163,20 @@ group_concat(L, Sep, V) :-
         ensure_atom(Sep,Sep1),
         atomic_list_concat(L1,Sep1,V1),
         ensure_string(V1,V).
+
+:- module_transparent(aggregate_group/4).
+aggregate_group(AggExpr, _GroupBys, Goal, Val) :-
+        aggregate(AggExpr, Goal, Val).
+
+        
+
+/*
+aggregate_group(AggExpr, [Witness], Goal, RWitness-RVal) :-
+        AggExpr =.. [Pred, Val],
+        GTerm =.. [Pred, Witness, Val],
+        RTerm =.. [Pred, RWitness, RVal],
+        aggregate(GTerm,Goal,RTerm).
+*/
 
 %:- rdf_meta rdf_path(r,r,r).
 %:- rdf_meta rdf_path(r,r,r,g).
@@ -286,6 +302,7 @@ bind(Expr,Result) :-
 %! seval(+FunctionTerm,?ReturnValue)
 %
 % evaluates a function term
+:- module_transparent(seval/2).
 seval(L,L2) :-
         is_list(L),
         !,
@@ -295,6 +312,7 @@ seval(V, V) :- var(V),!.
 seval(T, T) :- T = _@_, !.
 seval(T, T) :- T = _^^_, !.
 seval(T, T) :- T = literal(_), !.
+seval(T, T) :- is_aggregate_goal(T),!.
 seval(Term, Ret) :-
         compound(Term),
         !,
@@ -310,4 +328,7 @@ seval(Term, Ret) :-
             Goal =.. [P|GoalArgs],
             Goal).
 seval(X,X).
+
+is_aggregate_goal(aggregate_group(_,_,_,_)).
+is_aggregate_goal(aggregate(_,_,_)).
 

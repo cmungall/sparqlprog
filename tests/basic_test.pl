@@ -191,13 +191,20 @@ test(agg_count) :-
         format(' Query ==> ~w~n',[ SPARQL ]),
         assertion( SPARQL = "SELECT ?v0 WHERE {SELECT COUNT(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}}" ).
 
-test(agg_group) :-
+test(agg_group1) :-
         create_sparql_select(_,
-                             aggregate_group(count(D),[C],rdf(C,rdfs:subClassOf,D),C-N),
+                             aggregate_group(count(D),[C],rdf(C,rdfs:subClassOf,D),_N),
                              SPARQL,
                              []),
         format(' Query ==> ~w~n',[ SPARQL ]),
         assertion( SPARQL = "SELECT (COUNT(?v1) AS ?v3) ?v2 WHERE {?v2 <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?v1} GROUP BY ?v2").
+test(agg_group2) :-
+        create_sparql_select(_,
+                             aggregate_group(count(D),[C,P],rdf(C,P,D),_N),
+                             SPARQL,
+                             []),
+        format(' Query ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT (COUNT(?v1) AS ?v4) ?v2 ?v3 WHERE {?v2 ?v3 ?v1} GROUP BY ?v2 ?v3").
 
 
 

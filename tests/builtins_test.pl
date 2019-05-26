@@ -59,12 +59,27 @@ test(arith_types) :-
 test(agg) :-
         assertion( seval(count(append([a,b],[c])), 3) ).
 test(max) :-
-        assertion( seval(max(append([1,2],[3,5])), 5) ).
+        assertion( seval(agg_max(append([1,2],[3,5])), 5) ).
 
 test(agg_group) :-
-        findall(R,seval( aggregate_group(count(D),[C],isa(C,D),R)),Rs),
-        forall(member(R,Rs),
-               writeln(r=R)).
+        forall(aggregate_group(max(D),[C],entity_value(C,D),R),
+               format('Max for ~w is ~w~n',[C,R])),
+        findall(C-R,
+                aggregate_group(max(D),[C],entity_value(C,D),R),
+                L),
+        true,
+        assertion(L=[_,_,_]),
+        assertion(member(a-3,L)),
+        assertion(member(b-2,L)),
+        assertion(member(c-4,L)).
+/*
+test(agg_group2) :-
+        findall(sum(P,R),
+                aggregate_group(sum(Sal),[P],sal(P,J,Sal),R),
+                L),
+        maplist(writeln,L),
+        assertion(L=[_,_,_]).
+*/
 
 test(intersects) :-
         X=[a,b,c,d],
@@ -82,12 +97,21 @@ test(jac) :-
                     N=0.25)
                    ).
 
-isa(a,1).
-isa(a,2).
-isa(a,3).
-isa(b,1).
-isa(b,2).
-isa(c,4).
+entity_value(a,1).
+entity_value(a,2).
+entity_value(a,3).
+entity_value(b,1).
+entity_value(b,2).
+entity_value(c,4).
+
+sal(p1,j1,100).
+sal(p1,j2,200).
+
+sal(p2,j1,200).
+sal(p2,j2,400).
+
+sal(p3,j3,800).
+
 
 
 
