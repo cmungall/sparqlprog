@@ -270,6 +270,17 @@ run([report, Name|_], _Opts) :-
         ensure_loaded(library(sparqlprog/dataframe)),
         dataframe_to_csv(Name,[]).
 
+run([labelify, File|_Keys], Opts) :-
+        csv_read_file(File, Rows, [functor(row)]),
+        forall(member(Row,Rows),
+               (   row_labelify(Row,Row2),
+                   write_result(Row2,Opts))).
+
+
+run([save, F|_], _Opts) :-
+        ensure_loaded(library(semweb/rdf_turtle)),
+        rdf_turtle:rdf_save_turtle(F, []).
+
 run(['/',Pred|Args], Opts) :-
         !,
         % shorthand syntax for terms: / Pred Args
