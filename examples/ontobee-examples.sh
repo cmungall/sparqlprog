@@ -21,6 +21,9 @@ pq-ontobee -e -i ro.owl  "owl:objectProperty(P), label(P,PN), (ontobee ?? aggreg
 # also: usages of property by graph
 pq-ontobee  "aggregate_group(count(P),[P,G],rdf(_,owl:onProperty,P,G),Num)" 
 
+# number of distinct xrefs per graph
+pq-ontobee -f tsv   "aggregate_group(count(distinct(X)),[G],has_dbxref(C,X,G),NumX)"
+
 # all triples with a literal with a trailing whitespace
 pq-ontobee  'rdf(C,P,V),is_literal(V),str_ends(str(V)," ")'
 
@@ -29,6 +32,16 @@ pq-ontobee -l  "subClassOf(A,B),subClassOf(B,C),subClassOf(A,C)"
 
 # class labels that match exact synonyms of other classes
 pq-ontobee -l -u obo_metadata/oio  'has_exact_synonym(C1,N),label(C2,N),C1\=C2'
+
+# all labels used more than once
+
+# This causes virtuoso error: Virtuoso 22026 Error SR319: Max row length is exceeded when trying to store a string of 17 chars into a temp col
+## pq-ontobee -f tsv  "aggregate_group(count(distinct(C)),[N],(rdf(C,rdfs:label,N1),N is lcase(str(N1))),count(distinct(C))>1,R)" "x(N,R)" 
+
+pq-ontobee -f tsv  "aggregate_group(count(distinct(C)),[N],(rdf(C,rdfs:label,N1),N is str(N1)),count(distinct(C))>1,R)" "x(N,R)" 
+
+# same, exclude obsoletes
+pq-ontobee -f tsv   "aggregate_group(count(distinct(C)),[N],(rdf(C,rdfs:label,N1),N is str(N1), \+deprecated(C)),count(C)>1,R)" "x(N,R)" 
 
 # --------
 # SEARCH
