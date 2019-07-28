@@ -1,0 +1,3 @@
+#!/bin/sh
+#echo "$@"
+pl2sparql  -s ontobee  -A ~/repos/onto-mirror/void.ttl -u obo_ro/ro -u sparqlprog/endpoints -u sparqlprog/ontologies/gaz "$@"
