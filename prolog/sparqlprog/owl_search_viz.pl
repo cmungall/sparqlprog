@@ -270,6 +270,14 @@ display_quads(Objs, Quads, viz, _, _Opts) :-
         style_file_args(StyleFileArgs),
         sformat(Cmd,'og2dot.js ~w -S \'~w\' -t png ~w',[StyleFileArgs,Style, OgFile]),
         shell(Cmd).
+display_quads(Objs, Quads, dot, _, _Opts) :-
+        !,
+        quads_dict(Quads, Dict),
+        write_json_tmp(Dict, OgFile),
+        atom_json_term(Style,stylemap{highlightIds: Objs}, []),
+        style_file_args(StyleFileArgs),
+        sformat(Cmd,'og2dot.js ~w -S \'~w\' ~w',[StyleFileArgs,Style, OgFile]),
+        shell(Cmd).
 display_quads(_, Quads, json, Dest, _Opts) :-
         !,
         quads_dict(Quads, Dict),
