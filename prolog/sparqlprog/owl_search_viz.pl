@@ -63,6 +63,12 @@ write_json_tmp(Dict,File) :-
         debug(viz, 'j=~w', [JsonAtom]),
         close(IO).
 
+owl_search_and_display([SearchTerm], Opts) :-
+        concat_atom([Pred,ST2],'=',SearchTerm),
+        % e.g. id=GO:123456
+        !,
+        owl_search_and_display([ST2], [search_property(Pred)|Opts]).
+
 owl_search_and_display(SearchTerms, Opts) :-
         debug(search, 'Opts  = ~q',[Opts]),
         option(search_property(P),Opts,l),
@@ -87,13 +93,13 @@ owl_search_and_display(SearchTerms, Opts) :-
         append(Objs,ObjsX,SeedObjs),
         debug(search, 'SG(~q)',[Rels]),
         owl_subgraph(SeedObjs, Rels, Quads, []),
-        quads_objects(Quads, DispObjs),
         (   option(output(OutFile),Opts)
         ->  true
         ;   OutFile=_),
-        display_quads(DispObjs, Quads, OutFmt, OutFile, Opts).
+        display_quads(Objs, Quads, OutFmt, OutFile, Opts).
 
 
+% @Deprecated
 %! owl_search_and_display(+SearchTerm, +PredTerm, +PostTerm, +Rels, +DispTerm, +OutFile, +Opts:list) is det
 %
 %  SearchTerm = SearchAtom / FlagAtom
@@ -102,7 +108,7 @@ owl_search_and_display(SearchTerms, Opts) :-
 %    a regular expression used to search for literals. E.g. '^limb$'/i (exact match, case insensitive)
 %    
 %
-%  PredTerm = id | label | synonym | all
+%  PredTerm = id | label | synonym | all | 'X'
 %
 %    predicate used to connect subject to literal. 'label' will search against rdfs:label.
 %    id will search against the subject IRI *OR* it's curiefied form.
@@ -169,6 +175,7 @@ normalize_relterm(X,^(P)) :- atom_concat('^',P1,X),!,normalize_relterm(P1,P).
 normalize_relterm(X,P) :- normalize_rel(X,P1),ensure_uri(P1,P).
 
 normalize_rel(s,rdfs:subClassOf) :- !.
+normalize_rel(e,owl:equivalentClass) :- !.
 normalize_rel(t,rdf:type) :- !.
 normalize_rel(N,R) :- \+ \+ lmatch(N,R), !, lmatch(N,R).
 normalize_rel(N,R) :- concat_atom(L,'_',N), L=[_,_|_], concat_atom(L,' ',N1),!,normalize_rel(N1,R).
@@ -185,8 +192,7 @@ search_and_display1(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile, Opt
         debug(search, 'PP(~q) = ~q',[PostTerm, ObjsX]),
         append(Objs,ObjsX,SeedObjs),
         owl_subgraph(SeedObjs, Rels, Quads, []),
-        quads_objs(Quads, DispObjs),
-        display_quads(DispObjs, Quads, DispTerm, OutFile, Opts).
+        display_quads(Objs, Quads, DispTerm, OutFile, Opts).
 
 % TODO
 %normalize_extension_lambda(_, X,X,_).
@@ -269,22 +275,26 @@ display_quads(_, Quads, json, Dest, _Opts) :-
         quads_dict(Quads, Dict),
         atom_json_dict(JsonAtom, Dict, []),
         write_to(JsonAtom, Dest).
-display_quads(Objs, _, ids, _, _Opts) :-
+display_quads(_, Quads, ids, _, _Opts) :-
         !,
+        quads_objects(Quads, Objs),
         maplist(writeln, Objs).
-display_quads(Objs, _, info, _, Opts) :-
+display_quads(_, Quads, info, _, Opts) :-
         !,
+        quads_objects(Quads, Objs),
         forall(member(Obj, Objs),
                display_obj(Obj, Opts)).
-display_quads(Objs, _, obo, _, Opts) :-
+display_quads(_, Quads, obo, _, Opts) :-
         !,
+        quads_objects(Quads, Objs),
         ensure_loaded(library(sparqlprog/obo_util)),
         gen_header(user_output,_,Opts),
         nl,
         forall(member(Obj, Objs),
                display_obo_stanza(Obj, Opts)).
-display_quads(Objs, _, rdf, File, Opts) :-
+display_quads(_, Quads, rdf, File, Opts) :-
         !,
+        quads_objects(Quads, Objs),
         ensure_loaded(library(semweb/turtle)),
         G=x,
         extract_subontology(Objs,G,Opts),
