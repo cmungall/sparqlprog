@@ -38,7 +38,7 @@ main(Argv) :-
           longflags(['property']),
           shortflags([p]),
           default(l),
-          help('Search property: l, s, a or i')
+          help('Search property: l (label), s (synonyms+labels), a (all) or i (iri/curie/id). X = match anything')
          ],
          [opt(relations), type(atom),
           longflags(['relation']),
@@ -92,6 +92,11 @@ main(Argv) :-
           shortflags(['A']),
           help('rdf_attach_library - path to void.ttl')
          ],
+         [opt(prefix_mapping), type(atom),
+          longflags(['prefix_mapping']),
+          shortflags([m]),
+          help('Declare a prefix mapping. The value should be of the form "PREFIX=URIBase"')
+         ],
          [opt(prolog),
           type(boolean),
           default(false),
@@ -129,7 +134,10 @@ main(Argv) :-
                   halt(1))),
         halt.
 
-
+add_prefix(X) :-
+        concat_atom([Pre,Base],'=',X),
+        debug(sparqlprog,'Registering: ~w = ~w',[Pre,Base]),
+        rdf_register_prefix(Pre,Base).
 
 handle_opts(Opts) :-
         opt_if_call(verbose,debug(sparqlprog),Opts),
@@ -137,6 +145,7 @@ handle_opts(Opts) :-
         opt_if_call(stacktrace,use_module(library(sparqlprog/stacktrace)),Opts),
         opt_forall(attach(X),rdf_attach_library(X),Opts),
         opt_forall(debug(X),debug(X),Opts),        
+        opt_forall(prefix_mapping(X),add_prefix(X),Opts),
         opt_forall(use(X),use_module(library(X)),Opts),
         opt_forall(use_no_import(X),use_module(library(X),[]),Opts),
         opt_forall(consult(X),consult(X),Opts),
@@ -150,6 +159,13 @@ force_distinct :-
 
 
 
+rdf_load_wrap(X) :-
+        concat_atom([Pre,Post],':',X),
+        rdf_current_prefix(Pre,_),
+        rdf_global_id(Pre:Post,Y),
+        Y\=X,
+        !,
+        rdf_load_wrap(Y).
 rdf_load_wrap(X) :-
         catch(rdf_load(X),
               _E,
