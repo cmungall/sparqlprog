@@ -100,6 +100,7 @@
 select(_Vars,Goal,Options) -->
         {
          (   Goal=aggregate_group(_,_,_,_)
+         ;   Goal=aggregate_group(_,_,_,_,_)
          ;   Goal=aggregate(_,_,_))
         },
         !,
@@ -197,6 +198,15 @@ goal(aggregate_group(Expr, GroupVars, G, Result)) -->
         " ",
         where(G),
         " GROUP BY ", seqmap_with_sep(" ",expr,GroupVars).
+goal(aggregate_group(Expr, GroupVars, G, Having, Result)) -->
+        "SELECT (",
+        expr(Expr), " AS ", variable(Result),") ",
+        seqmap_with_sep(" ",head_expr,GroupVars),
+        " ",
+        where(G),
+        " GROUP BY ", seqmap_with_sep(" ",head_expr_val,GroupVars),
+        " HAVING ", cond(Having).
+
 
 
 goal(is(V,Expr)) --> goal(bind(Expr,V)).
@@ -227,6 +237,14 @@ goal(str_before(Str, Sep, Sub)) --> goal(bind(str_before(Str, Sep), Sub)).
 
 % allow conditions not wrapped by rdf_where/1
 goal(G) --> goal(filter(G)).
+
+% this is necessary for assigning variables in GROUP BY querie
+head_expr(is(V,Expr)) --> !, "BIND( ", expr(Expr), " AS ", variable(V), " )".
+head_expr(X) --> expr(X).
+
+head_expr_val(is(_V,Expr)) --> !, expr(Expr).
+head_expr_val(X) --> expr(X).
+
 
 tuple(Vals) --> "(", seqmap_with_sep(" ",expr,Vals), ")".
 
@@ -284,27 +302,52 @@ cond(G)            --> {throw(error(cond(G)))}.
 string_literal_expr(A) --> {atomic(A),atom_string(A,S)},expr(S).
 string_literal_expr(S) --> expr(S).
 
+
+% [121] builtin call
+expr(str(V))       --> "STR(", object(V), ")".
+expr(lang(V))      --> "LANG(", object(V), ")".
+expr(langmatches(V,W))      --> "LANGMATCHES(", object(V), ",", object( W), ")".
+expr(datatype(V))      --> "DATATYPE(", object(V), ")".
+expr(bound(V))      --> "BOUND(", object(V), ")".
+expr(uri(V))       --> "URI(", expr(V), ")".
+expr(iri(V))       --> "IRI(", expr(V), ")".
+expr(rand)       --> "RAND()" .
+expr(abs(V))       --> "ABS(", expr(V), ")".
+expr(ceil(V))       --> "CEIL(", expr(V), ")".
+expr(floor(V))       --> "FLOOR(", expr(V), ")".
+expr(round(V))       --> "ROUND(", expr(V), ")".
+
 expr(str_before(Str,Sep)) --> "strBefore(", string_literal_expr(Str), ", ", string_literal_expr(Sep), ")".
 expr(str_after(Str,Sep)) --> "strAfter(", string_literal_expr(Str), ", ", string_literal_expr(Sep), ")".
-expr(replace(S,P,R)) --> "replace(", string_literal_expr(S), ", ", string_literal_expr(P), ", ", string_literal_expr(R), ")".
 expr(concat(A,B)) --> "concat(", string_literal_expr(A), ", ", string_literal_expr(B), ")".
+expr(strlen(V))       --> "STRLEN(", expr(V), ")".
+expr(substr(V,W))     --> "SUBSTR(", expr(V), ", ", expr(W), ")". % [123]
+expr(substr(V,W,X))   --> "SUBSTR(", expr(V), ", ", expr(W), ", ", expr(X), ")". % [123]
+expr(replace(S,P,R)) --> "replace(", string_literal_expr(S), ", ", string_literal_expr(P), ", ", string_literal_expr(R), ")". % [124]
+expr(replace(S,P,R,Z)) --> "replace(", string_literal_expr(S), ", ", string_literal_expr(P), ", ", string_literal_expr(R),
+        ", ", string_literal_expr(Z), ")".                    % [124]
+
 expr(ucase(A)) --> "ucase(", string_literal_expr(A), ")".
 expr(lcase(A)) --> "lcase(", string_literal_expr(A), ")".
+
+% TODO more of 121
+
 expr(S)            --> {string(S)},"\"", at(S), "\"".
 expr('^^'(S,T))    --> "\"", at(S), "\"^^", resource(T).
 expr('@'(S,Lang))    --> "\"", at(S), "\"@", at(Lang).
-expr(uri(V))       --> "URI(", expr(V), ")".
-expr(str(V))       --> "STR(", object(V), ")".
-expr(lang(V))      --> "LANG(", object(V), ")".
-expr(count(X))     --> "COUNT(", expr(X), ")".
 expr(distinct(X))     --> "DISTINCT ", expr(X), " ".
 expr(datatype(V))  --> "DATATYPE(", object(V), ")".
 expr(quote(V))     --> quote(at(V)).
 
+% [127] Aggregate
 expr(max(X))   --> "max(", expr(X), ")".
 expr(min(X))   --> "min(", expr(X), ")".
 expr(sum(X))   --> "sum(", expr(X), ")".
-expr(count(X))   --> "count(", expr(X), ")".
+expr(count(X))     --> "COUNT(", expr(X), ")".
+expr(sample(X))     --> "SAMPLE(", expr(X), ")".
+expr(group_concat(X))     --> "GROUP_CONCAT(", expr(X), ")".
+expr(group_concat(X, S))     --> "GROUP_CONCAT(", expr(X), " ;  SEPARATOR = ", expr(S), ")".
+
 expr(+X) -->  p "+ ", expr(X), ")".
 expr(-X) -->  p "- ", expr(X), ")".
 expr(X+Y) --> p expr(X), " + ", expr(Y).

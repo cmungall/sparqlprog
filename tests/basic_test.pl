@@ -27,6 +27,7 @@ test_construct(H,Q,ExpectedSPARQL) :-
         assertion( SPARQL = ExpectedSPARQL ).
 
 
+% todo: Test succeeded with choicepoint
 test(bindings) :-
         Q=rdf(A,B,C),
         create_sparql_select(Q,Q,SPARQL,[bindings([a=A,b=B,c=C])]),
@@ -205,6 +206,23 @@ test(agg_group2) :-
                              []),
         format(' Query ==> ~w~n',[ SPARQL ]),
         assertion( SPARQL = "SELECT (COUNT(?v1) AS ?v4) ?v2 ?v3 WHERE {?v2 ?v3 ?v1} GROUP BY ?v2 ?v3").
+
+test(agg_group_having) :-
+        create_sparql_select(_,
+                             aggregate_group(count(D),[C,P],rdf(C,P,D),count(D)>2,_N),
+                             SPARQL,
+                             []),
+        format(' Query ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT (COUNT(?v1) AS ?v4) ?v2 ?v3 WHERE {?v2 ?v3 ?v1} GROUP BY ?v2 ?v3 HAVING (COUNT(?v1) > 2)").
+
+test(agg_group_having2) :-
+        create_sparql_select(_,
+                             aggregate_group(count(D),[P,group_concat(C," ")],rdf(C,P,D),count(D)>2,_N),
+                             SPARQL,
+                             []),
+        format(' Query ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT (COUNT(?v1) AS ?v4) ?v2 GROUP_CONCAT(?v3 ;  SEPARATOR = \" \") WHERE {?v3 ?v2 ?v1} GROUP BY ?v2 GROUP_CONCAT(?v3 ;  SEPARATOR = \" \") HAVING (COUNT(?v1) > 2)").
+
 
 
 
