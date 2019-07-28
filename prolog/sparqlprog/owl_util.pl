@@ -190,7 +190,7 @@ owl_node_info(S,P,O,Equiv) :-
 
 class_genus(C,G) :-
         eq_intersection_member(C,G),
-        \+ is_blank(G).
+        \+ rdf_is_bnode(G).
 class_differentia(C,P,Y) :-
         eq_intersection_member(C,R),
         owl_some(R,P,Y).
@@ -247,6 +247,10 @@ owl_edge(S,P,O,G) :-
         \+ rdf_is_bnode(S).
 owl_edge(S,rdfs:subClassOf,O,G) :-
         rdf(S,rdfs:subClassOf,O,G),
+        \+ rdf_is_bnode(O),
+        \+ rdf_is_bnode(S).
+owl_edge(S,owl:equivalentClass,O,G) :-
+        rdf(S,owl:equivalentClass,O,G),
         \+ rdf_is_bnode(O),
         \+ rdf_is_bnode(S).
 owl_edge(S,P,O,G) :-
@@ -333,12 +337,25 @@ extract_subontology(Objs, G, Opts) :-
         forall(member(rdf(S,P,O),Ts),
                rdf_assert(S,P,O,G)).
 
+owl_object_triple(Obj,T,_Objs,_Opts) :-
+        T=rdf(Obj,rdf:type,_),
+        T.
 owl_object_triple(Obj,T,Objs,_Opts) :-
         T=rdf(Obj,_P,O),
         T,
         (   rdf_is_iri(O)
         ->  member(O,Objs)
         ;   true).
+
+owl_object_triple(Obj,T,Objs,_Opts) :-
+        T1=rdf(Obj,_,Z),
+        T1,
+        rdf_is_bnode(Z),
+        \+ \+ (rdf(Z,_,O),member(O,Objs)),
+        (   T=T1
+        ;   T=rdf(Z,_,O),
+            T,
+            rdf_is_iri(O)).
 
         
 
