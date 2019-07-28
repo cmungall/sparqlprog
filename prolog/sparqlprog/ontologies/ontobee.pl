@@ -24,10 +24,13 @@ typed_in_graph(X,G,T) :-
         rdf(X,rdf:type,T,G).
 
 
-:- srule(in_ontology,[entity:iri, ontology:iri, type:iri],
-         'Entity is declared to be of type Type in Ontology').
+:- srule(in_ontology,[entity:iri, ontology:iri],
+         'Entity is declared to be of some type in Ontology').
 in_ontology(X,O) :-
         in_ontology(X,O,_).
+
+:- srule(in_ontology,[entity:iri, ontology:iri, type:iri],
+         'Entity is declared to be of type T in Ontology').
 in_ontology(X,O,T) :-
         typed_in_graph(X,G,T),
         graph_ontology(G,O).
