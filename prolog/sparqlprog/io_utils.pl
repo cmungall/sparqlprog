@@ -51,9 +51,9 @@ term_saferow(T,T3) :-
 
 
 term_saferow1(T,'?') :- var(T),!.
-term_saferow1(T^^_,A) :- !, atom_string(A,T).
-term_saferow1(T@_, A) :- !, atom_string(A,T).
-term_saferow1(T@_, A) :- !, atom_string(A,T).
+term_saferow1(T^^_,A) :- string(T),!, atom_string(A,T).
+term_saferow1(T@_, A) :- string(T),!, atom_string(A,T).
+term_saferow1(T@_, A) :- string(T),!, atom_string(A,T).
 term_saferow1(literal(type(_,A)), A) :- !.
 term_saferow1(literal(lang(_,A)), A) :- !.
 term_saferow1(literal(A), A) :- !.
