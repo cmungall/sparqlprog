@@ -83,6 +83,11 @@ entity_synonym(E,V,Scope,Type,Xrefs) :-
         ;   Type='').
 
 subset_uri_to_id(V1,V) :-
+        % envo has some subset tags as strings
+        rdf_is_literal(V1),
+        !,
+        ensure_atom(V1,V).
+subset_uri_to_id(V1,V) :-
         concat_atom([_,V],'#',V1),
         !.
 subset_uri_to_id(V,V).
@@ -120,11 +125,16 @@ gen_obo(S,G,Opts) :-
         forall((member(E,Es),\+is_dangling(E)),
                gen_stanza(S,E,G,Opts)).
 
-gen_header(S,G,_) :-
+
+
+gen_header(S,G,Opts) :-
+        forall(gen_header1(S,G,Opts),true).
+
+gen_header1(S,G,_) :-
         rdf_graph(G),
         ensure_id(G,Id),
         format(S,'ontology: ~w~n',Id).
-gen_header(S,_G,_) :-
+gen_header1(S,_G,_) :-
         rdf(V1,rdfs:subPropertyOf,oio:'SubsetProperty'),
         subset_uri_to_id(V1,V),
         format(S,'subsetdef: ~w "~w"~n',[V,V]).
@@ -138,7 +148,11 @@ gen_stanza(S,E,G,Opts) :-
         format(S,'[~w]~n',[T]),
         format(S,'id: ~w~n',[Id]),
         forall(gen_tag(S,E,G,Opts),true),
-        format(S,'~n',[]).
+        format(S,'~n',[]),
+        !.
+gen_stanza(_S,E,G,_Opts) :-
+        format(user_error,'Cannot write: ~w ~w~n',[E,G]).
+
 
 
 gen_tag(S,E,_,_) :-
@@ -169,6 +183,13 @@ gen_tag(S,E,_,_) :-
         owl_some(R,P,O),
         \+ rdf_is_bnode(O),
         tv(S,relationship,[P,O]).
+
+gen_tag(S,E,_,_) :-
+        class_genus(E,G),
+        \+ \+ class_differentia(E,_,_),
+        tv(S,intersection_of,[G]),
+        forall(class_differentia(E,P,Y),
+               tv(S,intersection_of,[P,Y])).
 
 tv(S,T,Vs) :-
         format(S,'~w:',[T]),
