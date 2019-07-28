@@ -1,2 +1,2 @@
 #!/bin/sh
-pl2sparql -u sparqlprog/endpoints -u sparqlprog/ontologies/ontobee  -u sparqlprog/owl_util  -s ontobee "$@"
+pl2sparql -u sparqlprog/endpoints -u sparqlprog/ontologies/ontobee  -u sparqlprog/owl_util  -u obo_metadata/oio  -s ontobee "$@"
