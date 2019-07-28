@@ -81,6 +81,7 @@
 
 :- setting(limit,integer,1000,'Default SPARQL SELECT limit').
 :- setting(select_options,list,[distinct(true)],'Default select options').
+:- setting(user_agent,atom,'sparqlprog','Value for http user-agent').
 
 :- meta_predicate query_phrase(+,//,-).
 
@@ -227,6 +228,7 @@ rewrite_goal(service(S,G), service(S,G2), D) :- !, rewrite_goal(G,G2,D).
 
 rewrite_goal(aggregate(A,G,V), aggregate(A,G2,V), D) :- !, rewrite_goal(G,G2,D).
 rewrite_goal(aggregate_group(A,GVs,G,V), aggregate_group(A,GVs,G2,V), D) :- !, rewrite_goal(G,G2,D).
+rewrite_goal(aggregate_group(A,GVs,G,H,V), aggregate_group(A,GVs,G2,H2,V), D) :- !, rewrite_goal(G,G2,D), rewrite_goal(H,H2,_).
 
 
 
@@ -709,5 +711,6 @@ downcase_first_char(A,A2) :-
 query_sparql(EP,SPARQL,Result) :-
    sparql_endpoint(EP,Host,Port,Path,EPOpts),
    debug(sparqlprog,'Querying endpoint http://~q:~q~q - ~w',[Host,Port,Path,SPARQL]),
-   sparql_query(SPARQL,Result,[host(Host),port(Port),path(Path)|EPOpts]).
+   setting(user_agent,UserAgent),
+   sparql_query(SPARQL,Result,[user_agent(UserAgent),host(Host),port(Port),path(Path)|EPOpts]).
 
