@@ -12,18 +12,43 @@
 label_atom(S,A) :-
         label_atom(S,A,[]).
 
+%! label_atom(+Input, ?Output, +Opts:list) is det
+%
 label_atom(S,A, _Opts) :-
         string(S),
         !,
         atom_string(A,S).
 label_atom(X,A, Opts) :-
+        atom(X),
+        concat_atom([Pre,Local],':',X),
+        \+ \+ rdf_current_prefix(Pre,_),
+        rdf_global_id(Pre:Local,Y),
+        !,
+        Y\=X,
+        label_atom(Y, A, Opts).
+label_atom(X,A, Opts) :-
+        atom(X),
+        concat_atom([Pre,Local],':',X),
+        \+ rdf_current_prefix(Pre,_),
+        concat_atom(['http://purl.obolibrary.org/obo/',Pre,'_',Local],IRI),
+        \+ \+ rdf(IRI,_,_),
+        IRI\=X,
+        !,
+        label_atom(IRI, A, Opts).
+label_atom(X,A, Opts) :-
         \+ compound(X),
         atom(X),
         atom_iri(X,IRI),
-        (   option(label_predicate(P),Opts)
-        ->  rdf(IRI,P,Literal)
-        ;   rdf(IRI,rdfs:label,Literal)),
+        get_label_predicate(P,Opts),
+        rdf(IRI,P,Literal),
+        !,
         ensure_atom(Literal,A).
+
+get_label_predicate(P, Opts) :-   option(label_predicate(P),Opts).
+get_label_predicate(rdfs:label, _).
+get_label_predicate(skos:prefLabel, _).
+
+
 
 atom_iri(X,I) :-
         concat_atom([Pre,Local],:,X),
@@ -78,22 +103,28 @@ rowargs_labelify([H|T],[H2,Label|T2]) :-
         compactify_arg(H,H2),
         rowargs_labelify(T,T2).
 
-compactify_arg(H,H2) :-
-        rdf_global_id(Curie,H),
-        Curie\=H,
-        !,
-        format(atom(H2),'~w',[Curie]).
 compactify_arg(Var,'_') :-
         var(Var),
-        !.
-compactify_arg(Str^^_,H2) :-
-        atom_string(H2,Str),
         !.
 compactify_arg(L,A) :-
         is_list(L),
         !,
         maplist(compactify_arg,L,L2),
         concat_atom(L2,'|',A).
+compactify_arg(H,H2) :-
+        compound(H),
+        !,
+        term_labelify(H,H2).
+        %format(atom(H2),'~w',[H]).
+compactify_arg(H,H2) :-
+        rdf_global_id(Curie,H),
+        Curie\=H,
+        Curie = Pre:Local,
+        !,
+        format(atom(H2),'~w:~w',[Pre,Local]).
+compactify_arg(Str^^_,H2) :-
+        atom_string(H2,Str),
+        !.
 compactify_arg(H,H).
 
 label_atom_det(L,A) :- label_atom(L,A),!.
