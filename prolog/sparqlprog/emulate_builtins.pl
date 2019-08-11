@@ -289,6 +289,7 @@ rdfx(A,P,B,G) :-
 %
 %   equivalent to OPTIONAL in SPARQL
 %
+:- module_transparent(optional/1).
 optional(G) :- G,!.
 optional(_).
 

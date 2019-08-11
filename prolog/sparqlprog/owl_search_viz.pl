@@ -20,6 +20,7 @@
 */
 
 :- use_module(library(semweb/rdfs)).
+:- use_module(library(semweb/rdf11)).
 :- use_module(library(sparqlprog/search_util)).
 :- use_module(library(sparqlprog/owl_util)).
 :- use_module(library(http/json)).

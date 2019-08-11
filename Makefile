@@ -55,6 +55,7 @@ pe-clean:
 	docker rm $(IM) || echo not made 
 
 pe-build:
+	test -f tests/out.tmp && rm tests/out.tmp || echo ok \
 	@docker build -t $(IM):$(VERSION) . \
 	&& docker tag $(IM):$(VERSION) $(IM):latest
 
