@@ -67,9 +67,11 @@ test(subclasses) :-
                     ['0005623']).
 
 test(dot) :-
-        test_output(['^nucleus$'],[format(dot),relations([s])],
-                    ['label=cellular_component'],
-                    []).
+        (   shell('og2dot.js')
+        ->  test_output(['^nucleus$'],[format(dot),relations([s])],
+                        ['label=cellular_component'],
+                        [])
+        ;   writeln('Skipping test, as og2dot not installed')).
 
 test(id) :-
         test_output(['GO:0005634'],[search_property(id)],
