@@ -67,7 +67,7 @@ test(subclasses) :-
                     ['0005623']).
 
 test(dot) :-
-        (   shell('og2dot.js')
+        (   shell('og2dot.js -h')
         ->  test_output(['^nucleus$'],[format(dot),relations([s])],
                         ['label=cellular_component'],
                         [])
