@@ -39,7 +39,7 @@ http://rdf.ebi.ac.uk/resource/ensembl/ENSMUSG00000035172,http://rdf.ebi.ac.uk/re
 
 How does this work? The query compilation makes use of pre-defined
 n-ary predicates, such as this one defined in the [faldo
-module](./prolog/sparqlprog/ontologies/faldo.pl):
+module](https://www.swi-prolog.org/pack/file_details/sparqlprog/prolog/sparqlprog/ontologies/faldo.pl):
 
 ```
 location(F,L,B,E,R) :-
@@ -51,7 +51,7 @@ location(F,L,B,E,R) :-
 The `:-` connects a rule head to a rule body. In this case the body is
 a conjuncation of goals. Each of these may be defined in their own
 rules. Typically everything bottoms out at a call over a 3-ary
-predicate `rdf(S,P,O)` which maps to a single triple. In this case the vocabulary used for genomic locations is [faldo](https://github.com/OBF/FALDO)
+predicate `rdf(S,P,O)` which maps to a single triple. In this case the vocabulary used for genomic locations is [faldo](https://github.com/OBF/FALDO).
 
 This approach allows for *composability* of queries. Rather that
 repeating the same verbose SPARQL each time in different queries,
@@ -62,7 +62,11 @@ SPARQL, this package provides a complete turing-complete environment
 for mixing code and queries in a relational/logic programming
 paradigm. See below for examples.
 
-## Quick Start
+## Quick Start (for prolog hackers)
+
+See the [sparqlprog module docs](https://www.swi-prolog.org/pack/file_details/sparqlprog/prolog/sparqlprog.pl)
+
+## Quick Start (for everyone else)
 
 There are a variety of ways to use this framework:
 
@@ -75,13 +79,15 @@ Consult the appropriate section below:
 
 ### Running queries from the command line
 
+See the [examples](./examples/) directory for all command line examples
+
 First [install](INSTALL.md), making sure the [bin](bin) directory is
 in your path. This will give you access to the the pl2sparql script.
 
 For full options, run:
 
 ```
-pl2sparql -h
+pl2sparql --help
 ```
 
 Note you should also have a number of convenience scripts in your
@@ -142,7 +148,7 @@ note: indentation and URI shortening are on the cards for future releases.
 
 Public pengines service: https://evening-falls-87315.herokuapp.com/pengine
 
-Pengines is a framework for running logic program environments as a
+[Pengines](http://pengines.swi-prolog.org/) is a framework for running logic program environments as a
 web service. They can be used by clients in any language (client
 libraries in python, javascript seem to be mature; as well as separate
 prolog clients as well).
