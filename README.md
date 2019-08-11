@@ -4,6 +4,10 @@
 [![Join the chat at https://gitter.im/sparqlprog/Lobby](https://badges.gitter.im/sparqlprog/Lobby.svg)](https://gitter.im/sparqlprog/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [**pack**](http://www.swi-prolog.org/pack/list?p=sparqlprog)
 
+sparqlprog is a programming language and environment that can be used
+to write composable modular building blocks that can be executed as
+federated SPARQL queries.
+
 Example of use (command line):
 
 ```
@@ -30,12 +34,14 @@ This logic query compiles down to a SPARQL query for fetching G and
 H. The query is then executed on the [EBI RDF
 Platform](https://www.ebi.ac.uk/rdf/services/sparql), giving:
 
-```
-http://rdf.ebi.ac.uk/resource/ensembl/ENSMUSG00000017167,http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000108797
-http://rdf.ebi.ac.uk/resource/ensembl/ENSMUSG00000044052,http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000184451
-http://rdf.ebi.ac.uk/resource/ensembl/ENSMUSG00000035172,http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000068137
-...
-```
+|Mouse Gene|Human Gene|
+|---|---|
+|ensembl:ENSMUSG00000035198|ensembl:ENSG00000131462|
+|ensembl:ENSMUSG00000017167|ensembl:ENSG00000108797|
+|ensembl:ENSMUSG00000044052|ensembl:ENSG00000184451|
+|ensembl:ENSMUSG00000017802|ensembl:ENSG00000141699|
+|ensembl:ENSMUSG00000045007|ensembl:ENSG00000037042|
+|ensembl:ENSMUSG00000035172|ensembl:ENSG00000068137|
 
 How does this work? The query compilation makes use of pre-defined
 n-ary predicates, such as this one defined in the [faldo
@@ -205,15 +211,16 @@ server.
 
 You can start a sparqlprog service running locally:
 
-`docker run -p 9083:9083 cmungall/sparqlprog`
+    docker run -p 9083:9083 cmungall/sparqlprog
 
 (requires docker)
 
-This creates a pengines service at localhost:9083/pengine
+This creates a pengines service at http://localhost:9083/pengine
 
 There is an example of how to contact this service in javascript in
-[bin/sprog-client.js](bin/sprog-client.js). You will need to do a `npm
-install pengines`.
+[sprog-client.js](bin/sprog-client.js). You will need to do:
+
+    npm install pengines
 
 ### SWISH
 
@@ -343,7 +350,7 @@ You can use sparqlprog with any local or remote triplestore that
 supports the SPARQL protocol. If you have RDF files and want to get
 started, here is one quick route (assuming you have docker):
 
- 1. Place your files in [examples/data](examples/data)
+ 1. Place your files in [data](examples/data)
  2. Run `make bg-run`
 
 This will run blazegraph within a docker container

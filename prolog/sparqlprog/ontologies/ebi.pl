@@ -36,8 +36,9 @@
 :- rdf_register_prefix(taxon, 'http://identifiers.org/taxonomy/').
 :- rdf_register_prefix(human, 'http://identifiers.org/taxonomy/9606').
 
-:- rdf_register_prefix(grch38, 'http://rdf.ebi.ac.uk/resource/ensembl/90/homo_sapiens/GRCh38/').
-:- rdf_register_prefix(grcm38, 'http://rdf.ebi.ac.uk/resource/ensembl/90/mus_musculus/GRCm38/').
+% Note: this needs updating every ensemnl release...    
+:- rdf_register_prefix(grch38, 'http://rdf.ebi.ac.uk/resource/ensembl/92/homo_sapiens/GRCh38/').
+:- rdf_register_prefix(grcm38, 'http://rdf.ebi.ac.uk/resource/ensembl/92/mus_musculus/GRCm38/').
 
 
 sample(A) :- rdf(A,rdf:type,biosd_terms:'Sample').
