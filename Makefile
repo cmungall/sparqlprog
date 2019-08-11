@@ -7,7 +7,7 @@
 #PACKNAME=sparkle
 #include ../Makefile.inc
 
-SWIPL = swipl  -L0 -G0 -T0  -p library=prolog
+SWIPL = swipl -p library=prolog
 
 all: test
 
@@ -73,6 +73,15 @@ heroku-new-app:
 heroku-deploy:
 	heroku container:push web &&\
 	heroku logs
+
+# --------------------
+# Run pldoc server in Docker
+# --------------------
+
+# after running, connect to 
+# http://localhost:4000/pldoc/doc/work/prolog/sparqlprog.pl
+pldoc-run:
+	docker run -v $PWD/:/work/ -w /work --name pldoc -p 4000:4000 -e PORT=4000 -it cmungall/sparqlprog swipl -p library=prolog -g [debug]
 
 # --------------------
 # Run SPARQL service inside Docker
