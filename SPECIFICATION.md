@@ -5,7 +5,7 @@ Sparqlprog is a subset of prolog, roughly equivalent to
 to SPARQL. Sparqlprog can also be executed natively by a native logic
 programming engine, allowing for delegation of large database queries
 to a remote service combined with local programming. See the
-[README](README.md) for more information.
+[README](./README.md) for more information.
 
 ## Queries and Compound Terms
 
@@ -18,20 +18,20 @@ Predicates may be built-in or defined. The core built-in predicate is
 
 The most basic query is a query for all triples:
 
-`rdf(S,P,O)`
+    rdf(S,P,O)
 
 Variables are denoted by a leading uppercase symbol. In the above
 example, all arguments are variables to the query succeeds for all
 triples. It is equivalent to the SPARQL query
 
-`SELECT * WHERE {?x ?p ?o}`
+    SELECT * WHERE {?x ?p ?o}
 
 The following query unifies the variable `Cls` with all subjects of a
 triple in which the predicate is `rdf:type` and the value/object is
 `owl:Class`. Note that "Class" is in single quotes to avoid being
 treated as a variable:
 
-`rdf(Cls,rdf:type,owl:'Class')`
+    rdf(Cls,rdf:type,owl:'Class')
 
 ## Boolean combinations
 

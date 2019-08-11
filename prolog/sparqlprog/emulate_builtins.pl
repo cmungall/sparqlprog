@@ -66,10 +66,15 @@ https://www.w3.org/TR/sparql11-query/#expressions
    
 */
 
+%! lcase(+S:strlike, ?V:str)
+%
+%
+%
 lcase(S,V) :-
         ensure_atom(S,S1),
         downcase_atom(S1,V1),
         ensure_string(V1,V).
+%! ucase(+S:strlike, ?V:str)
 ucase(S,V) :-
         ensure_atom(S,S1),
         upcase_atom(S1,V1),
@@ -85,15 +90,26 @@ lang(_^^L,L).
 
 
 %! regex(?String, +Pattern, +Flag) is nondet.
+%! regex(?String, +Pattern) is nondet.
+% 
+%    equivalent to REGEX in SPARQL
+% 
+%    corresponds to re_match/2 in SPARQL
 % 
 regex(S,P) :-
         regex(S,P,"").
+
 regex(S,P,Flag) :-
         eval_to_string(S,S1),
         eval_to_string(P,P1),
         eval_to_atom(Flag,Flag1),
         re_match(P1/Flag1, S1).
 
+
+%! eval_to_atom(?X, ?A) is nondet.
+%
+%   evaluates expression X ensuring A is an atom
+%
 eval_to_atom(X,A) :-
         seval(X,Y),
         ensure_atom(Y,A).
@@ -104,18 +120,27 @@ eval_to_string(X,A) :-
 
 
 %! str_starts(+S:strlike, +Sub:strlike) is semidet.
+%
+%
+%
 str_starts(S,Sub) :-
         ensure_atom(S,S1),
         ensure_atom(Sub,Sub1),
         atom_concat(Sub1,_,S1).
 
 %! str_ends(+S:strlike, +Sub:strlike) is semidet.
+%
+%
+%
 str_ends(S,Sub) :-
         ensure_atom(S,S1),
         ensure_atom(Sub,Sub1),
         atom_concat(_,Sub1,S1).
 
 %! str_before(+S:strlike, +Sep:strlike,  ?Sub:strlike) is det.
+%
+%
+%
 str_before(S,Sep,Sub) :-
         ensure_atom(S,S1),
         ensure_atom(Sep,Sep1),
@@ -125,6 +150,9 @@ str_before(S,Sep,Sub) :-
         ;   ensure_atom(Sub,Sub1)).
 
 %! str_after(+S:strlike, +Sep:strlike,  ?Sub:strlike) is det.
+%
+%
+%
 str_after(S,Sep,Sub) :-
         ensure_atom(S,S1),
         ensure_atom(Sep,Sep1),
@@ -133,6 +161,9 @@ str_after(S,Sep,Sub) :-
         ensure_atom(Sub,Sub1).
 
 %! str_replace(+S:strlike, +Match:strlike, +Replace:strlike,  ?NewStr:strlike) is det.
+%
+%
+%
 str_replace(S,In,Out,NewS) :-
         ensure_atom(S,S1),
         ensure_atom(In,In1),
@@ -141,8 +172,19 @@ str_replace(S,In,Out,NewS) :-
         atomic_list_concat(Toks,Out1,NewS1),
         ensure_string(NewS1,NewS).
 
+
+%! concat(?S1, ?S2, ?S) is nondet.
+%
+%    equivalent to CONCAT in SPARQL
+%
+%
 concat(S1,S2,S) :-
         concatl([S1,S2],S).
+
+%! concat(+S1, +S2, +S3, ?S) is nondet.
+%
+%    equivalent to CONCAT in SPARQL
+%
 concat(S1,S2,S3,S) :-
         concatl([S1,S2,S3],S).
 
@@ -153,11 +195,25 @@ concatl(L,S) :-
         ensure_string(SA,S).        
 
 % for compat
+
+%! count(?L, ?N) is nondet.
+%
+%
+%
 count(L,N) :- length(L,N).
+
+%! agg_max(?L, ?N) is nondet.
+%
+%
+%
 agg_max(L,N) :- aggregate(max(X),member(X,L),N).
 
 
-% aggregates TODO
+
+%! group_concat(?L, ?Sep, ?V) is nondet.
+%
+%
+%
 group_concat(L, Sep, V) :-
         maplist(ensure_atom,L,L1),
         ensure_atom(Sep,Sep1),
@@ -165,12 +221,22 @@ group_concat(L, Sep, V) :-
         ensure_string(V1,V).
 
 :- module_transparent(aggregate_group/4).
+%! aggregate_group(+AggExpression, +GroupBys:list, +Goal, ?Val) is det.
+%
+%   perform an aggregate query
+%
+%    equivalent to GROUP BY queries in SPARQL
+%
+%    maps to aggregate/3 in prolog
+%
 aggregate_group(AggExpr, _GroupBys, Goal, Val) :-
         aggregate(AggExpr, Goal, Val).
 
         
 
 /*
+
+%! aggregate_group(?AggExpr, ?[Witness], ?Goal, ?RWitness-RVal) is nondet.
 aggregate_group(AggExpr, [Witness], Goal, RWitness-RVal) :-
         AggExpr =.. [Pred, Val],
         GTerm =.. [Pred, Witness, Val],
@@ -188,7 +254,10 @@ aggregate_group(AggExpr, [Witness], Goal, RWitness-RVal) :-
 %                                
 %  See https://www.w3.org/TR/sparql11-query/#propertypaths
 %                                
+%  ==                              
 %  Path = Pred OR \Path OR P|Q OR P\Q OR zeroOrMore(Path) OR oneOrMore(Path) OR inverseOf(Path)
+%  ==                              
+
 rdf_path(A,P,B) :-  rdf_path(A,P,B,_).
 
 rdf_path(A,(\P),B,G) :-  rdf_path(B,P,A,G).
@@ -201,6 +270,7 @@ rdf_path(A,zeroOrMore(P),B,G) :-  rdf_path(A,oneOrMore(P),B,G).
 
 rdf_path(A,oneOrMore(P),B,G) :-  rdf_path(A,P,B,G).
 rdf_path(A,oneOrMore(P),B,G) :-  rdfx(A,P,Z,G),rdf_path(Z,oneOrMore(P),B,G).
+
 rdf_path(A,P,B,G) :- rdfx(A,P,B,G).
 
 % true if there is a triple A-P-B in G
@@ -212,6 +282,13 @@ rdfx(A,P,B,G) :-
         rdf(A,Px,B,G).
 
 
+
+%! optional(?G) is det.
+%
+%   call G once, succeed if G fails
+%
+%   equivalent to OPTIONAL in SPARQL
+%
 optional(G) :- G,!.
 optional(_).
 
@@ -239,17 +316,31 @@ all_succeed([G|L]) :-
         
 
 
-
-% convert strlike to atom
+%! ensure_atom(?Str:strlike, ?Atom:atom) is det
+%
+% convert a string, literal, or any strlike entity to an atom
 ensure_atom(S@_, A) :- !, atom_string(A,S).
+
 ensure_atom(S^^_, A) :- !, string(S), atom_string(A,S).
+
 ensure_atom(A, A) :- atom(A), !.
+
 ensure_atom(S, A) :- string(S), !, atom_string(A,S).
 
+%! ensure_string(?A, ?Str:string) is det
+%
+% convert an entity to its string representation
 ensure_string(S,S) :- string(S),!.
+
 ensure_string(A,S) :- atom(A), !, atom_string(A,S).
+
 ensure_string(A,_) :- throw(ensure_string(A)).
 
+
+%! ensure_atoms(?Input:list, ?Atoms:list) is det.
+%
+%
+%
 ensure_atoms(L, L2) :- maplist([A,B]>>ensure_atom(A,B),L,L2).
 
 
@@ -263,6 +354,11 @@ ensure_number(A, N) :- atom(A), !, atom_number(A,N).
 bound(Expr) :- nonvar(Expr).
 
 % 17.4.1.2 IF
+
+%! if(?E1, ?E2, ?E3, ?R) is nondet.
+%
+%
+%
 if(E1, E2, E3, R) :-
         (   E1
         ->  bind(E2, R)
@@ -276,6 +372,7 @@ coalesce([H|_],R) :-
 coalesce([_|T],R) :-
         coalesce(T,R).
 
+%! exists(E) is semidet.
 exists(E) :- \+ \+ E.
 
 % 17.4.1.8 sameTerm : use ==
@@ -301,18 +398,27 @@ bind(Expr,Result) :-
 
 %! seval(+FunctionTerm,?ReturnValue)
 %
-% evaluates a function term
+%    evaluates a function term
+%  
+%    this is the same as bind/2 with args reversed.
 :- module_transparent(seval/2).
+
 seval(L,L2) :-
         is_list(L),
         !,
         maplist(seval,L,L2).
 
+
 seval(V, V) :- var(V),!.
+
 seval(T, T) :- T = _@_, !.
+
 seval(T, T) :- T = _^^_, !.
+
 seval(T, T) :- T = literal(_), !.
+
 seval(T, T) :- is_aggregate_goal(T),!.
+
 seval(Term, Ret) :-
         compound(Term),
         !,

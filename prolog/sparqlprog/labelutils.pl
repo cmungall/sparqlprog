@@ -6,6 +6,13 @@
            term_labelify/2
           ]).
 
+/** <module> utilities for labeling entities
+
+  Convenience predicate for attaching labels to simple or compound entities.
+
+  
+*/
+
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(sparqlprog/emulate_builtins)).
 
@@ -57,7 +64,12 @@ atom_iri(X,I) :-
         !.
 atom_iri(X,X).
 
-
+%! term_labelify(+Term, ?LabeledTerm) is det
+%
+%    If Term is a compound term, LabeledTerm is the same term but with all
+%    atomic components A replaced with A-LabelA
+%
+%    where LabelA is the rdfs:label for A
 term_labelify(V,V) :-
         var(V),
         !.

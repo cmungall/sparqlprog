@@ -302,6 +302,10 @@ cond(G)            --> {throw(error(cond(G)))}.
 string_literal_expr(A) --> {atomic(A),atom_string(A,S)},expr(S).
 string_literal_expr(S) --> expr(S).
 
+% 17.4.1.2 IF
+expr(if(Expr,Yes,No)) --> "IF(", cond(Expr), ", ", expr(Yes), ", ", expr(No), ")".
+
+
 
 % [121] builtin call
 expr(str(V))       --> "STR(", object(V), ")".
@@ -351,7 +355,7 @@ expr(group_concat(X, S))     --> "GROUP_CONCAT(", expr(X), " ;  SEPARATOR = ", e
 expr(+X) -->  p "+ ", expr(X), ")".
 expr(-X) -->  p "- ", expr(X), ")".
 expr(X+Y) --> p expr(X), " + ", expr(Y).
-expr(X-Y) --> p expr(X), " + ", expr(Y).
+expr(X-Y) --> p expr(X), " - ", expr(Y).
 expr(X*Y) --> p expr(X), " * ", expr(Y).
 expr(X/Y) --> p expr(X), " / ", expr(Y).
 expr(X) --> {number(X)}, at(X).

@@ -1,24 +1,3 @@
-/* Part of sparqlprog
-
-    Adapted by Chris Mungall 2018
-    
-	Copyright 2014-2015 Samer Abdallah (UCL)
-	 
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-
-	You should have received a copy of the GNU Lesser General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-
 :- module(sparqlprog,[
       sparql_endpoint/2
    ,  sparql_endpoint/3
@@ -27,9 +6,9 @@
    ,  srule/2
    ,  srule/3
    ,  srule/4
-   ,  query_goal/3     % Endpoint, Context, Opts
-   ,  query_phrase/3   % Endpoint, QueryPhrase, Result
-   ,  query_sparql/3 % Endpoint,QueryText,Result
+%   ,  query_goal/3     % Endpoint, Context, Opts
+%   ,  query_phrase/3   % Endpoint, QueryPhrase, Result
+%   ,  query_sparql/3 % Endpoint,QueryText,Result
    ,  create_sparql_select/2
    ,  create_sparql_select/3
    ,  create_sparql_select/4
@@ -44,24 +23,157 @@
    ,  op(1150,xfy,??)
 	]).
 
-/** <module> Query to SPARQL endpoints with a more Prolog-like syntax
- 
-  Samer Abdallah, Dept. of Computer Science, UCL (2014)
-  Based on Yves Raimond's swic package, but completely re-written.
-  Adapted by Chris Mungall
+/** <module> sparqlprog - logic programming with SPARQL
 
-   This module provides a little language for expressing SPARQL queries
-   and a database of known SPARQL endpoints. Queries can be executed
-   across multiple endpoints in parallel. When using auto-paging,
-   multiple queries are made automatically to fetch new bindings as
-   they are needed. For example, 
-   ==
-   EP ?? rdf(A,B,C).
-   ==
-   will retrieve all triples from all endpoints in parallel, fetching
-   100 bindings at a time from each endpoint (assuming the setting
-   sparqlprog:limit takes it's default value of 100).
+This library provides a prolog interface to SPARQL queries. It allows
+logic program queries to be compiled to SPARQL, and then executed on a
+remote SPARQL server.
+
+# Quickstart
+  
+
+The following can be entered interactively on the prolog console:
+  
+  ==
+  [library(sparqlprog)].
+  rdf_register_prefix(dbont,'http://dbpedia.org/ontology/').
+  sparql_endpoint( dbp, 'http://dbpedia.org/sparql/').
+  dbp ?? rdf(B,rdf:type,dbont:'Band'), rdf(B,dbont:bandMember,M).
+  ==
+
+This performs the following steps:  
+  
+ 1. For convenience, the prefix `dbont` is registered using rdf_register_prefix/2
+ 2. Next we register the short name `dbp` for the [DBPedia endoint](http://dbpedia.org/sparql) using  sparql_endpoint/2.
+ 3. Then we query for all bands and their members using by queried by calling ??/2 - the query is specified using the standard rdf/3 predicate.
+
+On the console the results should look like:
+
+  ==
+  |    dbp ?? rdf(B,rdf:type,dbont:'Band'), rdf(B,dbont:bandMember,M).
+  B = 'http://dbpedia.org/resource/Alice_in_Chains',
+  M = 'http://dbpedia.org/resource/Sean_Kinney' ;
+  B = 'http://dbpedia.org/resource/Alice_in_Chains',
+  M = 'http://dbpedia.org/resource/William_DuVall' ;
+  B = 'http://dbpedia.org/resource/Alice_in_Chains',
+  M = 'http://dbpedia.org/resource/Jerry_Cantrell' ;
+  B = 'http://dbpedia.org/resource/Alice_in_Chains',
+  M = 'http://dbpedia.org/resource/Mike_Inez' ;
+  B = 'http://dbpedia.org/resource/Anthrax_(American_band)',
+  M = 'http://dbpedia.org/resource/Scott_Ian' .
+  ==
+
+### Using user-defined predicates
+
+You can define your own predicates for use in queries. So long as these stay within the sparqlprog subset, they can be rewritten into a query formed from rdf/3 terms.
+
+For example, you can create a file `dbpedia.pl` with the following content:
+  
+  ==
+  band(X) :- rdf(X,rdf:type,dbont:'Band').
+  band_member(S,O) :- rdf(S,dbont:bandMember,O).
+  ==
+
+The original query can then be rewritten as:
+  
+  ==
+  dbp ?? band(B), band_member(B,M).
+  ==
+
+This becomes more advantageous where we want to re-use predicates that encapsulate some query logic, for example, the following 3-ary predicate connects two bands by a shared member:
+
+  ==
+  has_shared_band_member(B1,B2,A) :-
+        rdf(A,dbo:associatedBand,B1),
+        rdf(A,dbo:associatedBand,B2),
+        B1\=B2.
+  ==
+
+library(sparqlprog/ontologies/dbpedia) provides basic wrapper predicates for dbpedia.
+
+  
+The example program
+[examples/dbpedia/dbpedia_rules](https://www.swi-prolog.org/pack/file_details/sparqlprog/examples/dbpedia/dbpedia_rules.pl)
+shows how to construct a more advanced example for being able to
+perform semantic similarity of bands based on shared genres.
+
+sparqlprog is distributed with a number of modules for existing triplestore schemas (with a bias towards life sciences triplestores).
+
+In future some of these will have their own distribution. Some examples:
+
+  * library(sparqlprog/ontologies/faldo), genome locations e.g. faldo:location/5
+  * library(sparqlprog/ontologies/ebi), EBI RDF e.g. ebi:homologous_to/2
+  * library(sparqlprog/ontologies/biopax3), BioPax level 3 e.g. biopax3:nextStep/2
+  * library(sparqlprog/ontologies/disgenet), DisGeNet e.g. disgenet:disease/1, disgenet:gda/3
+  * library(sparqlprog/ontologies/chembl), e.g. chembl:has_molecule/2
+  * library(sparqlprog/ontologies/nextprot), e.g. nextprot:expression/2
+  * library(sparqlprog/ontologies/rhea), e.g. rhea:reaction_chebi_participant/2
+  * library(sparqlprog/ontologies/uniprot), e.g. uniprot:protein/1, uniprot:has_disease_annotation/2.
+
+Note that library(sparqlprog/ontologies/wikidata) is deprecated, instead use library(sparqlprog_wikidata), a separate distribution
+
+## using OWL
+
+library(sparqlprog/owl_util) provides predicates for working with OWL ontologies.
+
+For example, owl_edge/4 provides an easy way to extract 'edges' from
+an ontology (e.g subClassOf between named classes, or involving
+existential restrictions).
+  
+## sparqlprog language
+
+Any program composed of sparqlprog primitive predicates and the following connectors is considered to be a sparqlprog program, and can be translated to SPARQL.
+
+The connectors allowed are:
+
+  * (,)/2 conjunctive queries
+  * (;)/2 disjunctive queries
+  * (\+)/1 negation
+  * (:-)/2 defining predicates
+
+Note that the cut operator `!` is *not* allowed.  
+  
+The following are sparqlprog primitives:
+
+  * rdf/3
+  * rdf/4
+  * rdf_has/3
+  * rdfs_subclass_of/2
+  * rdfs_individual_of/2
+  * rdf_path/3
+  * optional/1
+  * bind/2
+  * aggregate_group/4
+
+Additionally, all SPARQL functions are treated as built-in predicates, e.g. regex/3, str_starts/2, lcase/2
+  
+### Running sparqlprog programs over in-memory database  
+
+SWI-Prolog has its own in-memory database that can be interrogated via rdf/3.  
+  
+sparqlprog programs can be executed over this in-memory database, as well as remote databases. See sparqlprog/emulate_builtins.pl for examples
+
+### Mixing remote and local execution  
+
+One of the challenges of using SPARQL with a traditional programming
+language is the impedance mismatch when combining query logic and
+programmatic logic. With sparqlprog, both programs and queries are
+specified in the same language.
+
+
+### Authors
+
+  
+* Adapted from Samer Abdallah's sparkle by Chris Mungall 2018
+* Samer's code is based on Yves Raimond's swic package, but completely re-written.
+
+...  
+  
+@author Samer Abdallah
+@author Chris Mungall
+  
 */
+
 
 :- use_module(library(sandbox)).
 :- use_module(library(settings)).
@@ -97,19 +209,30 @@ service_query_all(EP,Template,Spec,Results) :-
 service_query_all(_,_,_,[]).
 
 
-%% '??'(+Goal:sparql_goal) is nondet.
-%  Equivalent to _ ?? Goal. Will query all endpoints
-%  in parallel. Identical bindings may be returned multiple times.
-%  See query_goal/3 for details.
-??(Spec) :- ??(_,Spec).
 
-%% '??'(EP,+Goal:sparql_goal) is nondet.
-%  Equivalent to query_goal(EP,Goal,Opts) where Opts is the value of
-%  the setting sparqlprog:select_options. See query_goal/3 for details.
+%! '??'(?EP, +Goal:sparql_goal, +SelectTerm) is nondet.
+%  
+%  Query endpoint EP using Goal, selecting variables in SelectTerm
+% 
+%  EP should be a name declared using sparql_endpoint/2. 
 %  IF EP is unbound on entry, it is bound to the endpoint from which
 %  the current bindings were obtained.
-??(EP,Spec) :-
-        ??(EP,Spec,Spec).
+%  
+%  Goal is any prolog query that conforms to the sparqlprog subset.
+%  i.e. it consists of sparqlprog predicates such as rdf/3, or defined  
+%  predicates that can be compiled down to basic predicates.
+%
+%  SelectTerm is any prolog term, the variables used in this term will be
+%  used to determine the SELECT in the SPARQL query
+%
+%  Example:
+%
+%  ==
+%  ??(dbp, band_member(B,M), row([B,M]))
+%  ==
+%  
+%  Note in many cases the SELECT variables can be determined from the
+%  query in which case ??/2 is more convenient
 ??(EP,Spec,SelectTerm) :-
         debug(sparqlprog,'Finding subqueries: ~q',[Spec]),
         expand_subqueries(Spec,Spec2,EP),
@@ -121,6 +244,22 @@ service_query_all(_,_,_,[]).
         setting(select_options,Opts0),
         merge_options(Opts,Opts0,Opts1),
         query_goal(EP,Goal,SelectTerm,Opts1).
+
+%! '??'(?EP, +Goal:sparql_goal) is nondet.
+%  
+%    Equivalent to ??/3 where the SELECT variables are extracted from
+%    variables in Goal.
+%
+%    Note: if Goal contains an aggregate query then ??/3 should be used.
+%
+??(EP,Spec) :-
+        ??(EP,Spec,Spec).
+
+%! '??'(+Goal:sparql_goal) is nondet.
+%
+%    equivalent to ??/2, calling all known endpoints in parallel.
+%
+??(Spec) :- ??(_,Spec).
 
 spec_goal_opts(Opts ?? Goal, Goal, Opts) :- !.
 spec_goal_opts(Goal,Goal,[]).
@@ -168,7 +307,7 @@ plist_to_disj([_-X|T],(X;T2)) :- plist_to_disj(T,T2).
 :- multifile rewrite_goal_hook/2.
 
 
-%% rewrite_goal(+InGoal, ?OutGoalDisjunction) is semidet
+%! rewrite_goal(+InGoal, ?OutGoalDisjunction) is semidet
 %
 % non-deterministic top-level goal rewrite
 % if multiple goals possible, return a disjunction of goals (G1;G2;...;Gn)
@@ -196,7 +335,7 @@ unify_keys(Term,[TermX-_ | T]) :-
   
 */
 
-%% rewrite_goal(+InGoal, ?OutGoal, +Depth) is semidet
+%! rewrite_goal(+InGoal, ?OutGoal, +Depth) is semidet
 %
 % typically deterministic, but non-deterministic if 
 % multiple possible paths
@@ -389,15 +528,17 @@ srule(P,A,D) :-
         current_module(M),
         assert(srule(P,A,D,M)).
 
-/*
- * Assert/declare a new sparql end point
- */
-
-%% sparql_endpoint(+EP:ground, +URL:atom, +Options) is det.
-%% sparql_endpoint(+EP:ground, +URL:atom) is det.
+%! sparql_endpoint(+EP:ground, +URL:atom, +Options) is det.
+%! sparql_endpoint(+EP:ground, +URL:atom) is det.
 %
 %  Declares EP as a short name for a SPARQL endpoint with the given URL.
+%  
 %  No options are defined at the moment.
+%
+%  Example:
+%  ==
+%  sparql_endpoint( dbp, 'http://dbpedia.org/sparql/').
+%  ==
 sparql_endpoint(EP,Url) :- sparql_endpoint(EP,Url,[]).
 sparql_endpoint(EP,Url,Options) :-
    url_endpoint(Url,Host,Port,Path),
@@ -432,7 +573,7 @@ url_endpoint(Url,Host,Port,Path) :-
 	(member(port(Port),Parsed);Port=80).
 
 
-%% current_sparql_endpoint(-EP:ground,-Host:atom,-Port:natural,-Path:atom,-Options:list) is nondet.
+%! current_sparql_endpoint(-EP:ground,-Host:atom,-Port:natural,-Path:atom,-Options:list) is nondet.
 %
 %  Succeeds once for each known endpoint.
 current_sparql_endpoint(EP,Host,Port,Path,Options) :-
@@ -443,8 +584,8 @@ current_sparql_endpoint(EP,Host,Port,Path,Options) :-
 % Goal-based queries 
 % These get translated into phrase-based queries.
 
-%% query_goal(+EP,+Goal:sparql_goal,+Opts) is nondet.
-%% query_goal(-EP,+Goal:sparql_goal,+Opts) is nondet.
+%! query_goal(+EP,+Goal:sparql_goal,+Opts) is nondet.
+%! query_goal(-EP,+Goal:sparql_goal,+Opts) is nondet.
 %
 %  Runs a SPARQL query against one or more SPARQL endpoints.
 %  Goal is converted into a textual SPARQL query using the DCG
@@ -495,15 +636,14 @@ query_goal(EP,Goal,SelectTerm,Opts) :-
       parallel_query(Query,EPs,EP-Result)
    ).
 
-%% create_sparql_select(+Goal,-SPARQL,+Opts) is det.
-%% create_sparql_select(+Goal,-SPARQL) is det.
+%! create_sparql_select(+SelectTerm, +Goal,-SPARQL,+Opts) is det.
+%! create_sparql_select(+Goal, -SPARQL,+Opts) is det.
+%! create_sparql_select(+Goal, -SPARQL) is det.
 %
 % Generates a sparql SELECT or ASK statement for a 
 % prolog goal without executing it.
 %
-% Goal can be any prolog goal consisting of based 
-% rdf/3 or rdf/4 statements, filters, or terms
-% that can be rewritten in this way
+% Goal can be any sparqlprog program, see ??/3
 create_sparql_select(Goal,SPARQL) :-
         create_sparql_select(Goal,SPARQL,[]).
 
@@ -549,10 +689,9 @@ filter_opts([_|T],T2) :-
         filter_opts(T,T2).
 
 
-%% inject_label_query(+Select, +Query, ?Select2, ?Query2, +Opts) is det
+%! inject_label_query(+Select, +Query, ?Select2, ?Query2, +Opts) is det
 %
 % Add an optional(rdf(X,rdfs:label,XL)) for every variable X in Select
-% TODO: interleave
 inject_label_query(Select, Goal, Select2, (Goal,ConjGoal), Opts) :-
         term_variables(Select,Vars),
         option(label_predicate(P),Opts,rdfpred(rdfs:label)),
@@ -589,8 +728,8 @@ conjoin(Term,L,T2) :-
 
         
 
-%% create_sparql_construct(+Head,+Goal,-SPARQL,+Opts) is det.
-%% create_sparql_construct(+Head,+Goal,-SPARQL) is det.
+%! create_sparql_construct(+Head,+Goal,-SPARQL,+Opts) is det.
+%! create_sparql_construct(+Head,+Goal,-SPARQL) is det.
 %
 % Generates a sparql CONSTRUCT statement for a 
 % prolog goal without executing it.
@@ -633,8 +772,8 @@ par_goal(P,Y,X,call(P,X,Y)).
 
 
 
-%% query_phrase(+EP,+Q:sparqle_phrase(R),R) is nondet.
-%% query_phrase(-EP,+Q:sparqle_phrase(R),R) is nondet.
+%! query_phrase(+EP,+Q:sparqle_phrase(R),R) is nondet.
+%! query_phrase(-EP,+Q:sparqle_phrase(R),R) is nondet.
 %
 % Phrase-based queries using the DCG defined in sparql_dcg.pl.
 % The return type depends on the query:
@@ -703,7 +842,7 @@ downcase_first_char(A,A2) :-
 % ----------------------------------------------------
 % In the end, everything comes through this.
 
-%% query_sparql(?EP,SPARQL,-Result) is nondet.
+%! query_sparql(?EP,SPARQL,-Result) is nondet.
 %
 %  Runs textual SPARQL query against an endpoint, exactly as
 %  with sparql_query/3. If EP is unbound on entry, all known

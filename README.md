@@ -66,6 +66,8 @@ paradigm. See below for examples.
 
 See the [sparqlprog module docs](https://www.swi-prolog.org/pack/file_details/sparqlprog/prolog/sparqlprog.pl)
 
+See also the [specification](SPECIFICATION.md)
+
 ## Quick Start (for everyone else)
 
 There are a variety of ways to use this framework:

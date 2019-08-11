@@ -1180,985 +1180,985 @@
 
 :-rdf_meta biopax3:year(r,r,g).
 
-%! absoluteRegion_iri(http://www.biopax.org/release/biopax-level3.owl#absoluteRegion)
+%! absoluteRegion_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#absoluteRegion>
 %
 biopax3:absoluteRegion_iri('http://www.biopax.org/release/biopax-level3.owl#absoluteRegion').
 
-%! author_iri(http://www.biopax.org/release/biopax-level3.owl#author)
+%! author_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#author>
 %
 biopax3:author_iri('http://www.biopax.org/release/biopax-level3.owl#author').
 
-%! availability_iri(http://www.biopax.org/release/biopax-level3.owl#availability)
+%! availability_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#availability>
 %
 biopax3:availability_iri('http://www.biopax.org/release/biopax-level3.owl#availability').
 
-%! bindingFeature_iri(http://www.biopax.org/release/biopax-level3.owl#BindingFeature)
+%! bindingFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#BindingFeature>
 %
 biopax3:bindingFeature_iri('http://www.biopax.org/release/biopax-level3.owl#BindingFeature').
 
-%! bindsTo_iri(http://www.biopax.org/release/biopax-level3.owl#bindsTo)
+%! bindsTo_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#bindsTo>
 %
 biopax3:bindsTo_iri('http://www.biopax.org/release/biopax-level3.owl#bindsTo').
 
-%! bioSource_iri(http://www.biopax.org/release/biopax-level3.owl#BioSource)
+%! bioSource_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#BioSource>
 %
 biopax3:bioSource_iri('http://www.biopax.org/release/biopax-level3.owl#BioSource').
 
-%! biochemicalPathwayStep_iri(http://www.biopax.org/release/biopax-level3.owl#BiochemicalPathwayStep)
+%! biochemicalPathwayStep_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#BiochemicalPathwayStep>
 %
 biopax3:biochemicalPathwayStep_iri('http://www.biopax.org/release/biopax-level3.owl#BiochemicalPathwayStep').
 
-%! biochemicalReaction_iri(http://www.biopax.org/release/biopax-level3.owl#BiochemicalReaction)
+%! biochemicalReaction_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#BiochemicalReaction>
 %
 biopax3:biochemicalReaction_iri('http://www.biopax.org/release/biopax-level3.owl#BiochemicalReaction').
 
-%! catalysisDirection_iri(http://www.biopax.org/release/biopax-level3.owl#catalysisDirection)
+%! catalysisDirection_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#catalysisDirection>
 %
 biopax3:catalysisDirection_iri('http://www.biopax.org/release/biopax-level3.owl#catalysisDirection').
 
-%! catalysis_iri(http://www.biopax.org/release/biopax-level3.owl#Catalysis)
+%! catalysis_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Catalysis>
 %
 biopax3:catalysis_iri('http://www.biopax.org/release/biopax-level3.owl#Catalysis').
 
-%! cellType_iri(http://www.biopax.org/release/biopax-level3.owl#cellType)
+%! cellType_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#cellType>
 %
 biopax3:cellType_iri('http://www.biopax.org/release/biopax-level3.owl#cellType').
 
-%! cellVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#CellVocabulary)
+%! cellVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#CellVocabulary>
 %
 biopax3:cellVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#CellVocabulary').
 
-%! cellularLocationVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#CellularLocationVocabulary)
+%! cellularLocationVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#CellularLocationVocabulary>
 %
 biopax3:cellularLocationVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#CellularLocationVocabulary').
 
-%! cellularLocation_iri(http://www.biopax.org/release/biopax-level3.owl#cellularLocation)
+%! cellularLocation_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#cellularLocation>
 %
 biopax3:cellularLocation_iri('http://www.biopax.org/release/biopax-level3.owl#cellularLocation').
 
-%! chemicalFormula_iri(http://www.biopax.org/release/biopax-level3.owl#chemicalFormula)
+%! chemicalFormula_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#chemicalFormula>
 %
 biopax3:chemicalFormula_iri('http://www.biopax.org/release/biopax-level3.owl#chemicalFormula').
 
-%! chemicalStructure_iri(http://www.biopax.org/release/biopax-level3.owl#ChemicalStructure)
+%! chemicalStructure_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ChemicalStructure>
 %
 biopax3:chemicalStructure_iri('http://www.biopax.org/release/biopax-level3.owl#ChemicalStructure').
 
-%! cofactor_iri(http://www.biopax.org/release/biopax-level3.owl#cofactor)
+%! cofactor_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#cofactor>
 %
 biopax3:cofactor_iri('http://www.biopax.org/release/biopax-level3.owl#cofactor').
 
-%! comment_iri(http://www.biopax.org/release/biopax-level3.owl#comment)
+%! comment_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#comment>
 %
 biopax3:comment_iri('http://www.biopax.org/release/biopax-level3.owl#comment').
 
-%! complexAssembly_iri(http://www.biopax.org/release/biopax-level3.owl#ComplexAssembly)
+%! complexAssembly_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ComplexAssembly>
 %
 biopax3:complexAssembly_iri('http://www.biopax.org/release/biopax-level3.owl#ComplexAssembly').
 
-%! complex_iri(http://www.biopax.org/release/biopax-level3.owl#Complex)
+%! complex_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Complex>
 %
 biopax3:complex_iri('http://www.biopax.org/release/biopax-level3.owl#Complex').
 
-%! componentStoichiometry_iri(http://www.biopax.org/release/biopax-level3.owl#componentStoichiometry)
+%! componentStoichiometry_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#componentStoichiometry>
 %
 biopax3:componentStoichiometry_iri('http://www.biopax.org/release/biopax-level3.owl#componentStoichiometry').
 
-%! component_iri(http://www.biopax.org/release/biopax-level3.owl#component)
+%! component_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#component>
 %
 biopax3:component_iri('http://www.biopax.org/release/biopax-level3.owl#component').
 
-%! confidence_iri(http://www.biopax.org/release/biopax-level3.owl#confidence)
+%! confidence_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#confidence>
 %
 biopax3:confidence_iri('http://www.biopax.org/release/biopax-level3.owl#confidence').
 
-%! controlType_iri(http://www.biopax.org/release/biopax-level3.owl#controlType)
+%! controlType_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#controlType>
 %
 biopax3:controlType_iri('http://www.biopax.org/release/biopax-level3.owl#controlType').
 
-%! control_iri(http://www.biopax.org/release/biopax-level3.owl#Control)
+%! control_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Control>
 %
 biopax3:control_iri('http://www.biopax.org/release/biopax-level3.owl#Control').
 
-%! controlledVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#ControlledVocabulary)
+%! controlledVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ControlledVocabulary>
 %
 biopax3:controlledVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#ControlledVocabulary').
 
-%! controlled_iri(http://www.biopax.org/release/biopax-level3.owl#controlled)
+%! controlled_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#controlled>
 %
 biopax3:controlled_iri('http://www.biopax.org/release/biopax-level3.owl#controlled').
 
-%! controller_iri(http://www.biopax.org/release/biopax-level3.owl#controller)
+%! controller_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#controller>
 %
 biopax3:controller_iri('http://www.biopax.org/release/biopax-level3.owl#controller').
 
-%! conversionDirection_iri(http://www.biopax.org/release/biopax-level3.owl#conversionDirection)
+%! conversionDirection_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#conversionDirection>
 %
 biopax3:conversionDirection_iri('http://www.biopax.org/release/biopax-level3.owl#conversionDirection').
 
-%! conversion_iri(http://www.biopax.org/release/biopax-level3.owl#Conversion)
+%! conversion_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Conversion>
 %
 biopax3:conversion_iri('http://www.biopax.org/release/biopax-level3.owl#Conversion').
 
-%! covalentBindingFeature_iri(http://www.biopax.org/release/biopax-level3.owl#CovalentBindingFeature)
+%! covalentBindingFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#CovalentBindingFeature>
 %
 biopax3:covalentBindingFeature_iri('http://www.biopax.org/release/biopax-level3.owl#CovalentBindingFeature').
 
-%! dataSource_iri(http://www.biopax.org/release/biopax-level3.owl#dataSource)
+%! dataSource_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#dataSource>
 %
 biopax3:dataSource_iri('http://www.biopax.org/release/biopax-level3.owl#dataSource').
 
-%! dbVersion_iri(http://www.biopax.org/release/biopax-level3.owl#dbVersion)
+%! dbVersion_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#dbVersion>
 %
 biopax3:dbVersion_iri('http://www.biopax.org/release/biopax-level3.owl#dbVersion').
 
-%! db_iri(http://www.biopax.org/release/biopax-level3.owl#db)
+%! db_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#db>
 %
 biopax3:db_iri('http://www.biopax.org/release/biopax-level3.owl#db').
 
-%! degradation_iri(http://www.biopax.org/release/biopax-level3.owl#Degradation)
+%! degradation_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Degradation>
 %
 biopax3:degradation_iri('http://www.biopax.org/release/biopax-level3.owl#Degradation').
 
-%! deltaGPrime0_iri(http://www.biopax.org/release/biopax-level3.owl#deltaGPrime0)
+%! deltaGPrime0_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#deltaGPrime0>
 %
 biopax3:deltaGPrime0_iri('http://www.biopax.org/release/biopax-level3.owl#deltaGPrime0').
 
-%! deltaG_iri(http://www.biopax.org/release/biopax-level3.owl#DeltaG)
+%! deltaG_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#DeltaG>
 %
 biopax3:deltaG_iri('http://www.biopax.org/release/biopax-level3.owl#DeltaG').
 
-%! deltaG_iri(http://www.biopax.org/release/biopax-level3.owl#deltaG)
+%! deltaG_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#deltaG>
 %
 biopax3:deltaG_iri('http://www.biopax.org/release/biopax-level3.owl#deltaG').
 
-%! deltaH_iri(http://www.biopax.org/release/biopax-level3.owl#deltaH)
+%! deltaH_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#deltaH>
 %
 biopax3:deltaH_iri('http://www.biopax.org/release/biopax-level3.owl#deltaH').
 
-%! deltaS_iri(http://www.biopax.org/release/biopax-level3.owl#deltaS)
+%! deltaS_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#deltaS>
 %
 biopax3:deltaS_iri('http://www.biopax.org/release/biopax-level3.owl#deltaS').
 
-%! displayName_iri(http://www.biopax.org/release/biopax-level3.owl#displayName)
+%! displayName_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#displayName>
 %
 biopax3:displayName_iri('http://www.biopax.org/release/biopax-level3.owl#displayName').
 
-%! dnaReference_iri(http://www.biopax.org/release/biopax-level3.owl#DnaReference)
+%! dnaReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#DnaReference>
 %
 biopax3:dnaReference_iri('http://www.biopax.org/release/biopax-level3.owl#DnaReference').
 
-%! dnaRegionReference_iri(http://www.biopax.org/release/biopax-level3.owl#DnaRegionReference)
+%! dnaRegionReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#DnaRegionReference>
 %
 biopax3:dnaRegionReference_iri('http://www.biopax.org/release/biopax-level3.owl#DnaRegionReference').
 
-%! dnaRegion_iri(http://www.biopax.org/release/biopax-level3.owl#DnaRegion)
+%! dnaRegion_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#DnaRegion>
 %
 biopax3:dnaRegion_iri('http://www.biopax.org/release/biopax-level3.owl#DnaRegion').
 
-%! dna_iri(http://www.biopax.org/release/biopax-level3.owl#Dna)
+%! dna_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Dna>
 %
 biopax3:dna_iri('http://www.biopax.org/release/biopax-level3.owl#Dna').
 
-%! eCNumber_iri(http://www.biopax.org/release/biopax-level3.owl#eCNumber)
+%! eCNumber_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#eCNumber>
 %
 biopax3:eCNumber_iri('http://www.biopax.org/release/biopax-level3.owl#eCNumber').
 
-%! entityFeature_iri(http://www.biopax.org/release/biopax-level3.owl#EntityFeature)
+%! entityFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#EntityFeature>
 %
 biopax3:entityFeature_iri('http://www.biopax.org/release/biopax-level3.owl#EntityFeature').
 
-%! entityFeature_iri(http://www.biopax.org/release/biopax-level3.owl#entityFeature)
+%! entityFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#entityFeature>
 %
 biopax3:entityFeature_iri('http://www.biopax.org/release/biopax-level3.owl#entityFeature').
 
-%! entityReferenceTypeVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#EntityReferenceTypeVocabulary)
+%! entityReferenceTypeVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#EntityReferenceTypeVocabulary>
 %
 biopax3:entityReferenceTypeVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#EntityReferenceTypeVocabulary').
 
-%! entityReferenceType_iri(http://www.biopax.org/release/biopax-level3.owl#entityReferenceType)
+%! entityReferenceType_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#entityReferenceType>
 %
 biopax3:entityReferenceType_iri('http://www.biopax.org/release/biopax-level3.owl#entityReferenceType').
 
-%! entityReference_iri(http://www.biopax.org/release/biopax-level3.owl#EntityReference)
+%! entityReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#EntityReference>
 %
 biopax3:entityReference_iri('http://www.biopax.org/release/biopax-level3.owl#EntityReference').
 
-%! entityReference_iri(http://www.biopax.org/release/biopax-level3.owl#entityReference)
+%! entityReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#entityReference>
 %
 biopax3:entityReference_iri('http://www.biopax.org/release/biopax-level3.owl#entityReference').
 
-%! entity_iri(http://www.biopax.org/release/biopax-level3.owl#Entity)
+%! entity_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Entity>
 %
 biopax3:entity_iri('http://www.biopax.org/release/biopax-level3.owl#Entity').
 
-%! evidenceCodeVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#EvidenceCodeVocabulary)
+%! evidenceCodeVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#EvidenceCodeVocabulary>
 %
 biopax3:evidenceCodeVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#EvidenceCodeVocabulary').
 
-%! evidenceCode_iri(http://www.biopax.org/release/biopax-level3.owl#evidenceCode)
+%! evidenceCode_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#evidenceCode>
 %
 biopax3:evidenceCode_iri('http://www.biopax.org/release/biopax-level3.owl#evidenceCode').
 
-%! evidence_iri(http://www.biopax.org/release/biopax-level3.owl#Evidence)
+%! evidence_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Evidence>
 %
 biopax3:evidence_iri('http://www.biopax.org/release/biopax-level3.owl#Evidence').
 
-%! evidence_iri(http://www.biopax.org/release/biopax-level3.owl#evidence)
+%! evidence_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#evidence>
 %
 biopax3:evidence_iri('http://www.biopax.org/release/biopax-level3.owl#evidence').
 
-%! experimentalFeature_iri(http://www.biopax.org/release/biopax-level3.owl#experimentalFeature)
+%! experimentalFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#experimentalFeature>
 %
 biopax3:experimentalFeature_iri('http://www.biopax.org/release/biopax-level3.owl#experimentalFeature').
 
-%! experimentalFormDescription_iri(http://www.biopax.org/release/biopax-level3.owl#experimentalFormDescription)
+%! experimentalFormDescription_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#experimentalFormDescription>
 %
 biopax3:experimentalFormDescription_iri('http://www.biopax.org/release/biopax-level3.owl#experimentalFormDescription').
 
-%! experimentalFormEntity_iri(http://www.biopax.org/release/biopax-level3.owl#experimentalFormEntity)
+%! experimentalFormEntity_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#experimentalFormEntity>
 %
 biopax3:experimentalFormEntity_iri('http://www.biopax.org/release/biopax-level3.owl#experimentalFormEntity').
 
-%! experimentalFormVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#ExperimentalFormVocabulary)
+%! experimentalFormVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ExperimentalFormVocabulary>
 %
 biopax3:experimentalFormVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#ExperimentalFormVocabulary').
 
-%! experimentalForm_iri(http://www.biopax.org/release/biopax-level3.owl#ExperimentalForm)
+%! experimentalForm_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ExperimentalForm>
 %
 biopax3:experimentalForm_iri('http://www.biopax.org/release/biopax-level3.owl#ExperimentalForm').
 
-%! experimentalForm_iri(http://www.biopax.org/release/biopax-level3.owl#experimentalForm)
+%! experimentalForm_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#experimentalForm>
 %
 biopax3:experimentalForm_iri('http://www.biopax.org/release/biopax-level3.owl#experimentalForm').
 
-%! featureLocationType_iri(http://www.biopax.org/release/biopax-level3.owl#featureLocationType)
+%! featureLocationType_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#featureLocationType>
 %
 biopax3:featureLocationType_iri('http://www.biopax.org/release/biopax-level3.owl#featureLocationType').
 
-%! featureLocation_iri(http://www.biopax.org/release/biopax-level3.owl#featureLocation)
+%! featureLocation_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#featureLocation>
 %
 biopax3:featureLocation_iri('http://www.biopax.org/release/biopax-level3.owl#featureLocation').
 
-%! feature_iri(http://www.biopax.org/release/biopax-level3.owl#feature)
+%! feature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#feature>
 %
 biopax3:feature_iri('http://www.biopax.org/release/biopax-level3.owl#feature').
 
-%! fragmentFeature_iri(http://www.biopax.org/release/biopax-level3.owl#FragmentFeature)
+%! fragmentFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#FragmentFeature>
 %
 biopax3:fragmentFeature_iri('http://www.biopax.org/release/biopax-level3.owl#FragmentFeature').
 
-%! gene_iri(http://www.biopax.org/release/biopax-level3.owl#Gene)
+%! gene_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Gene>
 %
 biopax3:gene_iri('http://www.biopax.org/release/biopax-level3.owl#Gene').
 
-%! geneticInteraction_iri(http://www.biopax.org/release/biopax-level3.owl#GeneticInteraction)
+%! geneticInteraction_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#GeneticInteraction>
 %
 biopax3:geneticInteraction_iri('http://www.biopax.org/release/biopax-level3.owl#GeneticInteraction').
 
-%! idVersion_iri(http://www.biopax.org/release/biopax-level3.owl#idVersion)
+%! idVersion_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#idVersion>
 %
 biopax3:idVersion_iri('http://www.biopax.org/release/biopax-level3.owl#idVersion').
 
-%! id_iri(http://www.biopax.org/release/biopax-level3.owl#id)
+%! id_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#id>
 %
 biopax3:id_iri('http://www.biopax.org/release/biopax-level3.owl#id').
 
-%! interactionScore_iri(http://www.biopax.org/release/biopax-level3.owl#interactionScore)
+%! interactionScore_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#interactionScore>
 %
 biopax3:interactionScore_iri('http://www.biopax.org/release/biopax-level3.owl#interactionScore').
 
-%! interactionType_iri(http://www.biopax.org/release/biopax-level3.owl#interactionType)
+%! interactionType_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#interactionType>
 %
 biopax3:interactionType_iri('http://www.biopax.org/release/biopax-level3.owl#interactionType').
 
-%! interactionVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#InteractionVocabulary)
+%! interactionVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#InteractionVocabulary>
 %
 biopax3:interactionVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#InteractionVocabulary').
 
-%! interaction_iri(http://www.biopax.org/release/biopax-level3.owl#Interaction)
+%! interaction_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Interaction>
 %
 biopax3:interaction_iri('http://www.biopax.org/release/biopax-level3.owl#Interaction').
 
-%! intraMolecular_iri(http://www.biopax.org/release/biopax-level3.owl#intraMolecular)
+%! intraMolecular_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#intraMolecular>
 %
 biopax3:intraMolecular_iri('http://www.biopax.org/release/biopax-level3.owl#intraMolecular').
 
-%! ionicStrength_iri(http://www.biopax.org/release/biopax-level3.owl#ionicStrength)
+%! ionicStrength_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ionicStrength>
 %
 biopax3:ionicStrength_iri('http://www.biopax.org/release/biopax-level3.owl#ionicStrength').
 
-%! kEQ_iri(http://www.biopax.org/release/biopax-level3.owl#kEQ)
+%! kEQ_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#kEQ>
 %
 biopax3:kEQ_iri('http://www.biopax.org/release/biopax-level3.owl#kEQ').
 
-%! kPrime_iri(http://www.biopax.org/release/biopax-level3.owl#KPrime)
+%! kPrime_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#KPrime>
 %
 biopax3:kPrime_iri('http://www.biopax.org/release/biopax-level3.owl#KPrime').
 
-%! kPrime_iri(http://www.biopax.org/release/biopax-level3.owl#kPrime)
+%! kPrime_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#kPrime>
 %
 biopax3:kPrime_iri('http://www.biopax.org/release/biopax-level3.owl#kPrime').
 
-%! left_iri(http://www.biopax.org/release/biopax-level3.owl#left)
+%! left_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#left>
 %
 biopax3:left_iri('http://www.biopax.org/release/biopax-level3.owl#left').
 
-%! memberEntityReference_iri(http://www.biopax.org/release/biopax-level3.owl#memberEntityReference)
+%! memberEntityReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#memberEntityReference>
 %
 biopax3:memberEntityReference_iri('http://www.biopax.org/release/biopax-level3.owl#memberEntityReference').
 
-%! memberFeature_iri(http://www.biopax.org/release/biopax-level3.owl#memberFeature)
+%! memberFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#memberFeature>
 %
 biopax3:memberFeature_iri('http://www.biopax.org/release/biopax-level3.owl#memberFeature').
 
-%! memberPhysicalEntity_iri(http://www.biopax.org/release/biopax-level3.owl#memberPhysicalEntity)
+%! memberPhysicalEntity_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#memberPhysicalEntity>
 %
 biopax3:memberPhysicalEntity_iri('http://www.biopax.org/release/biopax-level3.owl#memberPhysicalEntity').
 
-%! modificationFeature_iri(http://www.biopax.org/release/biopax-level3.owl#ModificationFeature)
+%! modificationFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ModificationFeature>
 %
 biopax3:modificationFeature_iri('http://www.biopax.org/release/biopax-level3.owl#ModificationFeature').
 
-%! modificationType_iri(http://www.biopax.org/release/biopax-level3.owl#modificationType)
+%! modificationType_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#modificationType>
 %
 biopax3:modificationType_iri('http://www.biopax.org/release/biopax-level3.owl#modificationType').
 
-%! modulation_iri(http://www.biopax.org/release/biopax-level3.owl#Modulation)
+%! modulation_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Modulation>
 %
 biopax3:modulation_iri('http://www.biopax.org/release/biopax-level3.owl#Modulation').
 
-%! molecularInteraction_iri(http://www.biopax.org/release/biopax-level3.owl#MolecularInteraction)
+%! molecularInteraction_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#MolecularInteraction>
 %
 biopax3:molecularInteraction_iri('http://www.biopax.org/release/biopax-level3.owl#MolecularInteraction').
 
-%! molecularWeight_iri(http://www.biopax.org/release/biopax-level3.owl#molecularWeight)
+%! molecularWeight_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#molecularWeight>
 %
 biopax3:molecularWeight_iri('http://www.biopax.org/release/biopax-level3.owl#molecularWeight').
 
-%! name_iri(http://www.biopax.org/release/biopax-level3.owl#name)
+%! name_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#name>
 %
 biopax3:name_iri('http://www.biopax.org/release/biopax-level3.owl#name').
 
-%! nextStep_iri(http://www.biopax.org/release/biopax-level3.owl#nextStep)
+%! nextStep_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#nextStep>
 %
 biopax3:nextStep_iri('http://www.biopax.org/release/biopax-level3.owl#nextStep').
 
-%! notFeature_iri(http://www.biopax.org/release/biopax-level3.owl#notFeature)
+%! notFeature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#notFeature>
 %
 biopax3:notFeature_iri('http://www.biopax.org/release/biopax-level3.owl#notFeature').
 
-%! organism_iri(http://www.biopax.org/release/biopax-level3.owl#organism)
+%! organism_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#organism>
 %
 biopax3:organism_iri('http://www.biopax.org/release/biopax-level3.owl#organism').
 
-%! pMg_iri(http://www.biopax.org/release/biopax-level3.owl#pMg)
+%! pMg_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#pMg>
 %
 biopax3:pMg_iri('http://www.biopax.org/release/biopax-level3.owl#pMg').
 
-%! participantStoichiometry_iri(http://www.biopax.org/release/biopax-level3.owl#participantStoichiometry)
+%! participantStoichiometry_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#participantStoichiometry>
 %
 biopax3:participantStoichiometry_iri('http://www.biopax.org/release/biopax-level3.owl#participantStoichiometry').
 
-%! participant_iri(http://www.biopax.org/release/biopax-level3.owl#participant)
+%! participant_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#participant>
 %
 biopax3:participant_iri('http://www.biopax.org/release/biopax-level3.owl#participant').
 
-%! pathwayComponent_iri(http://www.biopax.org/release/biopax-level3.owl#pathwayComponent)
+%! pathwayComponent_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#pathwayComponent>
 %
 biopax3:pathwayComponent_iri('http://www.biopax.org/release/biopax-level3.owl#pathwayComponent').
 
-%! pathwayOrder_iri(http://www.biopax.org/release/biopax-level3.owl#pathwayOrder)
+%! pathwayOrder_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#pathwayOrder>
 %
 biopax3:pathwayOrder_iri('http://www.biopax.org/release/biopax-level3.owl#pathwayOrder').
 
-%! pathwayStep_iri(http://www.biopax.org/release/biopax-level3.owl#PathwayStep)
+%! pathwayStep_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#PathwayStep>
 %
 biopax3:pathwayStep_iri('http://www.biopax.org/release/biopax-level3.owl#PathwayStep').
 
-%! pathway_iri(http://www.biopax.org/release/biopax-level3.owl#Pathway)
+%! pathway_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Pathway>
 %
 biopax3:pathway_iri('http://www.biopax.org/release/biopax-level3.owl#Pathway').
 
-%! patoData_iri(http://www.biopax.org/release/biopax-level3.owl#patoData)
+%! patoData_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#patoData>
 %
 biopax3:patoData_iri('http://www.biopax.org/release/biopax-level3.owl#patoData').
 
-%! ph_iri(http://www.biopax.org/release/biopax-level3.owl#ph)
+%! ph_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ph>
 %
 biopax3:ph_iri('http://www.biopax.org/release/biopax-level3.owl#ph').
 
-%! phenotypeVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#PhenotypeVocabulary)
+%! phenotypeVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#PhenotypeVocabulary>
 %
 biopax3:phenotypeVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#PhenotypeVocabulary').
 
-%! phenotype_iri(http://www.biopax.org/release/biopax-level3.owl#phenotype)
+%! phenotype_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#phenotype>
 %
 biopax3:phenotype_iri('http://www.biopax.org/release/biopax-level3.owl#phenotype').
 
-%! physicalEntity_iri(http://www.biopax.org/release/biopax-level3.owl#PhysicalEntity)
+%! physicalEntity_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#PhysicalEntity>
 %
 biopax3:physicalEntity_iri('http://www.biopax.org/release/biopax-level3.owl#PhysicalEntity').
 
-%! physicalEntity_iri(http://www.biopax.org/release/biopax-level3.owl#physicalEntity)
+%! physicalEntity_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#physicalEntity>
 %
 biopax3:physicalEntity_iri('http://www.biopax.org/release/biopax-level3.owl#physicalEntity').
 
-%! positionStatus_iri(http://www.biopax.org/release/biopax-level3.owl#positionStatus)
+%! positionStatus_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#positionStatus>
 %
 biopax3:positionStatus_iri('http://www.biopax.org/release/biopax-level3.owl#positionStatus').
 
-%! product_iri(http://www.biopax.org/release/biopax-level3.owl#product)
+%! product_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#product>
 %
 biopax3:product_iri('http://www.biopax.org/release/biopax-level3.owl#product').
 
-%! proteinReference_iri(http://www.biopax.org/release/biopax-level3.owl#ProteinReference)
+%! proteinReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#ProteinReference>
 %
 biopax3:proteinReference_iri('http://www.biopax.org/release/biopax-level3.owl#ProteinReference').
 
-%! protein_iri(http://www.biopax.org/release/biopax-level3.owl#Protein)
+%! protein_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Protein>
 %
 biopax3:protein_iri('http://www.biopax.org/release/biopax-level3.owl#Protein').
 
-%! provenance_iri(http://www.biopax.org/release/biopax-level3.owl#Provenance)
+%! provenance_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Provenance>
 %
 biopax3:provenance_iri('http://www.biopax.org/release/biopax-level3.owl#Provenance').
 
-%! publicationXref_iri(http://www.biopax.org/release/biopax-level3.owl#PublicationXref)
+%! publicationXref_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#PublicationXref>
 %
 biopax3:publicationXref_iri('http://www.biopax.org/release/biopax-level3.owl#PublicationXref').
 
-%! regionType_iri(http://www.biopax.org/release/biopax-level3.owl#regionType)
+%! regionType_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#regionType>
 %
 biopax3:regionType_iri('http://www.biopax.org/release/biopax-level3.owl#regionType').
 
-%! relationshipTypeVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#RelationshipTypeVocabulary)
+%! relationshipTypeVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#RelationshipTypeVocabulary>
 %
 biopax3:relationshipTypeVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#RelationshipTypeVocabulary').
 
-%! relationshipType_iri(http://www.biopax.org/release/biopax-level3.owl#relationshipType)
+%! relationshipType_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#relationshipType>
 %
 biopax3:relationshipType_iri('http://www.biopax.org/release/biopax-level3.owl#relationshipType').
 
-%! relationshipXref_iri(http://www.biopax.org/release/biopax-level3.owl#RelationshipXref)
+%! relationshipXref_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#RelationshipXref>
 %
 biopax3:relationshipXref_iri('http://www.biopax.org/release/biopax-level3.owl#RelationshipXref').
 
-%! right_iri(http://www.biopax.org/release/biopax-level3.owl#right)
+%! right_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#right>
 %
 biopax3:right_iri('http://www.biopax.org/release/biopax-level3.owl#right').
 
-%! rnaReference_iri(http://www.biopax.org/release/biopax-level3.owl#RnaReference)
+%! rnaReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#RnaReference>
 %
 biopax3:rnaReference_iri('http://www.biopax.org/release/biopax-level3.owl#RnaReference').
 
-%! rnaRegionReference_iri(http://www.biopax.org/release/biopax-level3.owl#RnaRegionReference)
+%! rnaRegionReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#RnaRegionReference>
 %
 biopax3:rnaRegionReference_iri('http://www.biopax.org/release/biopax-level3.owl#RnaRegionReference').
 
-%! rnaRegion_iri(http://www.biopax.org/release/biopax-level3.owl#RnaRegion)
+%! rnaRegion_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#RnaRegion>
 %
 biopax3:rnaRegion_iri('http://www.biopax.org/release/biopax-level3.owl#RnaRegion').
 
-%! rna_iri(http://www.biopax.org/release/biopax-level3.owl#Rna)
+%! rna_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Rna>
 %
 biopax3:rna_iri('http://www.biopax.org/release/biopax-level3.owl#Rna').
 
-%! scoreSource_iri(http://www.biopax.org/release/biopax-level3.owl#scoreSource)
+%! scoreSource_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#scoreSource>
 %
 biopax3:scoreSource_iri('http://www.biopax.org/release/biopax-level3.owl#scoreSource').
 
-%! score_iri(http://www.biopax.org/release/biopax-level3.owl#Score)
+%! score_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Score>
 %
 biopax3:score_iri('http://www.biopax.org/release/biopax-level3.owl#Score').
 
-%! sequenceIntervalBegin_iri(http://www.biopax.org/release/biopax-level3.owl#sequenceIntervalBegin)
+%! sequenceIntervalBegin_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#sequenceIntervalBegin>
 %
 biopax3:sequenceIntervalBegin_iri('http://www.biopax.org/release/biopax-level3.owl#sequenceIntervalBegin').
 
-%! sequenceIntervalEnd_iri(http://www.biopax.org/release/biopax-level3.owl#sequenceIntervalEnd)
+%! sequenceIntervalEnd_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#sequenceIntervalEnd>
 %
 biopax3:sequenceIntervalEnd_iri('http://www.biopax.org/release/biopax-level3.owl#sequenceIntervalEnd').
 
-%! sequenceInterval_iri(http://www.biopax.org/release/biopax-level3.owl#SequenceInterval)
+%! sequenceInterval_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#SequenceInterval>
 %
 biopax3:sequenceInterval_iri('http://www.biopax.org/release/biopax-level3.owl#SequenceInterval').
 
-%! sequenceLocation_iri(http://www.biopax.org/release/biopax-level3.owl#SequenceLocation)
+%! sequenceLocation_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#SequenceLocation>
 %
 biopax3:sequenceLocation_iri('http://www.biopax.org/release/biopax-level3.owl#SequenceLocation').
 
-%! sequenceModificationVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#SequenceModificationVocabulary)
+%! sequenceModificationVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#SequenceModificationVocabulary>
 %
 biopax3:sequenceModificationVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#SequenceModificationVocabulary').
 
-%! sequencePosition_iri(http://www.biopax.org/release/biopax-level3.owl#sequencePosition)
+%! sequencePosition_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#sequencePosition>
 %
 biopax3:sequencePosition_iri('http://www.biopax.org/release/biopax-level3.owl#sequencePosition').
 
-%! sequenceRegionVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#SequenceRegionVocabulary)
+%! sequenceRegionVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#SequenceRegionVocabulary>
 %
 biopax3:sequenceRegionVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#SequenceRegionVocabulary').
 
-%! sequenceSite_iri(http://www.biopax.org/release/biopax-level3.owl#SequenceSite)
+%! sequenceSite_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#SequenceSite>
 %
 biopax3:sequenceSite_iri('http://www.biopax.org/release/biopax-level3.owl#SequenceSite').
 
-%! sequence_iri(http://www.biopax.org/release/biopax-level3.owl#sequence)
+%! sequence_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#sequence>
 %
 biopax3:sequence_iri('http://www.biopax.org/release/biopax-level3.owl#sequence').
 
-%! smallMoleculeReference_iri(http://www.biopax.org/release/biopax-level3.owl#SmallMoleculeReference)
+%! smallMoleculeReference_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#SmallMoleculeReference>
 %
 biopax3:smallMoleculeReference_iri('http://www.biopax.org/release/biopax-level3.owl#SmallMoleculeReference').
 
-%! smallMolecule_iri(http://www.biopax.org/release/biopax-level3.owl#SmallMolecule)
+%! smallMolecule_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#SmallMolecule>
 %
 biopax3:smallMolecule_iri('http://www.biopax.org/release/biopax-level3.owl#SmallMolecule').
 
-%! source_iri(http://www.biopax.org/release/biopax-level3.owl#source)
+%! source_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#source>
 %
 biopax3:source_iri('http://www.biopax.org/release/biopax-level3.owl#source').
 
-%! spontaneous_iri(http://www.biopax.org/release/biopax-level3.owl#spontaneous)
+%! spontaneous_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#spontaneous>
 %
 biopax3:spontaneous_iri('http://www.biopax.org/release/biopax-level3.owl#spontaneous').
 
-%! standardName_iri(http://www.biopax.org/release/biopax-level3.owl#standardName)
+%! standardName_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#standardName>
 %
 biopax3:standardName_iri('http://www.biopax.org/release/biopax-level3.owl#standardName').
 
-%! stepConversion_iri(http://www.biopax.org/release/biopax-level3.owl#stepConversion)
+%! stepConversion_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#stepConversion>
 %
 biopax3:stepConversion_iri('http://www.biopax.org/release/biopax-level3.owl#stepConversion').
 
-%! stepDirection_iri(http://www.biopax.org/release/biopax-level3.owl#stepDirection)
+%! stepDirection_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#stepDirection>
 %
 biopax3:stepDirection_iri('http://www.biopax.org/release/biopax-level3.owl#stepDirection').
 
-%! stepProcess_iri(http://www.biopax.org/release/biopax-level3.owl#stepProcess)
+%! stepProcess_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#stepProcess>
 %
 biopax3:stepProcess_iri('http://www.biopax.org/release/biopax-level3.owl#stepProcess').
 
-%! stoichiometricCoefficient_iri(http://www.biopax.org/release/biopax-level3.owl#stoichiometricCoefficient)
+%! stoichiometricCoefficient_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#stoichiometricCoefficient>
 %
 biopax3:stoichiometricCoefficient_iri('http://www.biopax.org/release/biopax-level3.owl#stoichiometricCoefficient').
 
-%! stoichiometry_iri(http://www.biopax.org/release/biopax-level3.owl#Stoichiometry)
+%! stoichiometry_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Stoichiometry>
 %
 biopax3:stoichiometry_iri('http://www.biopax.org/release/biopax-level3.owl#Stoichiometry').
 
-%! structureData_iri(http://www.biopax.org/release/biopax-level3.owl#structureData)
+%! structureData_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#structureData>
 %
 biopax3:structureData_iri('http://www.biopax.org/release/biopax-level3.owl#structureData').
 
-%! structureFormat_iri(http://www.biopax.org/release/biopax-level3.owl#structureFormat)
+%! structureFormat_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#structureFormat>
 %
 biopax3:structureFormat_iri('http://www.biopax.org/release/biopax-level3.owl#structureFormat').
 
-%! structure_iri(http://www.biopax.org/release/biopax-level3.owl#structure)
+%! structure_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#structure>
 %
 biopax3:structure_iri('http://www.biopax.org/release/biopax-level3.owl#structure').
 
-%! subRegion_iri(http://www.biopax.org/release/biopax-level3.owl#subRegion)
+%! subRegion_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#subRegion>
 %
 biopax3:subRegion_iri('http://www.biopax.org/release/biopax-level3.owl#subRegion').
 
-%! temperature_iri(http://www.biopax.org/release/biopax-level3.owl#temperature)
+%! temperature_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#temperature>
 %
 biopax3:temperature_iri('http://www.biopax.org/release/biopax-level3.owl#temperature').
 
-%! templateDirection_iri(http://www.biopax.org/release/biopax-level3.owl#templateDirection)
+%! templateDirection_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#templateDirection>
 %
 biopax3:templateDirection_iri('http://www.biopax.org/release/biopax-level3.owl#templateDirection').
 
-%! templateReactionRegulation_iri(http://www.biopax.org/release/biopax-level3.owl#TemplateReactionRegulation)
+%! templateReactionRegulation_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#TemplateReactionRegulation>
 %
 biopax3:templateReactionRegulation_iri('http://www.biopax.org/release/biopax-level3.owl#TemplateReactionRegulation').
 
-%! templateReaction_iri(http://www.biopax.org/release/biopax-level3.owl#TemplateReaction)
+%! templateReaction_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#TemplateReaction>
 %
 biopax3:templateReaction_iri('http://www.biopax.org/release/biopax-level3.owl#TemplateReaction').
 
-%! template_iri(http://www.biopax.org/release/biopax-level3.owl#template)
+%! template_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#template>
 %
 biopax3:template_iri('http://www.biopax.org/release/biopax-level3.owl#template').
 
-%! term_iri(http://www.biopax.org/release/biopax-level3.owl#term)
+%! term_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#term>
 %
 biopax3:term_iri('http://www.biopax.org/release/biopax-level3.owl#term').
 
-%! tissueVocabulary_iri(http://www.biopax.org/release/biopax-level3.owl#TissueVocabulary)
+%! tissueVocabulary_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#TissueVocabulary>
 %
 biopax3:tissueVocabulary_iri('http://www.biopax.org/release/biopax-level3.owl#TissueVocabulary').
 
-%! tissue_iri(http://www.biopax.org/release/biopax-level3.owl#tissue)
+%! tissue_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#tissue>
 %
 biopax3:tissue_iri('http://www.biopax.org/release/biopax-level3.owl#tissue').
 
-%! title_iri(http://www.biopax.org/release/biopax-level3.owl#title)
+%! title_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#title>
 %
 biopax3:title_iri('http://www.biopax.org/release/biopax-level3.owl#title').
 
-%! transportWithBiochemicalReaction_iri(http://www.biopax.org/release/biopax-level3.owl#TransportWithBiochemicalReaction)
+%! transportWithBiochemicalReaction_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#TransportWithBiochemicalReaction>
 %
 biopax3:transportWithBiochemicalReaction_iri('http://www.biopax.org/release/biopax-level3.owl#TransportWithBiochemicalReaction').
 
-%! transport_iri(http://www.biopax.org/release/biopax-level3.owl#Transport)
+%! transport_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Transport>
 %
 biopax3:transport_iri('http://www.biopax.org/release/biopax-level3.owl#Transport').
 
-%! unificationXref_iri(http://www.biopax.org/release/biopax-level3.owl#UnificationXref)
+%! unificationXref_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#UnificationXref>
 %
 biopax3:unificationXref_iri('http://www.biopax.org/release/biopax-level3.owl#UnificationXref').
 
-%! url_iri(http://www.biopax.org/release/biopax-level3.owl#url)
+%! url_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#url>
 %
 biopax3:url_iri('http://www.biopax.org/release/biopax-level3.owl#url').
 
-%! utilityClass_iri(http://www.biopax.org/release/biopax-level3.owl#UtilityClass)
+%! utilityClass_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#UtilityClass>
 %
 biopax3:utilityClass_iri('http://www.biopax.org/release/biopax-level3.owl#UtilityClass').
 
-%! value_iri(http://www.biopax.org/release/biopax-level3.owl#value)
+%! value_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#value>
 %
 biopax3:value_iri('http://www.biopax.org/release/biopax-level3.owl#value').
 
-%! xref_iri(http://www.biopax.org/release/biopax-level3.owl#Xref)
+%! xref_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#Xref>
 %
 biopax3:xref_iri('http://www.biopax.org/release/biopax-level3.owl#Xref').
 
-%! xref_iri(http://www.biopax.org/release/biopax-level3.owl#xref)
+%! xref_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#xref>
 %
 biopax3:xref_iri('http://www.biopax.org/release/biopax-level3.owl#xref').
 
-%! year_iri(http://www.biopax.org/release/biopax-level3.owl#year)
+%! year_iri(?IRI) is det.
 %
 %  The IRI for the entity <http://www.biopax.org/release/biopax-level3.owl#year>
 %

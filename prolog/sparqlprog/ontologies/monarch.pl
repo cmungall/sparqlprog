@@ -9,7 +9,7 @@
            protein_coding_gene/1,
            human_gene/1,
            disease_to_gene/2,
-           is_marker_for/2,
+    %is_marker_for/2,
            association/4,
            association/5,
            has_phenotype_association/3,

@@ -59,8 +59,9 @@ http:location(pldoc, root(documentation), [priority(100)]).
 
 
 server :-
-        getenv('PORT',PortAtom),
-        atom_number(PortAtom,Port),
+        (   getenv('PORT',PortAtom)
+        ->  atom_number(PortAtom,Port)
+        ;   Port=9083),
         server(Port).
 
 server(Port) :-

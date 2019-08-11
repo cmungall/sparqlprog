@@ -1,4 +1,4 @@
-#!/usr/bin/env swipl -L0 -G0 -T0
+#!/usr/bin/env swipl
 
 :- initialization main.
 

@@ -2,7 +2,7 @@
 
   @Deprecated
 
-  now in its own pack
+    now in its own pack: https://www.swi-prolog.org/pack/list?p=sparqlprog_wikidata
   
 expose a subclass of dbpedia for demo purposes
 

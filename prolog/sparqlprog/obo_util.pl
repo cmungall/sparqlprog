@@ -71,6 +71,10 @@ syntype_uri_to_id(V1,V) :-
         !.
 syntype_uri_to_id(V,V).
 
+entity_xref(E,X,QVs) :-
+        triple_axiom_annotations(E,oio:hasDbXref,X1,QVs),
+        ensure_atom(X1,X).
+
 entity_synonym(E,V,Scope,Type,Xrefs) :-
         syn_scope(P,Scope),
         triple_axiom_annotations(E,P,V1,Anns),
@@ -173,6 +177,10 @@ gen_tag(S,E,_,_) :-
         serialize_xrefs(Xrefs,X),
         escq(V1,V),
         format(S,'synonym: "~w" ~w ~w ~w~n',[V,Scope,Type,X]).
+
+gen_tag(S,E,_,_) :-
+        entity_xref(E,X,_PVs),
+        format(S,'xref: ~w~n',[X]).
 
 gen_tag(S,E,_,_) :-
         is_a(E,X),

@@ -1,10 +1,3 @@
-/**
-  search and visualize results
-  
-  Convenience wrapper that combines search_util and owl_graph/4 from owl_util
-
-  requires og2dot
-*/
 :- module(owl_search_viz,
           [
            searchviz/1,
@@ -14,6 +7,13 @@
            owl_search_and_display/6,
            owl_search_and_display/7
            ]).
+
+/** <module> search and visualize results
+  
+  Convenience wrapper that combines search_util and owl_graph/4 from owl_util
+
+  requires og2dot
+*/
 
 :- use_module(library(sparqlprog/search_util)).
 :- use_module(library(sparqlprog/owl_util)).
@@ -208,6 +208,13 @@ normalize_extension_lambda(_,_) :- fail.
 call_lambda([In,Out]>>G,In,Out) :- !, G.
 call_lambda(P,In,Out) :- atomic(P),!, G =.. [P,In,Out], G.
 
+
+%! search_to_objs(+SearchTerm, +PredTerm, ?Objs:list, +Opts:list) is det.
+%
+%    given a SearchTerm and search predicate, find matching objects
+%
+%    SearchTerm = BaseSearchTerm / Flag
+%
 search_to_objs(SearchTerm, PredTerm, Objs, Opts) :-
         normalize_searchterm(SearchTerm,SearchTerm1),
         setof(Obj, search_to_obj(SearchTerm1, PredTerm, Obj, Opts), Objs),
@@ -241,7 +248,13 @@ search_to_obj(SearchTerm/FlagStr, label, Obj, _Opts) :-
         regex(str(Lit),SearchTerm,FlagStr).
 
 search_to_obj(SearchTerm/FlagStr, synonym, Obj, _Opts) :-
+        !,
         label_or_synonym_pred_hook(Pred),
+        rdf(Obj,Pred,Lit),
+        regex(str(Lit),SearchTerm,FlagStr).
+
+search_to_obj(SearchTerm/FlagStr, Pred, Obj, _Opts) :-
+        !,
         rdf(Obj,Pred,Lit),
         regex(str(Lit),SearchTerm,FlagStr).
 
