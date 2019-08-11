@@ -11,6 +11,8 @@
 :- use_module(library(sparqlprog/ontologies/owl)).
 :- use_module(library(sparqlprog/owl_search_viz)).
 
+:- rdf_register_prefix('GO', 'http://purl.obolibrary.org/obo/GO_').
+
 :- begin_tests(search_viz_test,
                [setup(load_test_file),
                 cleanup(rdf_retractall(_,_,_,_))]).
@@ -69,6 +71,10 @@ test(dot) :-
                     ['label=cellular_component'],
                     []).
 
+test(id) :-
+        test_output(['GO:0005634'],[search_property(id)],
+                    ['GO:0005634', nucleus],
+                    [cell]).
 
 
                                 %owl_search_and_display(nucleus, a, '.', [], obo, _).

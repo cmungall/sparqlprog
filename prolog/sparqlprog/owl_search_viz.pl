@@ -10,9 +10,13 @@
 
 /** <module> search and visualize results
   
-  Convenience wrapper that combines search_util and owl_graph/4 from owl_util
+  Convenience wrapper that combines search_util and owl_edge/4 from owl_util
 
-  requires og2dot
+  The main predicate is owl_search_and_display/2
+
+
+  
+  requires og2dot - https://www.npmjs.com/package/obographviz
 */
 
 :- use_module(library(semweb/rdfs)).
@@ -20,10 +24,9 @@
 :- use_module(library(sparqlprog/owl_util)).
 :- use_module(library(http/json)).
 
-searchviz(Term) :-
-        searchviz(Term, _).
 
 %% searchviz(+Term, +Preds) is semidet
+%% searchviz(+Term) is semidet
 %
 % performs search on Term using lsearch/2 and 
 % draws results
@@ -37,6 +40,9 @@ searchviz(Term, Preds) :-
         style_file_args(StyleFileArgs),
         sformat(Cmd,'og2dot.js ~w -S \'~w\' -t png ~w',[StyleFileArgs,Style, OgFile]),
         shell(Cmd).
+
+searchviz(Term) :-
+        searchviz(Term, _).
 
 % Default locations for style files
 style_file('obograph-style.json').
@@ -74,6 +80,12 @@ owl_search_and_display([SearchTerm], Opts) :-
 %
 %    perform a search over all SearchTerms and display
 %
+%    SearchTerms:
+%
+%    Each term in the list is an atom that is a regex used to search.
+%    Search is determined by search_property. By default this is `label`, to
+%    search using rdfs:label
+%
 %    Opts:
 %
 %     - search_property(Prop)
@@ -88,6 +100,10 @@ owl_search_and_display([SearchTerm], Opts) :-
 %       one of: disp, obo, viz, png, dot, ids
 %     - extend_lambda(File)
 %
+%  Examples:
+%   - `owl_search_and_display([nucleus],[])` show any terms text matching '.*nucleus.*'
+%   - `owl_search_and_display(['^nucleus$'],[relations([s])])` exact match, show superclasses
+%   - `owl_search_and_display(['GO:0005634'],[search_property(id)])` search by ID
 %
 owl_search_and_display(SearchTerms, Opts) :-
         debug(search, 'Opts  = ~q',[Opts]),
