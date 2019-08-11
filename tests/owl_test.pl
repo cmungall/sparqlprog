@@ -2,6 +2,7 @@
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(sparqlprog)).
 :- use_module(library(sparqlprog/owl_util)).
+:- use_module(library(sparqlprog/ontologies/owl)).
 
 :- begin_tests(owl_test).
 
