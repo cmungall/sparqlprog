@@ -3,6 +3,7 @@
 :- use_module(biotea, []).
 :- use_module(chembl, []).
 :- use_module(dbpedia, []).
+:- use_module(dbpedia/dbpedia_matcher, []).
 :- use_module(disgenet,[]).
 :- use_module(ebi, []).
 :- use_module(enipedia, []).

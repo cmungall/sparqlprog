@@ -80,6 +80,8 @@ The original query can then be rewritten as:
   dbp ?? band(B), band_member(B,M).
   ==
 
+library(sparqlprog/ontologies/dbpedia) provides basic wrapper predicates for dbpedia.  
+  
 This becomes more advantageous where we want to re-use predicates that encapsulate some query logic, for example, the following 3-ary predicate connects two bands by a shared member:
 
   ==
@@ -89,13 +91,9 @@ This becomes more advantageous where we want to re-use predicates that encapsula
         B1\=B2.
   ==
 
-library(sparqlprog/ontologies/dbpedia) provides basic wrapper predicates for dbpedia.
-
-  
-The example program
-[examples/dbpedia/dbpedia_rules](https://www.swi-prolog.org/pack/file_details/sparqlprog/examples/dbpedia/dbpedia_rules.pl)
-shows how to construct a more advanced example for being able to
-perform semantic similarity of bands based on shared genres.
+library(sparqlprog/ontologies/dbpedia/dbpedia_matcher) shows how to
+construct a more advanced example for being able to perform semantic
+similarity of bands based on shared genres.
 
 sparqlprog is distributed with a number of modules for existing triplestore schemas (with a bias towards life sciences triplestores).
 
