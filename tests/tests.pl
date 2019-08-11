@@ -8,5 +8,6 @@
     tests/labelutils_test,
     tests/builtins_test,
     tests/prolog_test,
+    tests/search_viz_test,
     tests/owl_test
 ], [ if(not_loaded) ]).

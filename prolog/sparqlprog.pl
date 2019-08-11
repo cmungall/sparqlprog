@@ -119,6 +119,8 @@ library(sparqlprog/owl_util) provides predicates for working with OWL ontologies
 For example, owl_edge/4 provides an easy way to extract 'edges' from
 an ontology (e.g subClassOf between named classes, or involving
 existential restrictions).
+
+library(sparqlprog/owl_search_viz) provides predicates for searching and visualizing OWL ontologies
   
 ## sparqlprog language
 

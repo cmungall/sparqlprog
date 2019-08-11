@@ -210,7 +210,7 @@ tv(S,T,Vs) :-
         ;   format(S,' !',[]),
             forall(member(N,Ns),
                    format(S,' ~w',[N]))),
-        nl.
+        nl(S).
 
 
 serialize_xrefs(Xs,A) :-

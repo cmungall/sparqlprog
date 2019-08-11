@@ -3,9 +3,9 @@
            searchviz/1,
            searchviz/2,
 
-           owl_search_and_display/2,
-           owl_search_and_display/6,
-           owl_search_and_display/7
+           owl_search_and_display/2
+           %owl_search_and_display/6,
+           %owl_search_and_display/7
            ]).
 
 /** <module> search and visualize results
@@ -15,6 +15,7 @@
   requires og2dot
 */
 
+:- use_module(library(semweb/rdfs)).
 :- use_module(library(sparqlprog/search_util)).
 :- use_module(library(sparqlprog/owl_util)).
 :- use_module(library(http/json)).
@@ -69,6 +70,25 @@ owl_search_and_display([SearchTerm], Opts) :-
         !,
         owl_search_and_display([ST2], [search_property(Pred)|Opts]).
 
+%! owl_search_and_display(+SearchTerms:list, +Opts:list) is semidet.
+%
+%    perform a search over all SearchTerms and display
+%
+%    Opts:
+%
+%     - search_property(Prop)
+%       one of: label, id, synonym, all
+%       only the first letter needs to be specified (l, i, s, a)
+%       default: label
+%     - relations(Rels)
+%       list of object properties
+%       `s` is a shorthand for rdfs:subClassOf
+%     - output(File)
+%     - format(Fmt)
+%       one of: disp, obo, viz, png, dot, ids
+%     - extend_lambda(File)
+%
+%
 owl_search_and_display(SearchTerms, Opts) :-
         debug(search, 'Opts  = ~q',[Opts]),
         option(search_property(P),Opts,l),
@@ -99,6 +119,7 @@ owl_search_and_display(SearchTerms, Opts) :-
         display_quads(Objs, Quads, OutFmt, OutFile, Opts).
 
 
+  
 % @Deprecated
 %! owl_search_and_display(+SearchTerm, +PredTerm, +PostTerm, +Rels, +DispTerm, +OutFile, +Opts:list) is det
 %
@@ -128,6 +149,8 @@ owl_search_and_display(SearchTerms, Opts) :-
 %    post process initial nodes returned from search
 %
 % @Deprecated
+/*
+
 owl_search_and_display(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile) :-
         owl_search_and_display(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile, []).
 owl_search_and_display(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile, Opts) :-
@@ -135,10 +158,11 @@ owl_search_and_display(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile, 
         normalize_rels(Rels, Rels1),
         debug(search,'S:~q P:~q Post:~q R:~q D:~q',[SearchTerm1,PredTerm1,PostTerm,Rels1,DispTerm]),
         search_and_display1(SearchTerm1, PredTerm1, PostTerm, Rels1, DispTerm, OutFile, Opts).
-
 matchpred('=').
 matchpred('~').
+*/
 
+/*  
 normalize_search_pred_terms(SearchTerm, _PredTerm, SearchTerm1, PredTerm1) :-
         matchpred(MatchPred),
         concat_atom([PredTermX|Rest],MatchPred,SearchTerm),
@@ -153,11 +177,12 @@ normalize_search_pred_terms(SearchTerm, _PredTerm, SearchTerm1, PredTerm1) :-
 normalize_search_pred_terms(SearchTerm, PredTerm, SearchTerm1, PredTerm1) :-
         normalize_searchterm(SearchTerm, SearchTerm1),
         normalize_predterm(PredTerm, PredTerm1).
-        
+*/
+
 normalize_searchterm(X,Y/i) :- atom(X),atom_concat('=',Z,X),concat_atom(['^',Z,'$'],Y).
 normalize_searchterm(X,X) :- X = _/_, !.
 normalize_searchterm(X,X/i).
-
+  
 predterm(i,id).
 predterm(l,label).
 predterm(s,synonym).
@@ -168,7 +193,7 @@ normalize_predterm(S,X) :- predterm(S,X),!.
 normalize_predterm(X,X).
 
 normalize_rels('.',_) :- !.
-normalize_rels(L,L) :- is_list(L), !.
+normalize_rels(L,L2) :- is_list(L), !, maplist(normalize_relterm,L,L2).
 normalize_rels(X,L) :- concat_atom(L1,',',X),maplist(normalize_relterm,L1,L).
 
 normalize_relterm(X,^(P)) :- atom_concat('^',P1,X),!,normalize_relterm(P1,P).
@@ -182,6 +207,7 @@ normalize_rel(N,R) :- concat_atom(L,'_',N), L=[_,_|_], concat_atom(L,' ',N1),!,n
 normalize_rel(X,X).
 
 % @Deprecated
+/*
 search_and_display1(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile, Opts) :-
         search_to_objs(SearchTerm, PredTerm, Objs, Opts),
         debug(search, 'Search(~q) / ~q = ~q',[SearchTerm, PredTerm, Objs]),
@@ -193,7 +219,7 @@ search_and_display1(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile, Opt
         append(Objs,ObjsX,SeedObjs),
         owl_subgraph(SeedObjs, Rels, Quads, []),
         display_quads(Objs, Quads, DispTerm, OutFile, Opts).
-
+*/
 % TODO
 %normalize_extension_lambda(_, X,X,_).
 
@@ -264,6 +290,19 @@ search_to_obj(_, match_anything, Obj, _Opts) :-
 gv_fmt(svg).
 gv_fmt(png).
 
+magic_tell(F) :-
+        var(F),
+        !.
+magic_tell(F) :- tell(F).
+
+opt_open_stream(F,user_output) :-
+        var(F),
+        !.
+opt_open_stream(F,S) :-
+        open(F,write,S,[]),
+        !.
+
+
 display_quads(Objs, Quads, Fmt, OutFile, _Opts) :-
         gv_fmt(Fmt),
         !,
@@ -283,13 +322,15 @@ display_quads(Objs, Quads, viz, _, _Opts) :-
         style_file_args(StyleFileArgs),
         sformat(Cmd,'og2dot.js ~w -S \'~w\' -t png ~w',[StyleFileArgs,Style, OgFile]),
         shell(Cmd).
-display_quads(Objs, Quads, dot, _, _Opts) :-
+display_quads(Objs, Quads, dot, F, _Opts) :-
         !,
         quads_dict(Quads, Dict),
         write_json_tmp(Dict, OgFile),
         atom_json_term(Style,stylemap{highlightIds: Objs}, []),
         style_file_args(StyleFileArgs),
-        sformat(Cmd,'og2dot.js ~w -S \'~w\' ~w',[StyleFileArgs,Style, OgFile]),
+        (   nonvar(F)
+        ->  sformat(Cmd,'og2dot.js ~w -S \'~w\' -o ~w ~w',[StyleFileArgs,Style, F, OgFile])
+        ;   sformat(Cmd,'og2dot.js ~w -S \'~w\' ~w',[StyleFileArgs,Style, OgFile])),
         shell(Cmd).
 display_quads(_, Quads, json, Dest, _Opts) :-
         !,
@@ -300,19 +341,24 @@ display_quads(_, Quads, ids, _, _Opts) :-
         !,
         quads_objects(Quads, Objs),
         maplist(writeln, Objs).
-display_quads(_, Quads, info, _, Opts) :-
+display_quads(_, Quads, info, F, Opts) :-
         !,
+        magic_tell(F),
         quads_objects(Quads, Objs),
         forall(member(Obj, Objs),
-               display_obj(Obj, Opts)).
-display_quads(_, Quads, obo, _, Opts) :-
+               display_obj(Obj, Opts)),
+        told.
+display_quads(_, Quads, obo, F, Opts) :-
         !,
+        opt_open_stream(F,S),
         quads_objects(Quads, Objs),
         ensure_loaded(library(sparqlprog/obo_util)),
-        gen_header(user_output,_,Opts),
-        nl,
+        gen_header(S,_,Opts),
+        nl(S),
         forall(member(Obj, Objs),
-               display_obo_stanza(Obj, Opts)).
+               gen_stanza(S,Obj,Opts)),
+        close(S).
+
 display_quads(_, Quads, rdf, File, Opts) :-
         !,
         quads_objects(Quads, Objs),
