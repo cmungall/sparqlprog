@@ -1,4 +1,3 @@
-:- use_module(test_aux).
 
 :- load_files([
     tests/basic_test,

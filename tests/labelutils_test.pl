@@ -1,6 +1,5 @@
 
 :- use_module(library(semweb/rdf11)).
-:- use_module(test_aux).
 :- use_module(library(sparqlprog/labelutils)).
 
 :- rdf_register_prefix('GO','http://purl.obolibrary.org/obo/GO_').

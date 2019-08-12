@@ -22,8 +22,10 @@
 :- use_module(library(semweb/rdfs)).
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(sparqlprog/search_util)).
+:- use_module(library(sparqlprog/emulate_builtins)).
 :- use_module(library(sparqlprog/owl_util)).
 :- use_module(library(http/json)).
+:- use_module(library(regex)).
 
 
 %% searchviz(+Term, +Preds) is semidet

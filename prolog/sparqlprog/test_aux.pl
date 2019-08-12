@@ -1,3 +1,9 @@
+/** <module> test module
+
+This module is included only for running unit tests    
+    
+*/
+
 :- module(test_aux,
           [my_unary_pred/1,
            a_or_b/1,

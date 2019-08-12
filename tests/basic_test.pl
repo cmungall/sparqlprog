@@ -1,6 +1,6 @@
 
 :- use_module(library(semweb/rdf11)).
-:- use_module(test_aux).
+:- use_module(library(sparqlprog/test_aux)).
 :- use_module(library(sparqlprog)).
 
 :- rdf_register_prefix(foaf,'http://xmlns.com/foaf/0.1/').
