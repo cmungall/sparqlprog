@@ -222,7 +222,33 @@ test(agg_group_having2) :-
                              []),
         format(' Query ==> ~w~n',[ SPARQL ]),
         assertion( SPARQL = "SELECT (COUNT(?v1) AS ?v4) ?v2 GROUP_CONCAT(?v3 ;  SEPARATOR = \" \") WHERE {?v3 ?v2 ?v1} GROUP BY ?v2 GROUP_CONCAT(?v3 ;  SEPARATOR = \" \") HAVING (COUNT(?v1) > 2)").
+test(rule_expansion) :-
+        create_sparql_select(_,
+                             foo(_,_),
+                             SPARQL,
+                             [rule( (foo(A,B) :- rdf(A,rdfs:label,B)))]),
+        format(' Query ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT ?v0 WHERE {?v1 <http://www.w3.org/2000/01/rdf-schema#label> ?v2}").
 
+test(recursive_rule_expansion) :-
+        create_sparql_select(_,
+                             cls(_),
+                             SPARQL,
+                             [rule( (mytype(A,B) :- rdf(A,rdf:type,B))),
+                              rule( (cls(A) :- mytype(A,owl:'Class')) )
+                             ]),
+        format(' Query ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT ?v0 WHERE {?v1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}").
+
+test(recursive_rule_expansion_prog) :-
+        create_sparql_select(_,
+                             cls(_),
+                             SPARQL,
+                             [rule('mytype(A,B) :- rdf(A,rdf:type,B).'),
+                              rule('cls(A) :- mytype(A,owl:\'Class\').')
+                             ]),
+        format(' Query ==> ~w~n',[ SPARQL ]),
+        assertion( SPARQL = "SELECT ?v0 WHERE {?v1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}").
 
 
 

@@ -1,4 +1,4 @@
-/**
+/** <module> chembl
 
   See https://www.ebi.ac.uk/rdf/documentation/chembl/
 */

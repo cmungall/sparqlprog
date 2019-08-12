@@ -15,7 +15,9 @@ This module is intended primarily as an example of how to mix local logic and re
   
 */
 
-:- use_module(library(tabling)).
+
+% now builtin
+%:- use_module(library(tabling)).
 :- use_module(library(sparqlprog/emulate_builtins)).
 :- use_module(library(sparqlprog/ontologies/dbpedia)).
 

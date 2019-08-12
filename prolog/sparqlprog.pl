@@ -19,6 +19,7 @@
    ,  (??)/1
    ,  (??)/2
    ,  (??)/3
+   ,  (??)/4
    ,  op(1150,fx,??)
    ,  op(1150,xfy,??)
 	]).
@@ -211,6 +212,7 @@ service_query_all(_,_,_,[]).
 
 
 %! '??'(?EP, +Goal:sparql_goal, +SelectTerm) is nondet.
+%! '??'(?EP, +Goal:sparql_goal, +SelectTerm, +Opts:list) is nondet.
 %  
 %  Query endpoint EP using Goal, selecting variables in SelectTerm
 % 
@@ -234,14 +236,20 @@ service_query_all(_,_,_,[]).
 %  Note in many cases the SELECT variables can be determined from the
 %  query in which case ??/2 is more convenient
 ??(EP,Spec,SelectTerm) :-
-        debug(sparqlprog,'Finding subqueries: ~q',[Spec]),
+        ??(EP,Spec,SelectTerm,[]).
+??(EP,Spec,SelectTerm,OptsOrig) :-
+        copy_term(OptsOrig,Opts),
+        debug(sparqlprog,'Finding subqueries: ~q opts=~q',[Spec,Opts]),
+        %expand_opts(OptsIn,Opts),
         expand_subqueries(Spec,Spec2,EP),
         debug(sparqlprog,'Rewriting goal: ~q',[Spec2]),
-        rewrite_goal(Spec2,SpecRewrite),
+        rewrite_goal(Spec2,SpecRewrite,Opts),
         debug(sparqlprog,'Rewritten goal: ~q',[SpecRewrite]),
-        spec_goal_opts(SpecRewrite,Goal,Opts),
-        debug(sparqlprog,'Opts: ~q',[Opts0]),
+        Goal=SpecRewrite,
+        %spec_goal_opts(SpecRewrite,Goal,Opts),
+        %debug(sparqlprog,'selecting opts...',[]),
         setting(select_options,Opts0),
+        debug(sparqlprog,'Opts: ~q',[Opts0]),
         merge_options(Opts,Opts0,Opts1),
         query_goal(EP,Goal,SelectTerm,Opts1).
 
@@ -261,8 +269,29 @@ service_query_all(_,_,_,[]).
 %
 ??(Spec) :- ??(_,Spec).
 
-spec_goal_opts(Opts ?? Goal, Goal, Opts) :- !.
-spec_goal_opts(Goal,Goal,[]).
+
+
+/*
+expand_opts(OptsIn,OptsOut) :-
+        select(program(P),OptsIn,T),
+        !,
+        tmp_file(prog,F),
+        open(F,write,WS,[]),
+        write(F),
+        trace,
+        write(WS,P),
+        close(WS),
+        open(F,read,S,[]),
+        findall(rule(T),read_term(S,T,[]),Rules),
+        close(S),
+        append(Rules,T,OptsOut).
+expand_opts(Opts,Opts).
+*/
+
+
+
+%spec_goal_opts(Opts ?? Goal, Goal, Opts) :- !.
+%spec_goal_opts(Goal,Goal,[]).
 
 subq_term(subq(Q),EP,Q,EP).
 subq_term(subq(Q,EP),_,Q,EP).
@@ -312,9 +341,9 @@ plist_to_disj([_-X|T],(X;T2)) :- plist_to_disj(T,T2).
 % non-deterministic top-level goal rewrite
 % if multiple goals possible, return a disjunction of goals (G1;G2;...;Gn)
 % TODO: may be nondet if select variables in In...
-rewrite_goal(In,OutDisj) :-
+rewrite_goal(In,OutDisj,Opts) :-
         debug(sparqlprog,'XXX: Rewriting goal: ~q',[In]),
-        setof(Out,rewrite_goal(In,Out,1),Outs),
+        setof(Out,rewrite_goal(In,Out,1,Opts),Outs),
         list_to_disj(Outs,OutDisj).
 
 /*
@@ -339,11 +368,11 @@ unify_keys(Term,[TermX-_ | T]) :-
 %
 % typically deterministic, but non-deterministic if 
 % multiple possible paths
-rewrite_goal(In,Out,N) :-
+rewrite_goal(In,Out,N,Opts) :-
         debug(sparqlprog,'rewriting: ~q',[In]),
         rewrite_goal_hook(In,X), !,
         debug(sparqlprog,'Using hook to transform ~q -> ~q',[In,X]),
-        rewrite_goal(X,Out,N).
+        rewrite_goal(X,Out,N,Opts).
 
 
 
@@ -354,78 +383,100 @@ rewrite_goal(In,Out,N) :-
 % ------
 % terminals
 % ------
-rewrite_goal(T, T2,_) :- T=rdf(_,_,_), !, replace_string_unification(T,T2).
-rewrite_goal(T, T2,_) :- T=rdf(_,_,_,_), !, replace_string_unification(T,T2).
-rewrite_goal(filter(A), filter(A),_) :- !.
-rewrite_goal(rdf_has(S,P,O), T2,_) :- !, replace_string_unification(rdf(S,P,O),T2).
-rewrite_goal(service(S,G), service(S,G2), D) :- !, rewrite_goal(G,G2,D).
+rewrite_goal(T, T2,_, _Opts) :- T=rdf(_,_,_), !, replace_string_unification(T,T2).
+rewrite_goal(T, T2,_, _Opts) :- T=rdf(_,_,_,_), !, replace_string_unification(T,T2).
+rewrite_goal(filter(A), filter(A),_, _Opts) :- !.
+rewrite_goal(rdf_has(S,P,O), T2,_, _Opts) :- !, replace_string_unification(rdf(S,P,O),T2).
+rewrite_goal(service(S,G), service(S,G2), D, Opts) :- !, rewrite_goal(G,G2,D, Opts).
 
 % TODO: consider adding semantics
-%rewrite_goal(rdf(S,P,O), rdf_has(S,P,O),_) :- !.
+%rewrite_goal(rdf(S,P,O), rdf_has(S,P,O),_, _Opts) :- !.
 
-%rewrite_goal('??'(Opts,Q), '??'(Opts,Q2), _) :- !, rewrite_goal(Q,Q2).
+%rewrite_goal('??'(Opts,Q), '??'(Opts,Q2), _, Opts) :- !, rewrite_goal(Q,Q2).
 
-rewrite_goal(aggregate(A,G,V), aggregate(A,G2,V), D) :- !, rewrite_goal(G,G2,D).
-rewrite_goal(aggregate_group(A,GVs,G,V), aggregate_group(A,GVs,G2,V), D) :- !, rewrite_goal(G,G2,D).
-rewrite_goal(aggregate_group(A,GVs,G,H,V), aggregate_group(A,GVs,G2,H2,V), D) :- !, rewrite_goal(G,G2,D), rewrite_goal(H,H2,_).
+rewrite_goal(aggregate(A,G,V), aggregate(A,G2,V), D, Opts) :- !, rewrite_goal(G,G2,D, Opts).
+rewrite_goal(aggregate_group(A,GVs,G,V), aggregate_group(A,GVs,G2,V), D, Opts) :- !, rewrite_goal(G,G2,D, Opts).
+rewrite_goal(aggregate_group(A,GVs,G,H,V), aggregate_group(A,GVs,G2,H2,V), D, Opts) :- !, rewrite_goal(G,G2,D, Opts), rewrite_goal(H,H2,D, Opts).
 
 
 
 % rdfs terminals
-rewrite_goal(rdf_where(Q), rdf_where(Q2), D) :-
+rewrite_goal(rdf_where(Q), rdf_where(Q2), D, Opts) :-
         !,
-        rewrite_goal(Q, Q2, D).
-rewrite_goal({Q}, {Q2}, D) :-
+        rewrite_goal(Q, Q2, D, Opts).
+rewrite_goal({Q}, {Q2}, D, Opts) :-
         !,
-        rewrite_goal(Q, Q2, D).
-rewrite_goal(optional(Q), optional(Q2), _) :-
+        rewrite_goal(Q, Q2, D, Opts).
+rewrite_goal(optional(Q), optional(Q2), _, Opts) :-
         !,
-        rewrite_goal(Q,Q2).
-rewrite_goal(rdfs_subclass_of(C,P), rdf(C,oneOrMore(rdfs:subClassOf),P),_) :- !.
-rewrite_goal(rdfs_subproperty_of(C,P), rdf(C,oneOrMore(rdfs:subPropertyOf),P),_) :- !.
-rewrite_goal(rdfs_individual_of(I,C), (rdf(I,rdf:type,X),rdf(X,zeroOrMore(rdfs:subClassOf),C)),_) :- !.
-rewrite_goal(a(I,C), rdf(I,rdf:type,C),_) :- !.
-%rewrite_goal(rdf_member(X,L), rdf(L,oneOrMore(rdf:rest)/rdf:last,X),_) :- !.
-rewrite_goal(rdf_member(X,L), rdf(L,(zeroOrMore(rdf:rest)/(rdf:first)),X),_) :- !.
+        rewrite_goal(Q,Q2, Opts).
+rewrite_goal(rdfs_subclass_of(C,P), rdf(C,oneOrMore(rdfs:subClassOf),P),_, _Opts) :- !.
+rewrite_goal(rdfs_subproperty_of(C,P), rdf(C,oneOrMore(rdfs:subPropertyOf),P),_, _Opts) :- !.
+rewrite_goal(rdfs_individual_of(I,C), (rdf(I,rdf:type,X),rdf(X,zeroOrMore(rdfs:subClassOf),C)),_, _Opts) :- !.
+rewrite_goal(a(I,C), rdf(I,rdf:type,C),_, _Opts) :- !.
+%rewrite_goal(rdf_member(X,L), rdf(L,oneOrMore(rdf:rest)/rdf:last,X),_, _Opts) :- !.
+rewrite_goal(rdf_member(X,L), rdf(L,(zeroOrMore(rdf:rest)/(rdf:first)),X),_, _Opts) :- !.
 
 % rdf11 rules
-rewrite_goal(substring(S,P), contains(S,P), _) :- !.
-rewrite_goal(prefix(S,P), str_starts(S,P), _) :- !.
+rewrite_goal(substring(S,P), contains(S,P), _, _Opts) :- !.
+rewrite_goal(prefix(S,P), str_starts(S,P), _, _Opts) :- !.
 
 % Match any literal that matches Pattern case insensitively, where the `*' character in Pattern matches zero or more characters
-rewrite_goal(like(S,P1), regex(S,P2,i), _) :- !, like_to_regex(P1,P2).
+rewrite_goal(like(S,P1), regex(S,P2,i), _, _Opts) :- !, like_to_regex(P1,P2).
 
 % TODO
-%rewrite_goal(word(S,P1), regex(S,P2,i), _) :- !, like_to_regex(P1,P2).
+%rewrite_goal(word(S,P1), regex(S,P2,i), _, Opts) :- !, like_to_regex(P1,P2).
 
 
 % ------
 % non-terminals
 % ------
-rewrite_goal((A,B),(A2,B2),D) :-
+rewrite_goal((A,B),(A2,B2),D, Opts) :-
         !,
-        rewrite_goal(A,A2,D),
-        rewrite_goal(B,B2,D).
+        rewrite_goal(A,A2,D, Opts),
+        rewrite_goal(B,B2,D, Opts).
 
-rewrite_goal((A;B),(A2;B2),D) :-
+rewrite_goal((A;B),(A2;B2),D, Opts) :-
         !,
-        rewrite_goal(A,A2,D),
-        rewrite_goal(B,B2,D).
-rewrite_goal(\+A, \+A2, D) :-
+        rewrite_goal(A,A2,D, Opts),
+        rewrite_goal(B,B2,D, Opts).
+rewrite_goal(\+A, \+A2, D, Opts) :-
         !,
-        rewrite_goal(A,A2,D).
+        rewrite_goal(A,A2,D, Opts).
 
 % EXPERIMENTING WITH NONDET
-rewrite_goal(A,A2,D) :-
+rewrite_goal(A,A2,D, Opts) :-
         % TODO: see refl/2 test in test_aux
         setof(A-Clause,safe_clause(A,Clause),Clauses),
         !,
-        debug(sparqlprog,' ~q CLAUSES==> ~q',[A,Clauses,A]),
+        debug(sparqlprog,' ~q CLAUSES==> ~q ~q',[A,Clauses,A2]),
         increase_depth(D,D2),
         %list_to_disj(Clauses,X),
         member(A-Clause,Clauses),
-        rewrite_goal(Clause,A2,D2).
-rewrite_goal(A,A,_).
+        rewrite_goal(Clause,A2,D2, Opts).
+rewrite_goal(A,A2,D, Opts) :-
+        % user defined expansion rule
+        copy_term(Opts,OptsCopy),
+        setof(A-Body,member( rule( (A:-Body) ) ,OptsCopy),Clauses),
+        !,
+        debug(sparqlprog,' ~q RULE==> ~q ~q',[A,Clauses,A2]),
+        increase_depth(D,D2),
+        %list_to_disj(Clauses,X),
+        member(A-Clause,Clauses),
+        rewrite_goal(Clause,A2,D2, Opts).
+        %rewrite_goal(X,A2,D2, Opts).
+rewrite_goal(A,A2,D, Opts) :-
+        % as above, but parse the rule strinmg
+        member(rule( Atom ),Opts),
+        atom(Atom),
+        read_term_from_atom(Atom, (Head :- Body), []),
+        Head=A,
+        !,
+        debug(sparqlprog,' ~q RULE==> ~q',[A,A2]),
+        increase_depth(D,D2),
+        rewrite_goal(Body,A2,D2, Opts).
+rewrite_goal(A,A,_,_).
+
 
 % for certain predicates, do not use replace_string_unification(T,T3)
 % TODO: make this a hook
@@ -549,15 +600,15 @@ sparql_endpoint(EP,Url,Options) :-
 
 retract_declared_endpoint(EP,Url) :-
    sparql_endpoint(EP,Host,Port,Path,_),
-   format('% WARNING: Updating already registered SPARQL end point ~q.\n',[Url]),
+   debug(info,'% WARNING: Updating already registered SPARQL end point ~q.\n',[Url]),
    retractall(sparql_endpoint(EP,Host,Port,Path,_)),
    !.
 retract_declared_endpoint(_,_).
 
-user:term_expansion(:-(sparql_endpoint(EP,Url)), Expanded) :- 
-   endpoint_declaration(EP,Url,[],Expanded).
-user:term_expansion(:-(sparql_endpoint(EP,Url,Options)), Expanded) :- 
-   endpoint_declaration(EP,Url,Options,Expanded).
+%user:term_expansion(:-(sparql_endpoint(EP,Url)), Expanded) :- 
+%   endpoint_declaration(EP,Url,[],Expanded).
+%user:term_expansion(:-(sparql_endpoint(EP,Url,Options)), Expanded) :- 
+%   endpoint_declaration(EP,Url,Options,Expanded).
 
 sparql_endpoint_url(EP,Url) :- sparql_endpoint(EP,Url,_,_,_).
 
@@ -614,7 +665,8 @@ query_goal(EP,Goal,Opts) :-
         query_goal(EP,Goal,Goal,Opts).
 
 query_goal(EP,Goal,SelectTerm,Opts) :- 
-   findall(EP,sparql_endpoint(EP,_,_,_,_),EPs),
+   findall(EP,sparql_endpoint(EP,_,_,_,_),EPs1),
+   sort(EPs1,EPs),
    term_variables(SelectTerm,Vars),
    (  Vars = [] % if no variables, do an ASK query, otherwise, SELECT
    -> phrase_to_sparql(ask(Goal),SPARQL),
@@ -633,7 +685,8 @@ query_goal(EP,Goal,SelectTerm,Opts) :-
       debug(sparqlprog,'DCG: ~q ~q ~q',[Vars,Goal,Opts1]),
       phrase_to_sparql(select(Vars,Goal,Opts1),SPARQL),
       debug(sparqlprog,'Executing parallel query: ~w // ~w // ~w',[SPARQL,Query,EPs]),
-      parallel_query(Query,EPs,EP-Result)
+      parallel_query(Query,EPs,EP-Result),
+      debug(sparqlprog,'RR=~q',[Result])
    ).
 
 %! create_sparql_select(+SelectTerm, +Goal,-SPARQL,+Opts) is det.
@@ -659,7 +712,7 @@ create_sparql_select(Select,Goal,SPARQL,Opts) :-
                 
 create_sparql_select(Select,Goal,SPARQL,Opts) :-
         filter_opts(Opts,OptsFiltered),
-        rewrite_goal(Goal,Goal2),
+        rewrite_goal(Goal,Goal2,Opts),
         debug(sparqlprog,'Rewritten goal2: ~q',[Goal2]),
         term_variables(Select,Vars),
         debug(sparqlprog,'Vars: ~q',[Vars]),
@@ -742,8 +795,8 @@ conjoin(Term,L,T2) :-
 create_sparql_construct(Head,Goal,SPARQL) :-
    create_sparql_construct(Head,Goal,SPARQL,[]).
 create_sparql_construct(Head,Goal,SPARQL,Opts) :-
-   rewrite_goal(Goal,Goal2),
-   rewrite_goal(Head,Head2),
+   rewrite_goal(Goal,Goal2, Opts),
+   rewrite_goal(Head,Head2, Opts),
    debug(sparqlprog,'Rewritten: ~q <- ~q',[Head2,Goal2]),        
    phrase_to_sparql(construct(Head2,Goal2,Opts),SPARQL).
 
@@ -763,7 +816,7 @@ autopage(EP,SPARQL,Limit,Offset,Result) :-
    ).
 
 parallel_query(_,[],_) :- !, fail.
-parallel_query(P,[X],Y) :- !, call(P,X,Y).
+parallel_query(P,[X],Y) :- !, debug(sparqlprog,'Bypassing parallelism (~q) calling ~q on ~q',[X,P,Y]), call(P,X,Y). % no parallel
 parallel_query(P,Xs,Y) :-
    maplist(par_goal(P,Y),Xs,Goals),
    concurrent_or(Y,Goals,[on_error(continue)]).

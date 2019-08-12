@@ -21,6 +21,7 @@ For complete ontology use rdfs2pl
            descendant_of/2,
            has_director/2,
            directed/2,
+           has_genre/2,
            band_member/2,
            has_name/2]).
 
@@ -40,6 +41,12 @@ person(Person) :- rdf(Person,rdf:type,foaf:'Person').
 %   binds foaf:Name
 %
 has_name(S,L) :- rdf(S,foaf:'Name',L).
+
+%! has_genre(?S, ?G) is nondet.
+%
+%   binds dbont:genre
+%
+has_genre(S,G) :- rdf(S,dbont:genre,G).
 
 
 %! has_director(?S, ?O) is nondet.

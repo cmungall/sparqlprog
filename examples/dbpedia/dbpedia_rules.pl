@@ -13,8 +13,8 @@ band(B) :- rdf(B,rdf:type,dbont:'Band').
 %    true if SharedMember is a member of both B1 and B2 (and B1 and B2 are distinct)
 %
 has_shared_band_member(B1,B2,A) :-
-        rdf(A,dbo:associatedBand,B1),
-        rdf(A,dbo:associatedBand,B2),
+        rdf(A,dbont:associatedBand,B1),
+        rdf(A,dbont:associatedBand,B2),
         B1\=B2.
 
 %! has_shared_band_genre(?B1, ?B2, ?SharedGenre) is nondet
@@ -24,13 +24,13 @@ has_shared_band_member(B1,B2,A) :-
 %    true if SharedGenre is a genre of both B1 and B2 (and B1 and B2 are distinct)
 %
 has_shared_genre(B1,B2,A) :-
-        rdf(B1,dbo:genre,A),
-        rdf(B2,dbo:genre,A),
+        rdf(B1,dbont:genre,A),
+        rdf(B2,dbont:genre,A),
         B1\=B2.
 
 genre_pair(G1,G2,A) :-
-        rdf(A,dbo:genre,G1),
-        rdf(A,dbo:genre,G2),
+        rdf(A,dbont:genre,G1),
+        rdf(A,dbont:genre,G2),
         G1\=G2.
 
 
@@ -65,7 +65,7 @@ jaccard(SA,SB,Sim) :-
         Sim is NI/NU.
 
 get_all_genres(Entity,L) :-
-        service_query_all(dbpedia,G,rdf(Entity,dbo:genre,G),L).
+        service_query_all(dbpedia,G,rdf(Entity,dbont:genre,G),L).
 
 
 

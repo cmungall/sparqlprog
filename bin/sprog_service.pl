@@ -11,9 +11,15 @@
 :- use_module(library(semweb/rdf_cache)).
 :- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/rdfs)).
-%:- rdf_attach_library('void.ttl').
 :- use_module(library(sparqlprog/ontologies/owl), []).
 :- use_module(library(sparqlprog/owl_util)).
+
+:- use_module(library(sparqlprog)).
+:- use_module(library(sparqlprog/labelutils)).
+:- use_module(library(sparqlprog/endpoints)).
+:- use_module(library(sparqlprog/ontologies/wikidata)).
+:- [library(sparqlprog/ontologies/load)].
+:- packinfo:consult('pack.pl').
 
 :- multifile http:location/3.
 :- dynamic   http:location/3.
@@ -35,9 +41,13 @@ http:location(root, '/', []).
 :- use_module(library(semweb/rdf_sandbox)).
 
 :- multifile sandbox:safe_primitive/1.
+sandbox:safe_primitive(packinfo:version(_)).
 sandbox:safe_primitive(rdf11:rdf(_,_,_)).
 sandbox:safe_primitive(rdf11:rdf_iri(_)).
+sandbox:safe_primitive(sparqlprog:'??'(_)).
 sandbox:safe_primitive(sparqlprog:'??'(_,_)).
+sandbox:safe_primitive(sparqlprog:'??'(_,_,_)).
+sandbox:safe_primitive(sparqlprog:'??'(_,_,_,_)).
 %sandbox:safe_primitive(clause(_,_,_)).
 
 
@@ -48,10 +58,6 @@ http:location(pldoc, root(documentation), [priority(100)]).
                            create_global_directory(true)
                          ]).
 
-:- use_module(library(sparqlprog)).
-:- use_module(library(sparqlprog/labelutils)).
-:- use_module(library(sparqlprog/endpoints)).
-:- use_module(library(sparqlprog/ontologies/wikidata)).
 
 %:- initialization prolog_ide(thread_monitor).
 :- initialization debug(sparqlprog).

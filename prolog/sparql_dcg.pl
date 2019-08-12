@@ -132,7 +132,11 @@ construct(Head,Goal,Options) -->
    {check_remaining_options(O4)}.
 
 check_remaining_options([]) :- !.
+check_remaining_options([Opt|Opts]) :- ignore_option(Opt), !, check_remaining_options(Opts).
 check_remaining_options(Opts) :- throw(unrecognised_options(Opts)).
+
+ignore_option(rule(_)).
+
 
 if_option(Opt,Phrase,O1,O2) -->
    ( {select_option(Opt,O1,O2)} -> call_dcg(Phrase); {O2=O1}).

@@ -74,6 +74,17 @@ See the [sparqlprog module docs](https://www.swi-prolog.org/pack/file_details/sp
 
 See also the [specification](SPECIFICATION.md)
 
+## Quick Start (for Python hackers)
+
+See the [sparqlprog-python](https://github.com/cmungall/sparqlprog-python) package
+
+This provides a Python interface to a sparqlprog service
+
+You can also see demonstration notebooks:
+
+ * [Basic SPARQLProg](https://nbviewer.jupyter.org/github/cmungall/sparqlprog-python/blob/master/Notebook_01_Basics.ipynb)
+ * [sending programs over the wire](https://nbviewer.jupyter.org/github/cmungall/sparqlprog-python/blob/master/Notebook_02_Programs.ipynb)
+
 ## Quick Start (for everyone else)
 
 There are a variety of ways to use this framework:
