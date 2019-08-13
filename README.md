@@ -395,9 +395,10 @@ You just need SWI Prolog with its Semantic Web libraries.
 
 ## Simple usage
 
-The (??)/2  and (??)/1 operators have a high precedence so that conjuction and disjunctive
-queries can be written to the right of it without parentheses.
-==
+The `(??)/2`  and `(??)/1` operators have a high precedence so that conjuction and disjunctive
+queries can be written to the right of it without parentheses:
+
+```
 ?- rdf_register_prefix(foaf,'http://xmlns.com/foaf/0.1/')
 ?- rdf_register_prefix(dbont,'http://dbpedia.org/ontology/')
 ?- sparql_endpoint( dbp, 'http://dbpedia.org/sparql/').
@@ -408,35 +409,35 @@ queries can be written to the right of it without parentheses.
           rdf(Person,foaf:Name,Name),
           filter(regex('Colt.*',Name)).
 ?- dbp ?? rdf(A,rdf:type,dbont:'Photographer'); rdf(A, rdf:type, dbont:'MusicalArtist').
-==
+```
 
 
 ## Clause expansion
 
 If the following clause is defined:
 
-==
+```
 cls(Class) :-
         rdf(Class,rdf:type,owl:'Class').
-==
+```
 
 Then cls/1 can be used in queries, e.g.
 
-==
+```
 ?-  dbp ?? cls(X).
-==
+```
 
 The cls/1 goal will be expanded.
 
 More complex goals can be defined; for example, this queries for existential restrictions:
 
-==
+```
 subclass_of(C,D) :- rdf(C,rdfs:subClassOf,Restr).
 svf_edge(C,P,D) :-
         subclass_of(C,Restr),
         rdf(Restr,owl:onProperty,P),
         rdf(Restr,owl:someValuesFrom,D).
-==
+```
 
 Only a subset of prolog can be expanded in this way. Conjunction,
 disjunction (or multiple clauses), negation are supported. Terminals
