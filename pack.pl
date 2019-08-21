@@ -8,5 +8,8 @@ packager('Chris Mungall','cjmungall@lbl.gov').
 download('https://github.com/cmungall/sparqlprog/releases/*.zip' ).
 requires(dcgutils).
 requires(regex).
+requires(typedef).
+optional_pack(obo_metadata).
+
 
 
