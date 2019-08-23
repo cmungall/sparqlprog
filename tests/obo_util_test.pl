@@ -38,7 +38,7 @@ wl(L) :-
 
 
 test(def) :-
-        forall(entity_def(E,D,Xs),
+        forall(entity_def_xrefs(E,D,Xs),
                writeln(e(E,D,Xs))).
 
 test(gen) :-

@@ -24,6 +24,9 @@ pq-ontobee  "aggregate_group(count(P),[P,G],rdf(_,owl:onProperty,P,G),Num)"
 # number of distinct xrefs per graph
 pq-ontobee -f tsv   "aggregate_group(count(distinct(X)),[G],has_dbxref(C,X,G),NumX)"
 
+# exact matches between mondo and other resources
+pq-ontobee -u sparqlprog/ontologies/skos -C "in_ontology(X,mondo),has_exact_match(X,Y)"
+
 # all triples with a literal with a trailing whitespace
 pq-ontobee  'rdf(C,P,V),is_literal(V),str_ends(str(V)," ")'
 

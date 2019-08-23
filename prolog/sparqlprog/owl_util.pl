@@ -55,7 +55,13 @@
            mrcd/3,
 
            simj_by_subclass/3,
-           simj_by_subclass/5
+           simj_by_subclass/5,
+
+           owl_assert_axiom/1,
+           owl_assert_axiom/2,
+           owl_assert_axiom/3,
+           owl_assert_axiom_with_anns/3,
+           owl_assert_axiom_with_anns/4
           ]).
 
 /** <module> OWL ontology wrapper
@@ -109,7 +115,9 @@ declare_shacl_prefixes :-
 declare_shacl_prefixes.
 
 
-
+%! triple_axiom(T,A) is nondet.
+%
+%  as triple_axiom/4, first argument is triple(I,P1,J)
 triple_axiom(rdf(I,P,J),A) :-
         triple_axiom(I,P,J,A).
 
@@ -126,8 +134,8 @@ triple_axiom(I,P,J,A) :-
 
 %! triple_axiom_annotation(?T, ?P, ?V) is nondet.
 %
-%
-%
+%  as triple_axiom_annotation/5, first argument is triple(I,P1,J)
+% 
 triple_axiom_annotation(T,P,V) :-
         triple_axiom(T,A),
         axiom_annotation(A,P,V).
@@ -684,3 +692,91 @@ simj_by_subclass(C1,C2,S,N1,N2) :-
         S is N1/N2.
 
         
+                                % === WRITING ====
+
+%! owl_assert_axiom(+Axiom, ?MainTriple, +Graph:iri) is det.
+%! owl_assert_axiom(+Axiom, +Graph:iri) is det.
+%! owl_assert_axiom(+Axiom) is det.
+%
+%  asserts an axiom
+%  
+owl_assert_axiom(Axiom) :-
+        rdf_default_graph(G),
+        owl_assert_axiom(Axiom,G).
+
+owl_assert_axiom(Axiom,G) :-
+        owl_assert_axiom(Axiom,_,G).
+owl_assert_axiom(equivalentTo(A,B),rdf(A,owl:equivalentClass,B),G) :-
+        !,
+        debug(def, 'Saving ~w = ~w to ~w',[A,B,G]),
+        owl_assert_expression(A,Ax,G),
+        owl_assert_expression(B,Bx,G),
+        rdf_assert(Ax,owl:equivalentClass,Bx,G).
+owl_assert_axiom(subClassOf(A,B),rdf(A,rdfs:subClassOf,B),G) :-
+        !,
+        owl_assert_expression(A,Ax,G),
+        owl_assert_expression(B,Bx,G),
+        rdf_assert(Ax,rdfs:subClassOf,Bx,G).
+owl_assert_axiom(T,T,G) :-
+        % fallback
+        T=rdf(S,P,O),
+        !,
+        rdf_assert(S,P,O,G).
+
+%! owl_assert_axiom_with_anns(+Axiom, ?MainTriple, +Graph:iri, +Annotations:list) is det.
+%! owl_assert_axiom_with_anns(+Axiom, +Graph:iri, +Annotations:list) is det.
+%
+%  Annotations = [annotation(P1,V1), ...]
+%  
+owl_assert_axiom_with_anns(Axiom,G,Anns) :-
+        owl_assert_axiom_with_anns(Axiom,_,G,Anns).
+owl_assert_axiom_with_anns(Axiom,T,G,Anns) :-
+        owl_assert_axiom(Axiom,T,G),
+        T=rdf(S,P,O),
+        owl_assert_expression(P,Px,G),
+        owl_assert_expression(S,Sx,G),
+        owl_assert_expression(O,Ox,G),
+        rdf_create_bnode(AxiomNode),
+        debug(def, 'Saving AxiomAnnotation ~w = ~w -> ~w // ~w,~w,~w',[AxiomNode,AP,V,S,Px,O]),
+        rdf_assert(AxiomNode,owl:annotatedSource,Sx,G),
+        rdf_assert(AxiomNode,owl:annotatedProperty,Px,G),
+        rdf_assert(AxiomNode,owl:annotatedTarget,Ox,G),
+        rdf_assert(AxiomNode,rdf:type,owl:'Axiom',G),
+        forall(member(annotation(AP,V),Anns),
+               rdf_assert(AxiomNode,AP,V,G)),
+        !.
+owl_assert_axiom_with_anns(Axiom,T,G,Anns) :-
+        throw(error(could_not_owl_assert(Axiom,T,G,Anns))).
+
+
+
+% TODO: axiom annotation
+owl_assert_expression(and(Xs),Node,G) :-
+        !,
+        rdf_create_bnode(Node),
+        debug(xdef,'Made IXN bnode: ~w',[Node]),
+        rdf_assert(Node,rdf:type,owl:'Class',G),
+        maplist({G}/[In,Out]>>owl_assert_expression(In,Out,G),Xs,IxnNodesPL),
+        debug(xdef, 'AND list = ~w',[IxnNodesPL]),
+        rdf_assert_list(IxnNodesPL,IxnNode,G),
+        rdf_assert(Node,owl:intersectionOf,IxnNode,G).
+owl_assert_expression(some(P,V),Node,G) :-
+        !,
+        rdf_create_bnode(Node),
+        owl_assert_expression(P,Px,G),
+        owl_assert_expression(V,Vx,G),
+        rdf_assert(Node,rdf:type,owl:'Restriction',G),
+        rdf_assert(Node,owl:onProperty,Px,G),
+        rdf_assert(Node,owl:someValuesFrom,Vx,G).
+owl_assert_expression(Node,Node,_) :-
+        Node = _^^_,
+        !.
+owl_assert_expression(Node,Node,_) :-
+        Node = _@_,
+        !.
+owl_assert_expression(P:X,Node,_) :-
+        rdf_global_id(P:X,Node),
+        !.
+owl_assert_expression(Node,Node,_) :-
+        atomic(Node),
+        !.

@@ -1,4 +1,4 @@
-#!/usr/bin/env swipl
+#!/usr/bin/env swipl 
 
 :- initialization main.
 
@@ -54,7 +54,7 @@ main(Argv) :-
          ],
          [opt(consult), type(atom),
           longflags([consult]),
-          shortflags([c]),
+          shortflags([c]),  % Stopped working in swipl8? interferes with command line flag?
           help('Prolog program to load/consult')
          ],
          [opt(use), type(atom),
@@ -193,6 +193,7 @@ handle_opts(Opts) :-
         opt_forall(input(X),rdf_load_wrap(X),Opts),
         opt_forall(index(_),ensure_loaded(library(index_util)),Opts),
         opt_forall(index(X),materialize_index(X),Opts),
+        forall((member(goal(X),Opts),\+var(X)), X),
         opt_forall(goal(X),X,Opts),
         opt_forall(assign(X),assign_setting(X),Opts).
 

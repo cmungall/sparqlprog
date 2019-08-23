@@ -34,6 +34,11 @@
            group_concat/3,
            aggregate_group/4,
 
+           iri_prefix_curie/3,
+           iri_prefix/2,
+           iri_curie/2,
+           curie_prefix/2,
+
            optional/1,
            rdf_path/3,
            rdf_path/4,
@@ -280,6 +285,25 @@ rdfx(A,P,B,G) :-
         rdf_global_id(P,Px),
         atomic(Px),
         rdf(A,Px,B,G).
+
+:- rdf_meta iri_prefix_curie(r,o,o).
+iri_prefix_curie(IRI, Prefix, CURIE) :-
+        ground(IRI),
+        !,
+        rdf_global_id(Prefix:Local, IRI),
+        concat_atom([Prefix,Local],':',CURIE).
+iri_prefix_curie(IRI, Prefix, CURIE) :-
+        ground(CURIE),
+        !,
+        concat_atom([Prefix,Local],':',CURIE),
+        rdf_global_id(Prefix:Local, IRI).
+iri_curie(IRI, CURIE) :-
+        iri_prefix_curie(IRI, _, CURIE).
+iri_prefix(IRI, Prefix) :-
+        iri_prefix_curie(IRI, Prefix, _).
+curie_prefix(CURIE, Prefix) :-
+        str_before(CURIE,":",Prefix).
+
 
 
 
