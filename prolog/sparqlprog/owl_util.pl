@@ -287,9 +287,9 @@ owl_restriction(R, all(P,O)) :-
         owl:someValuesFrom(R,O).
 
 
-%! owl_node_info(?S, ?P, ?O, ?E) is nondet.
+%! owl_node_info(+S, ?P, ?O, ?E) is nondet.
 %
-%
+%  find asserted or inferred triples for S
 %
 owl_node_info(S,P,O,E) :-
         rdf(S,P,O),

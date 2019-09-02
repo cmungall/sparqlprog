@@ -7,6 +7,10 @@
 # ---
 pq-up  "in_human(P),annotation(P,A),disease_annotation(A),interpro(P,X)
 
+# ---
+# diseases for a specific protein and their annotations
+# ---
+pq-up "protein_natural_variant_disease(uniprot:'Q15465',A,D),substitution(A,Seq)" "x(A,D,Seq)"
 
 # ---
 # count of xrefs broken down by database

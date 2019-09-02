@@ -21,7 +21,8 @@
 :- type rdf_literal ---> rdf_plain_literal ; rdf_lang_literal ; rdf_typed_literal.
 :- type rdf_plain_literal == string.
 :- type rdf_lang_literal ---> '@'(string,atom).   % todo - consider enum
-:- type rdf_typed_literal ---> '^^'(string,iri_ref).
+:- type rdf_typed_literal ---> '^^'(string,xsd_type).
+:- type xsd_type ---> iri_ref.
 
 :- type rdf_triple ---> rdf(rdf_resource, iri_ref, rdf_resource_or_literal).
 :- type rdf_quad ---> rdf(rdf_resource, iri_ref, rdf_resource_or_literal, rdf_resource).
