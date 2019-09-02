@@ -242,7 +242,20 @@ atom_uri(A,U) :-
         !.
 atom_uri(A,A).
 
-run([describe|Xs], Opts) :-
+run([describe_all|Xs], Opts) :-
+        !,
+        maplist(atom_uri,Xs,Xs2),
+        Goal=rdf(X,P,O,G),
+        Q=(member(X,Xs2),Goal),
+        exec_query(Goal, Q, ['P'=P,'O'=O,'G'=G], Opts).
+
+run([describe,X], Opts) :-
+        !,
+        atom_uri(X,X2),
+        Goal=rdf(X2,P,O),
+        exec_query(Goal, Goal, ['P'=P,'O'=O], Opts).
+
+run([owl_noode_info|Xs], Opts) :-
         !,
         maplist(atom_uri,Xs,Xs2),
         Goal=owl_node_info(X,P,O,G),
