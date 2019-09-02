@@ -5,6 +5,11 @@
            has_disease_annotation/2,
            natural_variant_annotation/1,
            has_natural_variant_annotation/2,
+           protein_natural_variant_disease/3,
+           protein_natural_variant_disease_xref/4,
+           protein_natural_variant_disease_dbsnp/4,
+           is_dbsnp/1,
+           
            transmembrane_annotation/1,
            has_transmembrane_annotation/2,
 
@@ -38,6 +43,8 @@
 :- use_module(library(sparqlprog/ontologies/faldo)).
 :- use_module(library(sparqlprog)).
 
+:- use_module(library(sparqlprog/owl_types)).
+:- use_module(library(typedef)).
 
 :- rdf_register_prefix(up,'http://purl.uniprot.org/core/').
 :- rdf_register_prefix(updb,'http://purl.uniprot.org/database/').
@@ -46,8 +53,10 @@
 :- rdf_register_prefix(skos, 'http://www.w3.org/2004/02/skos/core#').
 :- rdf_register_prefix(embl_csd, 'http://purl.uniprot.org/embl-cds/').
 
-
 :- sparql_endpoint( uniprot, 'http://sparql.uniprot.org/sparql').
+
+
+:- type protein_iri ---> atomic_iri.
 
 protein(C) :- rdf(C,rdf:type,up:'Protein').
 
@@ -56,6 +65,14 @@ has_disease_annotation(P,A) :- annotation(P,A),rdf(A,rdf:type,up:'Disease_Annota
 
 natural_variant_annotation(A) :- rdf(A,rdf:type,up:'Natural_Variant_Annotation').
 has_natural_variant_annotation(P,A) :- annotation(P,A),rdf(A,rdf:type,up:'Natural_Variant_Annotation').
+
+protein_natural_variant_disease(P,A,D) :- annotation(P,A),rdf(A,rdf:type,up:'Natural_Variant_Annotation'),rdf(A,skos:related,D).
+
+protein_natural_variant_disease_xref(P,A,D,X) :- annotation(P,A),rdf(A,rdf:type,up:'Natural_Variant_Annotation'),rdf(A,skos:related,D),rdf(A,rdfs:seeAlso,X).
+protein_natural_variant_disease_dbsnp(P,A,D,X) :- protein_natural_variant_disease_xref(P,A,D,X), is_dbsnp(X).
+
+is_dbsnp(X) :- rdf(X,up:database,updb:dbSNP).
+
 
 transmembrane_annotation(A) :- rdf(A,rdf:type,up:'Transmembrane_Annotation').
 has_transmembrane_annotation(P,A) :- annotation(P,A),rdf(A,rdf:type,up:'Transmembrane_Annotation').
@@ -107,6 +124,7 @@ xref_pro(P,X) :- xref(P,X),is_pro(X).
 is_interpro(X) :- database(X,updb:'InterPro').
 is_panther(X) :- database(X,updb:'PANTHER').
 is_pro(X) :- database(X,updb:'PRO').
+
 
 
 
