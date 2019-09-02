@@ -260,7 +260,7 @@ test(rdf_predicate) :-
 test(member) :-
         test_select( member(_A,[1,2,3]),
                      "SELECT ?v0 WHERE {VALUES ?v0 {1 2 3 }}").
-test(member) :-
+test(member2) :-
         test_select( member([_A,_B],[["a",1],["b",2],["c",3]]),
                      "SELECT ?v0 ?v1 WHERE {VALUES (?v0 ?v1) {(\"a\" 1) (\"b\" 2) (\"c\" 3) }}").
 
