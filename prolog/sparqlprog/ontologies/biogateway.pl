@@ -1,4 +1,4 @@
-:- module(dumontierlab,
+:- module(biogateway,
           [
 
            ]).

@@ -14,7 +14,8 @@
 :- use_module(library(sparqlprog)).
 :- use_module(library(semweb/rdf11)).
 
-:- rdf_register_prefix(obmerged,'http://purl.obolibrary.org/obo/merged/').
+:- rdf_register_prefix(obomerged,'http://purl.obolibrary.org/obo/merged/').
+:- rdf_register_prefix(obo,'http://purl.obolibrary.org/obo/').
 
 :- rdf_register_prefix('MONDO','http://purl.obolibrary.org/obo/MONDO_').
 

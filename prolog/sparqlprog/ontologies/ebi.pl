@@ -6,17 +6,26 @@
            
            identifier/2,
            description/2,
+           direct_mapping/2,
            see_also/2,
            alt_label/2,
+           exon/1,
            protein_coding_gene/1,
            paralogous_to/2,
            orthologous_to/2,
            homologous_to/2,
            in_taxon/2,
-           transcribed_from/2
+           transcribed_from/2,
+           translates_to/2,
+           has_part/2,
+
+           feature_in_range/4,
+           mouse_ortho_by_range/5,
+           has_mouse_ortholog/2
            ]).
 
 :- use_module(library(sparqlprog/ontologies/faldo)).
+:- use_module(library(sparqlprog/ontologies/sequence_feature), []).
 
 :- sparql_endpoint( ebi, 'https://www.ebi.ac.uk/rdf/services/sparql').
 
@@ -29,6 +38,7 @@
 
 :- rdf_register_prefix(skos, 'http://www.w3.org/2004/02/skos/core#').
 :- rdf_register_prefix(ensembl,'http://rdf.ebi.ac.uk/resource/ensembl/').
+:- rdf_register_prefix(ensembl_protein,'http://rdf.ebi.ac.uk/resource/ensembl.protein/').
 :- rdf_register_prefix(dcterms,'http://purl.org/dc/terms/').
 :- rdf_register_prefix(so, 'http://purl.obolibrary.org/obo/SO_').
 :- rdf_register_prefix(ro, 'http://purl.obolibrary.org/obo/RO_').
@@ -57,13 +67,40 @@ in_taxon(A,B) :- rdf(A,ro:'0002162',B).
 
 identifier(A,X) :- rdf(A,dcterms:identifier,X).
 description(A,X) :- rdf(A,dcterms:description,X).
-transcribed_from(T,G) :- rdf(T,so:transcribed_from,G).
+translates_to(T,P) :- rdf(T,so:translates_to,P).  % e.g. T to G
+transcribed_from(T,G) :- rdf(T,so:transcribed_from,G).  % e.g. T to G
+has_part(T,E) :- rdf(T,so:has_part,E).                  % e.g. T to E
+
+direct_mapping(A,B) :- rdf(A,'http://rdf.ebi.ac.uk/terms/ensembl/DIRECT',B).
 
 protein_coding_gene(G) :- rdf(G,rdf:type,so:'0001217').
+exon(X) :- rdf(X,rdf:type,so:'0000147').
+transcript(X) :- rdf(X,rdf:type,so:'0000234').
 
 homologous_to(A,B) :- orthologous_to(A,B).
 homologous_to(A,B) :- paralogous_to(A,B).
 
 orthologous_to(A,B) :- rdf(A,sio:'000558',B).
 paralogous_to(A,B) :- rdf(A,'http://semanticscience.org/resource/SIO:000630',B).  % EBI uses incorrect PURL
+
+foo1('0').
+
+feature_in_range(Chr,B,E,F) :-
+        location(F,FB,FE,Chr),
+        FB >= B,
+        FE =< E.
+
+% mostly for demo:
+mouse_ortho_by_range(Chr,B,E,G,H) :-
+        protein_coding_gene(G), % SO
+        feature_in_range(Chr,B,E,G),
+        orthologous_to(G,H),
+        in_taxon(H,taxon:'10090').
+
+foo2('0').
+
+has_mouse_ortholog(HumanGene, MouseGene) :- 
+        orthologous_to(MouseGene, HumanGene),
+        in_taxon(MouseGene,taxon:'10090').
+
 
