@@ -451,6 +451,10 @@ limited subset of pure prolog that can be executed outside
 the prolog environment - effectively a limited prolog to SPARQL
 compiler.
 
+## Comparison with SPIN
+
+TODO https://spinrdf.org/
+
 ## Credits
 
 The majority of code in this repo was developed by Samer Abdallah, as
