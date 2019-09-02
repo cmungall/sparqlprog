@@ -85,7 +85,8 @@ heroku-deploy:
 # after running, connect to 
 # http://localhost:4000/pldoc/doc/work/prolog/sparqlprog.pl
 pldoc-run:
-	docker run -v $PWD/:/work/ -w /work --name pldoc -p 4000:4000 -e PORT=4000 -it cmungall/sparqlprog swipl -p library=prolog -g [debug]
+	docker run -v $(PWD)/:/work/ -w /work --name pldoc -p 4000:4000 -e PORT=4000 -it cmungall/sparqlprog swipl -p library=prolog -g [debug] && \
+	echo "server started, see http://localhost:4000/pldoc/"
 
 # --------------------
 # Run SPARQL service inside Docker
