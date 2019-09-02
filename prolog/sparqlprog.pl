@@ -420,6 +420,7 @@ rewrite_goal(rdf_member(X,L), rdf(L,(zeroOrMore(rdf:rest)/(rdf:first)),X),_, _Op
 % rdf11 rules
 rewrite_goal(substring(S,P), contains(S,P), _, _Opts) :- !.
 rewrite_goal(prefix(S,P), str_starts(S,P), _, _Opts) :- !.
+rewrite_goal(the(_,_), true, _, _Opts) :- !.
 
 % Match any literal that matches Pattern case insensitively, where the `*' character in Pattern matches zero or more characters
 rewrite_goal(like(S,P1), regex(S,P2,i), _, _Opts) :- !, like_to_regex(P1,P2).
@@ -531,14 +532,20 @@ no_rewrite(rdf_graph(_)).
 no_rewrite(rdf_predicate(_)).
 no_rewrite(rdf_is_iri(_)).
 no_rewrite(member(_,_)).
+no_rewrite(sparqlprog:member(_,_)).
 
+no_rewrite_mod(emulate_builtins).
+no_rewrite_mod(rdf11).
+
+
+:- meta_predicate safe_clause(:,?).
 
 safe_clause(Goal,Body) :-
-        catch(clause(Goal,Body,Ref),_,fail),
         % TODO: come up with a more extensible way to prevent SPARQL builtins being expanded
-        \+ no_rewrite(Goal),
-        \+ ((clause_property(Ref,module(Mod)),
-             Mod=emulate_builtins)).
+        \+ \+ \+ no_rewrite(Goal),
+        catch(clause(Goal,Body,Ref),_,fail),
+        \+ \+ \+ ((clause_property(Ref,module(Mod)),
+                   no_rewrite_mod(Mod))).
 
 
 
