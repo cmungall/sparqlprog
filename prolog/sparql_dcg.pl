@@ -238,6 +238,7 @@ goal(true) --> "true" .
 
 % TODO: put this in its own section
 goal(str_before(Str, Sep, Sub)) --> goal(bind(str_before(Str, Sep), Sub)).
+goal(replace(Str, Match, Rep, V)) --> goal(bind(replace(Str, Match, Rep), V)).
 
 % allow conditions not wrapped by rdf_where/1
 goal(G) --> goal(filter(G)).
