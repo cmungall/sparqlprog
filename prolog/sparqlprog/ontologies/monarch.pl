@@ -12,6 +12,8 @@
     %is_marker_for/2,
            association/4,
            association/5,
+           clinvar_to_rs_number/2,
+           dbsnp_to_rs_number/2,
            has_phenotype_association/3,
            has_phenotype_association/4,
            has_phenotype_freq/3,
@@ -29,7 +31,10 @@
 :- use_module(library(sparqlprog/ontologies/oban)).
 
 %:- sparql_endpoint( monarch, 'http://rdf.monarchinitiative.org/sparql').
+:- sparql_endpoint( monarch, 'https://translator.ncats.io/monarch-blazegraph/namespace/kb/sparql/').
 
+
+:- rdf_register_ns(oio,'http://www.geneontology.org/formats/oboInOwl#').
 :- rdf_register_prefix(oban,'http://purl.org/oban/').
 :- rdf_register_prefix(foaf,'http://xmlns.com/foaf/0.1/').
 :- rdf_register_prefix(obo,'http://purl.obolibrary.org/obo/').
@@ -41,7 +46,7 @@
 % TODO
 :- rdf_register_prefix(mgi,'http://www.informatics.jax.org/accession/MGI:').
 :- rdf_register_prefix(orphanet,'http://www.orpha.net/ORDO/Orphanet_').
-
+:- rdf_register_prefix(clinvar,'http://www.ncbi.nlm.nih.gov/clinvar/').
 
 id_uri(ID,URI) :-
         concat_atom([Pre,Frag],':',ID),
@@ -154,7 +159,18 @@ phenotype_rel(Ph,Pr,Y) :-
         owl_some(M,Pr,Y).
 
 
-        
+clinvar_to_rs_number(V,Id) :-
+        % see https://github.com/monarch-initiative/dipper/issues/822
+        rdf(V,rdf:type,obo:'GENO_0000030'),
+        rdf(V,oio:hasdbxref,X),
+        dbsnp_to_rs_number(X,Id).
+
+dbsnp_to_rs_number(X,Id) :-
+        % CHANGE THIS: see https://github.com/monarch-initiative/dipper/issues/822
+        replace(str(X),"http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=","",Id).
+dbsnp_to_curie(X,Id) :-
+        replace(str(X),"http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=","dbSNP:",Id).
+
         
         
 % in RO        
