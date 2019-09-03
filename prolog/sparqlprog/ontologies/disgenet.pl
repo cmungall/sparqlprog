@@ -45,6 +45,8 @@ refers_to(A,B) :- rdf(A,sio:'000628',X).
 %! has_evidence(?A : disgenet_annotation ,?E : disgenet_publication) is nondet.
 has_evidence(A,B) :- rdf(A,sio:'000772',B).
 
+
+
 %! disease(?D : disgenet_disease) is nondet.
 disease(D) :- rdf(D,rdf:type,ncitevs:'C7057').
 
@@ -68,7 +70,9 @@ gene_disease_association(A,G,D,P) :- gene_disease_association(A),refers_to(A,G),
 %  both D1 and D2 are associated with the same gene G
 disease_pair_by_shared_gene(D1,D2,G) :- gene_disease_association(_,G,D1),gene_disease_association(_,G,D2).
 
-
+has_measurement_value(A,V) :- rdf(A,sio:'000772',V).
+has_source(A,V) :- rdf(A,sio:'000253',V).
+has_value(A,V) :- rdf(A,sio:'000300',V).
 
 
 
