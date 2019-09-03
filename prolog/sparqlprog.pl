@@ -278,7 +278,6 @@ expand_opts(OptsIn,OptsOut) :-
         tmp_file(prog,F),
         open(F,write,WS,[]),
         write(F),
-        trace,
         write(WS,P),
         close(WS),
         open(F,read,S,[]),
@@ -822,7 +821,7 @@ autopage(EP,SPARQL,Limit,Offset,Result) :-
       autopage(EP,SPARQL,Limit,Offset1,Result)
    ).
 
-parallel_query(_,[],_) :- !, fail.
+parallel_query(_,[],_) :- !, format(user_error, 'No endpoints',[]), fail.
 parallel_query(P,[X],Y) :- !, debug(sparqlprog,'Bypassing parallelism (~q) calling ~q on ~q',[X,P,Y]), call(P,X,Y). % no parallel
 parallel_query(P,Xs,Y) :-
    maplist(par_goal(P,Y),Xs,Goals),

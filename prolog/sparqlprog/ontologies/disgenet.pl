@@ -42,13 +42,6 @@ See http://www.disgenet.org/rdf
 :- rdf_register_prefix(ncbigene, 'http://identifiers.org/ncbigene/').
 
 
-%! refers_to(?A : disgenet_annotation, ?X : atomic_iri) is nondet.
-%refers_to(A,B) :- rdf(A,sio:'000628',X).
-
-%! has_evidence(?A : disgenet_annotation ,?E : disgenet_publication) is nondet.
-%has_evidence(A,B) :- rdf(A,sio:'000772',B).
-
-
 
 %! disease(?D : disgenet_disease) is nondet.
 disease(D) :- rdf(D,rdf:type,ncitevs:'C7057').
