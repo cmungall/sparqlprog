@@ -1,5 +1,7 @@
 /** <module> wrapper for disgenet endpoint
 
+See http://www.disgenet.org/rdf
+  
 */
 
 :- module(disgenet,
@@ -22,6 +24,7 @@
 :- use_module(library(semweb/rdf11)).
 
 :- use_module(library(sparqlprog/owl_types)).
+:- use_module(library(sparqlprog/ontologies/sio),[has_evidence/2, has_source/2, refers_to/2, has_measurement_value/2]).
 :- use_module(library(typedef)).
 
 :- type disgenet_protein ---> atomic_iri.
@@ -40,10 +43,10 @@
 
 
 %! refers_to(?A : disgenet_annotation, ?X : atomic_iri) is nondet.
-refers_to(A,B) :- rdf(A,sio:'000628',X).
+%refers_to(A,B) :- rdf(A,sio:'000628',X).
 
 %! has_evidence(?A : disgenet_annotation ,?E : disgenet_publication) is nondet.
-has_evidence(A,B) :- rdf(A,sio:'000772',B).
+%has_evidence(A,B) :- rdf(A,sio:'000772',B).
 
 
 
@@ -54,7 +57,7 @@ disease(D) :- rdf(D,rdf:type,ncitevs:'C7057').
 gene(G) :- rdf(G,rdf:type,ncitevs:'C16612').
 
 %! association(?A : disgenet_annotation) is nondet.
-assoc(A) :- rdfs_individual_of(A,sio:'000897').
+association(A) :- rdfs_individual_of(A,sio:'000897').
 
 %! gene_disease_association(?A : disgenet_annotation) is nondet.
 %! gene_disease_association(?A : disgenet_annotation, ?G : disgenet_gene, ?D : disgenet_disease) is nondet.
@@ -70,9 +73,10 @@ gene_disease_association(A,G,D,P) :- gene_disease_association(A),refers_to(A,G),
 %  both D1 and D2 are associated with the same gene G
 disease_pair_by_shared_gene(D1,D2,G) :- gene_disease_association(_,G,D1),gene_disease_association(_,G,D2).
 
-has_measurement_value(A,V) :- rdf(A,sio:'000772',V).
-has_source(A,V) :- rdf(A,sio:'000253',V).
-has_value(A,V) :- rdf(A,sio:'000300',V).
+% these should go to a generic SIO module
+%has_measurement_value(A,V) :- rdf(A,sio:'000772',V).
+%has_source(A,V) :- rdf(A,sio:'000253',V).
+%has_value(A,V) :- rdf(A,sio:'000300',V).
 
 
 
