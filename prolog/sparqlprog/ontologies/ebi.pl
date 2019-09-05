@@ -2,7 +2,15 @@
           [
 
            sample/1,
-           sample_attribute_node/2,
+           sample_attribute/2,
+           attribute_property_value/3,
+           attribute_property_value/4,
+           attribute_property_value/5,
+           sample_biocharacteristic/2,
+           sample_property_value/3,
+           sample_property_value/4,
+           sample_depth/2,
+           sample_environment_feature/2,
            
            identifier/2,
            description/2,
@@ -52,11 +60,48 @@
 
 
 sample(A) :- rdf(A,rdf:type,biosd_terms:'Sample').
-sample_attribute_node(S,A) :-
+
+%! sample_biocharacteristic(?S : ebi_biosample, ?A : ebi_attribute_node) is nondet.
+sample_biocharacteristic(S,A) :-
+        rdf(S,biosd_terms:'has-bio-characteristic',A).
+
+
+
+%! sample_attribute(?S : ebi_biosample, ?A : ebi_attribute_node) is nondet.
+sample_attribute(S,A) :-
         rdf(S,biosd_terms:'has-sample-attribute',A).
 
-%sample_
+%! attribute_property_value(?A : ebi_attribute_node,
+%                           ?P : ebi_biosample_property,
+%                           ?V : ebi_biosample_value) is nondet.
+%
+attribute_property_value(A, P, V) :-
+        rdf(A,ebi_atlas:propertyType,P),
+        rdf(A,ebi_atlas:propertyValue,V).
+attribute_property_value(A, P, V, T) :-
+        rdf(A,rdf:type,T),
+        rdf(A,ebi_atlas:propertyType,P),
+        rdf(A,ebi_atlas:propertyValue,V).
+attribute_property_value(A, P, V, T, G) :-
+        rdf(A,rdf:type,T, G),
+        rdf(A,ebi_atlas:propertyType,P),
+        rdf(A,ebi_atlas:propertyValue,V).
 
+%! sample_property_value(?S : ebi_biosample,
+%                        ?P : ebi_biosample_property,
+%                        ?V : ebi_biosample_value) is nondet.
+%
+sample_property_value(S, P, V) :-
+        sample_attribute(S, A),
+        attribute_property_value(A,P,V).
+sample_property_value(S, P, V, T) :-
+        sample_attribute(S, A),
+        attribute_property_value(A,P,V, T).
+
+sample_depth(S,V) :-
+        sample_property_value(S, "depth"^^xsd:string, V).
+sample_environment_feature(S,V) :-
+        sample_property_value(S,  "environment feature"^^xsd:string, V).
 
 % B seems to always be identifiers.org
 see_also(A,B) :- rdf(A,rdfs:seeAlso,B).
