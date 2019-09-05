@@ -58,13 +58,22 @@ pe-clean:
 	docker rm $(IM) || echo not made 
 
 pe-build:
-	test -f tests/out.tmp && rm tests/out.tmp || echo ok \
-	@docker build -t $(IM):$(VERSION) . \
+	(test -f tests/out.tmp && rm tests/out.tmp || echo ok) && \
+	docker build -t $(IM):$(VERSION) . \
 	&& docker tag $(IM):$(VERSION) $(IM):latest
 
 
 pe-run:
 	docker run -p 9083:9083 -e PORT=9083 --name sparqlprog $(IM)
+
+pe-run-bg:
+	docker run -p 9083:9083 -e PORT=9083 --name sparqlprog $(IM) &
+
+pe-test: pe-run-bg
+	sleep 3 ;\
+	python3 ../sparqlprog-python/sparqlprog.py -u http://localhost:9083 -e wd "continent(X)" ;\
+	docker kill sparqlprog ;\
+	docker rm sparqlprog
 
 pe-publish: pe-build
 	@docker push $(IM):$(VERSION) \

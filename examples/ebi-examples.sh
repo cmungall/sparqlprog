@@ -11,3 +11,12 @@ pq-ebi -l  sample
 # everything about https://www.ebi.ac.uk/biosamples/samples/SAMN02847463
 pq-ebi -l  "rdf(biosd:'SAMN02847463',P,Y)"
 
+# sample property-values
+pq-ebi -l  "sample_property_value(biosd:'SAMN02847463',P,V)"
+
+# distincty attributes
+# (may be too slow...)
+pq-ebi  "aggregate(count(distinct(P)),rdf(A,ebi_atlas:propertyType,P),Num)" "x(Num)"
+
+# all distinct attributes (24732)
+pq-ebi --distinct "rdf(A,ebi_atlas:propertyType,P)" "x(P)

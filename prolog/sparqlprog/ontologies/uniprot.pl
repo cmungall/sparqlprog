@@ -62,6 +62,7 @@
 :- type uniprot_annotation ---> atomic_iri.
 :- type uniprot_disease_annotation ---> uniprot_annotation.
 :- type uniprot_xref ---> atomic_iri.
+:- type uniprot_term ---> atomic_iri.
 :- type uniprot_sequence_string ---> string ^^ xsd_type.
 
 %! protein(?P : uniprot_protein) is nondet.
@@ -118,78 +119,45 @@ protein_natural_variant_disease_dbsnp(P,A,D,X) :- protein_natural_variant_diseas
 
 
 %! is_dbsnp(?X : uniprot_xref) is nondet.
-%
-%
-%
 is_dbsnp(X) :- rdf(X,up:database,updb:dbSNP).
 
 
 
 %! transmembrane_annotation(?A : uniprot_annotation) is nondet.
-%
-%
-%
 transmembrane_annotation(A) :- rdf(A,rdf:type,up:'Transmembrane_Annotation').
 
 %! has_transmembrane_annotation(?P : uniprot_protein, ?A : uniprot_annotation) is nondet.
-%
-%
-%
 has_transmembrane_annotation(P,A) :- annotation(P,A),rdf(A,rdf:type,up:'Transmembrane_Annotation').
 
 
 
 %! mnemonic(?C, ?N) is nondet.
-%
-%
-%
 mnemonic(C,N) :- rdf(C,up:mnemonic,N).
 
 %! encoded_by(?P : uniprot_protein, ?G) is nondet.
-%
-%
-%
 encoded_by(P,G) :- rdf(P,up:encodedBy,G).
 
 
 %! recommended_name(?P : uniprot_protein, ?N) is nondet.
-%
-%
-%
 recommended_name(P,N) :- rdf(P,up:recommendedName,N).
 
 %! has_full_name(?P : uniprot_protein, ?X) is nondet.
-%
-%
-%
 has_full_name(P,X) :- rdf(P,up:recommendedName,N), rdf(N,up:fullName,X).
 
 % for genes only
 
 %! pref_label(?E, ?N) is nondet.
-%
-%
-%
 pref_label(E,N) :- rdf(E,skos:prefLabel,N).
 
 
 %! in_taxon(?P : uniprot_protein, ?T) is nondet.
-%
-%
-%
 in_taxon(P,T) :- rdf(P,up:organism,T).
 
 
 %! annotation(?P : uniprot_protein, ?A : uniprot_annotation) is nondet.
-%
-%
-%
 annotation(P,A) :- rdf(P,up:annotation,A).
 
 %! database(?X : uniprot_xref, ?D) is nondet.
-%
-%
-%
 database(X,D) :- rdf(X,up:database,D).
 
     
@@ -203,21 +171,20 @@ protein_annotation_range(P,A,B,E,R) :-
 
 
 %! annotation_range(?P : uniprot_annotation, ?B, ?E, ?R) is nondet.
-%
-%
-%
 annotation_range(P,B,E,R) :-
         rdf(P,up:range,I),
         begin_coord(I,B,R),
         end_coord(I,E,R).
 
 %! protein_begin(?P : uniprot_protein, ?B, ?R) is nondet.
-%
-%
-%
 protein_begin(P,B,R) :-
         rdf(P,up:range,I),
         begin_coord(I,B,R).
+
+
+
+%! classified_with(P : uniprot_protein, T : uniprot_term) is nondet.
+classified_with(P,T) :- rdf(P,up:classifiedWith,t).
 
 
 %! substitution(?A : uniprot_annotation, ?S : uniprot_sequence_string) is nondet.
@@ -225,6 +192,7 @@ protein_begin(P,B,R) :-
 %  annotation A is associated with a substitution S
 %
 substitution(A,S) :- rdf(A,up:substitution,S).
+
 
 
 %! xref(?P : uniprot_protein, ?X : uniprot_xref) is nondet.

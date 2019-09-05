@@ -9,6 +9,7 @@ install_requirements :-
 install_optional_packs :-
         writeln(loading),
         ensure_loaded(pack),
+        ensure_loaded(packplus),
         Opts=[interactive(false)],
         \+ \+ clause(optional_pack(_),_),
         forall(optional_pack(X),
