@@ -4,7 +4,7 @@
     get_longRef/2,
     get_longForm/2,
     get_shortForm/2,
-    get_longForms/3
+    get_longForms/4
  ]).
 
 :- sparql_endpoint(allie, 'https://data.allie.dbcls.jp/sparql').
@@ -16,11 +16,13 @@ get_longRef(A, B) :- rdf(A, allie:hasLongFormRepresentationOf, B).
 get_longForm(A, B) :- rdf(A, allie:hasLongFormOf, B).
 get_shortForm(A, B) :- rdf(A, allie:hasShortFormOf, B).
 
-get_longForms(S, L1, L2) :-
+get_longForms(S, L1, L2, LANG) :-
   in_cluster(A, B),
-  get_longRef(A, D),
-  rdf(D,rdfs:label,L1),
-  get_longForm(B, E),
-  rdf(E,rdfs:label,L2),
   get_shortForm(B, F),
-  label_of(S, F, "en").
+  label_of(S, F, "en"),
+  optional(
+    (get_longRef(A, D),
+    rdf(D,rdfs:label,L1),lang(L1)=LANG)),
+  optional(
+    (get_longForm(B, E),
+    rdf(E,rdfs:label,L2),lang(L2)=LANG)).
