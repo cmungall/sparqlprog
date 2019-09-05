@@ -184,7 +184,7 @@ protein_begin(P,B,R) :-
 
 
 %! classified_with(P : uniprot_protein, T : uniprot_term) is nondet.
-classified_with(P,T) :- rdf(P,up:classifiedWith,t).
+classified_with(P,T) :- rdf(P,up:classifiedWith,T).
 
 
 %! substitution(?A : uniprot_annotation, ?S : uniprot_sequence_string) is nondet.

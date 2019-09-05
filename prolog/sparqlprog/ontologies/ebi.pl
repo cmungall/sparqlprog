@@ -71,9 +71,7 @@ sample_biocharacteristic(S,A) :-
 sample_attribute(S,A) :-
         rdf(S,biosd_terms:'has-sample-attribute',A).
 
-%! attribute_property_value(?A : ebi_attribute_node,
-%                           ?P : ebi_biosample_property,
-%                           ?V : ebi_biosample_value) is nondet.
+%! attribute_property_value(?A : ebi_attribute_node, ?P : ebi_biosample_property, ?V : ebi_biosample_value) is nondet.
 %
 attribute_property_value(A, P, V) :-
         rdf(A,ebi_atlas:propertyType,P),
@@ -87,9 +85,7 @@ attribute_property_value(A, P, V, T, G) :-
         rdf(A,ebi_atlas:propertyType,P),
         rdf(A,ebi_atlas:propertyValue,V).
 
-%! sample_property_value(?S : ebi_biosample,
-%                        ?P : ebi_biosample_property,
-%                        ?V : ebi_biosample_value) is nondet.
+%! sample_property_value(?S : ebi_biosample, ?P : ebi_biosample_property, ?V : ebi_biosample_value) is nondet.
 %
 sample_property_value(S, P, V) :-
         sample_attribute(S, A),
