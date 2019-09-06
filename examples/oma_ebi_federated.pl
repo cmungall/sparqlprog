@@ -5,7 +5,9 @@
   
 pl2sparql -e --consult examples/oma_ebi_federated.pl "orthologs_with_coordinates(ensembl:'ENSG00000198840',G2,Tax,E,R)"
 
-  
+  We pass the -e option to force execution within the prolog environment (rather attempting to compile the function)
+
+  Within the prolog environment, the ?? predicate will explicitly invoke sparqlprog on an explicit endpoint
 
     */
 
