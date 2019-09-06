@@ -87,6 +87,17 @@ main(Argv) :-
           shortflags([s]),
           help('name of remote service to query')
          ],
+         [opt(limit),
+          type(integer),
+          longflags([limit]),
+          help('SELECT limit. Note you may want to combine this with --no-autopage')
+         ],         
+         [opt(autopage),
+          type(boolean),
+          default(true),
+          longflags([autopage]),
+          help('If true, then iterate multiple SPARQL queries with increasing offset')
+         ],         
          [opt(inject_labels),
           type(boolean),
           default(false),
@@ -406,7 +417,8 @@ exec_query_direct(Select, Query, Bindings, Opts) :-
         (   option(inject_labels(true),Opts)
         ->  inject_label_query(Select,Query,Select2,Query2,Opts)
         ;   Select2=Select, Query2=Query),
-        forall('??'(Service,Query2,Select2),
+        include(is_select_option, Opts, SelectOpts),
+        forall('??'(Service,Query2,Select2, SelectOpts),
                write_result(Select2,Opts)),
         nl.
 
@@ -418,6 +430,9 @@ exec_query_direct(Select, Query, Bindings, Opts) :-
         opt_show_query(Select, Query, Bindings, Opts),
         format(SPARQL),
         nl.
+
+is_select_option(limit(X)) :- ground(X).
+is_select_option(autopage(X)) :- ground(X).
 
 % execute a goal for every ground instance of Template
 opt_forall(Template,Goal,Opts) :-

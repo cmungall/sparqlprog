@@ -36,6 +36,7 @@
 :- use_module(library(sparqlprog/ontologies/sequence_feature), []).
 
 :- sparql_endpoint( ebi, 'https://www.ebi.ac.uk/rdf/services/sparql').
+%:- sparql_endpoint( ebi, ['https://www.ebi.ac.uk/rdf/services/sparql', 'https://integbio.jp/rdf/mirror/ebi/sparql']).
 
 % samples
 :- rdf_register_prefix(biosd_terms, 'http://rdf.ebi.ac.uk/terms/biosd/').
