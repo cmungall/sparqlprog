@@ -1,0 +1,2 @@
+#!/bin/sh
+pl2sparql -u sparqlprog/ontologies/mbgd -s mbgd "$@"
