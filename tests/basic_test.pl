@@ -264,7 +264,15 @@ test(member2) :-
         test_select( member([_A,_B],[["a",1],["b",2],["c",3]]),
                      "SELECT ?v0 ?v1 WHERE {VALUES (?v0 ?v1) {(\"a\" 1) (\"b\" 2) (\"c\" 3) }}").
 
-        
+
+test(strlang) :-
+        test_select( (X is strlang("x","en")),
+                     "SELECT ?v0 WHERE {BIND( STRLANG("x","en") AS ?v0 )}").
+test(strlang2) :-
+        test_select( (X is strlang(literal('x'),"en")),
+                     "SELECT ?v0 WHERE {BIND( STRLANG("x","en") AS ?v0 )}").
+
+
 
 % TODO
 test(disj) :-
