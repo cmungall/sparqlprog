@@ -20,3 +20,7 @@ pq-ebi  "aggregate(count(distinct(P)),rdf(A,ebi_atlas:propertyType,P),Num)" "x(N
 
 # all distinct attributes (24732)
 pq-ebi --distinct "rdf(A,ebi_atlas:propertyType,P)" "x(P)
+
+# federated query
+#  see examples/oma_ebi_federated.pl for explanation
+pl2sparql -e -d sparqlprog --consult examples/oma_ebi_federated.pl "orthologs_with_coordinates(ensembl:'ENSG00000198840',G2,Tax,B,E,R)"
