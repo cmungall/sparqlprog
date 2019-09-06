@@ -314,8 +314,9 @@ expr(if(Expr,Yes,No)) --> "IF(", cond(Expr), ", ", expr(Yes), ", ", expr(No), ")
 
 % [121] builtin call
 expr(str(V))       --> "STR(", object(V), ")".
+expr(strlang(V,L))       --> "STRLANG(", object(V), ",", object(L), ")".
 expr(lang(V))      --> "LANG(", object(V), ")".
-expr(langmatches(V,W))      --> "LANGMATCHES(", object(V), ",", object( W), ")".
+expr(langmatches(V,W))      --> "LANGMATCHES(", object(V), ",", object(W), ")".
 expr(datatype(V))      --> "DATATYPE(", object(V), ")".
 expr(bound(V))      --> "BOUND(", object(V), ")".
 expr(uri(V))       --> "URI(", expr(V), ")".
