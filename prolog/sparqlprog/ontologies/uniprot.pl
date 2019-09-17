@@ -1,6 +1,7 @@
 :- module(uniprot,
           [
            protein/1,
+           has_annotation_type/3,
            disease_annotation/1,
            has_disease_annotation/2,
            natural_variant_annotation/1,
@@ -9,6 +10,8 @@
            protein_natural_variant_disease_xref/4,
            protein_natural_variant_disease_dbsnp/4,
            is_dbsnp/1,
+
+           has_ptm_annotation/2,
            
            transmembrane_annotation/1,
            has_transmembrane_annotation/2,
@@ -51,6 +54,7 @@
 :- rdf_register_prefix(up,'http://purl.uniprot.org/core/').
 :- rdf_register_prefix(updb,'http://purl.uniprot.org/database/').
 :- rdf_register_prefix(uniprot,'http://purl.uniprot.org/uniprot/').
+:- rdf_register_prefix(uniprot_annotation,'http://purl.uniprot.org/annotation/').
 :- rdf_register_prefix(uptaxon,'http://purl.uniprot.org/taxonomy/').
 :- rdf_register_prefix(skos, 'http://www.w3.org/2004/02/skos/core#').
 :- rdf_register_prefix(embl_csd, 'http://purl.uniprot.org/embl-cds/').
@@ -61,6 +65,7 @@
 :- type uniprot_protein ---> atomic_iri.
 :- type uniprot_annotation ---> atomic_iri.
 :- type uniprot_disease_annotation ---> uniprot_annotation.
+:- type uniprot_variant_annotation ---> uniprot_annotation.
 :- type uniprot_xref ---> atomic_iri.
 :- type uniprot_term ---> atomic_iri.
 :- type uniprot_sequence_string ---> string ^^ xsd_type.
@@ -71,6 +76,8 @@
 %
 protein(C) :- rdf(C,rdf:type,up:'Protein').
 
+%! has_annotation_type(?P : uniprot_protein, ?A : uniprot_annotation, ?T : owl_class) is nondet.
+has_annotation_type(P,A,T) :- annotation(P,A),rdf(A,rdf:type,T).
 
 %! disease_annotation(?A : uniprot_disease_annotation) is nondet.
 %
@@ -83,6 +90,11 @@ disease_annotation(A) :- rdf(A,rdf:type,up:'Disease_Annotation').
 %  protein P links to disease annotation A
 %
 has_disease_annotation(P,A) :- annotation(P,A),rdf(A,rdf:type,up:'Disease_Annotation').
+
+
+has_ptm_annotation(P,A) :-
+        annotation(P,A),
+        rdf(A,rdf:type,up:'PTM_Annotation').
 
 
 %! natural_variant_annotation(?A : uniprot_annotation) is nondet.
@@ -98,7 +110,7 @@ natural_variant_annotation(A) :- rdf(A,rdf:type,up:'Natural_Variant_Annotation')
 has_natural_variant_annotation(P,A) :- annotation(P,A),rdf(A,rdf:type,up:'Natural_Variant_Annotation').
 
 
-%! protein_natural_variant_disease(?P : uniprot_protein, ?A : uniprot_annotation, ?D) is nondet.
+%! protein_natural_variant_disease(?P : uniprot_protein, ?V : uniprot_variant_annotation, ?D) is nondet.
 %
 %  protein P links to disease D via natural variant annotation A 
 %
@@ -166,8 +178,8 @@ database(X,D) :- rdf(X,up:database,D).
 %  
 %
 protein_annotation_range(P,A,B,E,R) :-
-        protein_annotation(P,A),
-        annotation_range(P,B,E,R).
+        annotation(P,A),
+        annotation_range(A,B,E,R).
 
 
 %! annotation_range(?P : uniprot_annotation, ?B, ?E, ?R) is nondet.
