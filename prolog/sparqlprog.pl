@@ -821,8 +821,11 @@ autopage(EP,SPARQL,Limit,Offset,Result) :-
       autopage(EP,SPARQL,Limit,Offset1,Result)
    ).
 
+%! parallel_query(+Query, +EPs:list, ?EPResultPairs:list) is nondet.
 parallel_query(_,[],_) :- !, format(user_error, 'No endpoints',[]), fail.
-parallel_query(P,[X],Y) :- !, debug(sparqlprog,'Bypassing parallelism (~q) calling ~q on ~q',[X,P,Y]), call(P,X,Y). % no parallel
+parallel_query(P,[X],Y) :- !,
+        debug(sparqlprog,'Bypassing parallelism, endpoints= ~q',[X]),
+        call(P,X,Y).            % no parallel
 parallel_query(P,Xs,Y) :-
    maplist(par_goal(P,Y),Xs,Goals),
    concurrent_or(Y,Goals,[on_error(continue)]).
