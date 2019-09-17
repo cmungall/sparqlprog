@@ -18,6 +18,7 @@
            owl_equivalent_class/2,
            owl_equivalent_class_asserted/2,
            owl_equivalent_class_asserted_symm/2,
+           owl_equivalent_property_asserted_symm/2,
            thing_class/1,
            not_thing_class/1,
            deprecated/1,           
@@ -227,6 +228,14 @@ owl_equivalent_class_asserted(A,B) :- rdf(A,owl:equivalentClass,B).
 owl_equivalent_class_asserted_symm(A,B) :-
         (   rdf(A,owl:equivalentClass,B)
         ;    rdf(B,owl:equivalentClass,A)).
+
+%! owl_equivalent_property_asserted_symm(?A, ?B) is nondet.
+%
+%   inferred equivalent property between A and B, exploiting symmetry
+%
+owl_equivalent_property_asserted_symm(A,B) :-
+        (   rdf(A,owl:equivalentProperty,B)
+        ;    rdf(B,owl:equivalentProperty,A)).
 
 
 
