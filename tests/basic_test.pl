@@ -182,7 +182,7 @@ test(agg_max) :-
                              SPARQL,
                              []),
         format(' Query ==> ~w~n',[ SPARQL ]),
-        assertion( SPARQL = "SELECT max(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}" ).
+        assertion( SPARQL = "SELECT (max(?v1) AS ?v0) WHERE {?v2 <http://example.org/v> ?v1}" ).
 
 test(agg_count) :-
         create_sparql_select(Count,
@@ -190,7 +190,7 @@ test(agg_count) :-
                              SPARQL,
                              []),
         format(' Query ==> ~w~n',[ SPARQL ]),
-        assertion( SPARQL = "SELECT COUNT(?v1) AS ?v0 WHERE {?v2 <http://example.org/v> ?v1}" ).
+        assertion( SPARQL = "SELECT (COUNT(?v1) AS ?v0) WHERE {?v2 <http://example.org/v> ?v1}" ).
 
 test(agg_group1) :-
         create_sparql_select(_,
@@ -266,11 +266,11 @@ test(member2) :-
 
 
 test(strlang) :-
-        test_select( (X is strlang("x","en")),
-                     "SELECT ?v0 WHERE {BIND( STRLANG("x","en") AS ?v0 )}").
+        test_select( (_X is strlang("x","en")),
+                     "SELECT ?v0 WHERE {BIND( STRLANG(\"x\",\"en\") AS ?v0 )}").
 test(strlang2) :-
-        test_select( (X is strlang(literal('x'),"en")),
-                     "SELECT ?v0 WHERE {BIND( STRLANG("x","en") AS ?v0 )}").
+        test_select( (_X is strlang(literal('x'),"en")),
+                     "SELECT ?v0 WHERE {BIND( STRLANG(\"x\",\"en\") AS ?v0 )}").
 
 
 
