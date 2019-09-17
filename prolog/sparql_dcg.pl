@@ -194,7 +194,7 @@ goal(rdf_graph_goals(G,Goals)) --> "GRAPH ", resource(G), " ", brace(goal(Goals)
 
 goal(rdf_predicate(P)) --> "SELECT DISTINCT ", expr(P), " ", where(rdf(_,P,_)).
 
-goal(aggregate(Expr,G,Result)) --> "SELECT ", expr(Expr), " AS ", variable(Result), " ", where(G).
+goal(aggregate(Expr,G,Result)) --> "SELECT (", expr(Expr), " AS ", variable(Result), ") ", where(G).
 goal(aggregate_group(Expr, GroupVars, G, Result)) -->
         "SELECT (",
         expr(Expr), " AS ", variable(Result),") ",
