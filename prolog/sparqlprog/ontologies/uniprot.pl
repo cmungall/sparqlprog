@@ -12,7 +12,8 @@
            is_dbsnp/1,
 
            has_ptm_annotation/2,
-           
+
+           modification_annotation/1,
            transmembrane_annotation/1,
            has_transmembrane_annotation/2,
 
@@ -133,6 +134,8 @@ protein_natural_variant_disease_dbsnp(P,A,D,X) :- protein_natural_variant_diseas
 %! is_dbsnp(?X : uniprot_xref) is nondet.
 is_dbsnp(X) :- rdf(X,up:database,updb:dbSNP).
 
+%! modification_annotation(?A : uniprot_annotation) is nondet.
+modification_annotation(A) :- rdfs_individual_of(A,up:'Modification_Annotation').
 
 
 %! transmembrane_annotation(?A : uniprot_annotation) is nondet.
