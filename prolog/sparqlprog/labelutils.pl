@@ -30,11 +30,13 @@ label_atom(X,A, Opts) :-
         concat_atom([Pre,Local],':',X),
         \+ \+ rdf_current_prefix(Pre,_),
         rdf_global_id(Pre:Local,Y),
-        !,
         Y\=X,
+        member(expand_uris(true), Opts),
+        !,
         label_atom(Y, A, Opts).
 label_atom(X,A, Opts) :-
         atom(X),
+        member(expand_uris(true), Opts),
         concat_atom([Pre,Local],':',X),
         \+ rdf_current_prefix(Pre,_),
         concat_atom(['http://purl.obolibrary.org/obo/',Pre,'_',Local],IRI),
