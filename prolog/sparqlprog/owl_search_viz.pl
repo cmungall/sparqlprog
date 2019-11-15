@@ -387,8 +387,12 @@ display_quads(_, Quads, rdf, File, Opts) :-
         rdf_save_turtle(File,[graph(G)]).
 
 
-display_obj(Uri, _Opts) :-
-        ensure_curie(Uri, Id),
+display_obj(Uri, Opts) :-
+        (   option(expand_uris(IsExp), Opts),
+            ground(IsExp),
+            IsExp=true
+        ->  Id=Uri
+        ;   ensure_curie(Uri, Id)),
         format('~w !',[Id]),
         forall((rdf(Uri,rdfs:label,Label),ensure_atom(Label,A)),
                format(' ~w',[A])),
