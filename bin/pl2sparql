@@ -161,6 +161,11 @@ main(Argv) :-
           shortflags(['T']),
           help('Shows stack trace on error')
          ],
+         [opt(prefix_mapping), type(atom),
+          longflags(['prefix_mapping']),
+          shortflags([m]),
+          help('Declare a prefix mapping. The value should be of the form "PREFIX=URIBase"')
+         ],
          [opt(execute),
           type(boolean),
           default(false),
@@ -180,6 +185,7 @@ main(Argv) :-
         ],
         opt_parse(Spec, Argv, Opts, QueryAtoms, [duplicated_flags(keepall)]),
         handle_opts(Opts),
+        declare_shacl_prefixes,
         opt_if_call(interactive,sparqlprog_shell(Opts),Opts),
         opt_if_call(prolog,prolog_shell(Opts),Opts),
         debug(pl2sparql,'Opts=~q',[Opts]),
@@ -190,6 +196,10 @@ main(Argv) :-
         halt.
 
 
+add_prefix(X) :-
+        concat_atom([Pre,Base],'=',X),
+        debug(sparqlprog,'Registering: ~w = ~w',[Pre,Base]),
+        rdf_register_prefix(Pre,Base).
 
 handle_opts(Opts) :-
         opt_if_call(verbose,debug(sparqlprog),Opts),
@@ -198,6 +208,7 @@ handle_opts(Opts) :-
         opt_if_call(execute,ensure_loaded(library(sparqlprog/emulate_builtins)),Opts),
         opt_forall(attach(X),rdf_attach_library(X),Opts),
         opt_forall(debug(X),debug(X),Opts),        
+        opt_forall(prefix_mapping(X),add_prefix(X),Opts),
         opt_forall(use(X),use_module(library(X)),Opts),
         opt_forall(use_no_import(X),use_module(library(X),[]),Opts),
         opt_forall(consult(X),consult(X),Opts),

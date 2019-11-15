@@ -22,9 +22,12 @@
 :- use_module(library(sparqlprog/search_util)).
 
 % TODO: make configurable
-:- rdf_set_cache_options([ global_directory('RDF-Cache'),
-                           create_global_directory(true)
-                         ]).
+:- (expand_file_name('~/.RDF-Cache', [Dir|_]),
+    rdf_set_cache_options([ global_directory(Dir),
+                            create_global_directory(true)
+                          ])).
+
+        
 
 main(Argv) :-
         Spec =
@@ -96,6 +99,11 @@ main(Argv) :-
           longflags(['prefix_mapping']),
           shortflags([m]),
           help('Declare a prefix mapping. The value should be of the form "PREFIX=URIBase"')
+         ],
+         [opt(expand_uris), type(boolean),
+          longflags(['expand-uris']),
+          shortflags(['W']),
+          help('If true use full URIs in output')
          ],
          [opt(prolog),
           type(boolean),
