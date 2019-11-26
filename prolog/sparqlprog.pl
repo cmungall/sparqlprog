@@ -24,6 +24,20 @@
    ,  op(1150,xfy,??)
 	]).
 
+/*
+:- meta_predicate ??(:).
+:- meta_predicate ??(?, :).
+:- meta_predicate ??(?, :, ?).
+:- meta_predicate ??(?, :, ?, ?).
+:- meta_predicate create_sparql_select(?, :).
+:- meta_predicate create_sparql_select(?, :, ?).
+:- meta_predicate create_sparql_select(?, :, ?, ?).
+:- meta_predicate create_sparql_construct(:, :, ?, ?).
+*/
+
+:- meta_predicate create_sparql_select(?, :, ?, ?).
+
+
 /** <module> sparqlprog - logic programming with SPARQL
 
 This library provides a prolog interface to SPARQL queries. It allows
@@ -527,6 +541,10 @@ replace_string_unification_args([A|Args],[A|Args2],T,T2) :-
         replace_string_unification_args(Args,Args2,T,T2).
 
 
+no_rewrite( (_,_) ).
+no_rewrite( (_;_) ).
+no_rewrite(rdf(_,_,_)).
+no_rewrite(rdf(_,_,_,_)).
 no_rewrite(rdf_graph(_)).
 no_rewrite(rdf_predicate(_)).
 no_rewrite(rdf_is_iri(_)).
@@ -542,6 +560,7 @@ no_rewrite_mod(rdf11).
 safe_clause(Goal,Body) :-
         % TODO: come up with a more extensible way to prevent SPARQL builtins being expanded
         \+ \+ \+ no_rewrite(Goal),
+        \+ \+ \+ ((strip_module(Goal, _, GoalStripped), no_rewrite(GoalStripped))),
         catch(clause(Goal,Body,Ref),_,fail),
         \+ \+ \+ ((clause_property(Ref,module(Mod)),
                    no_rewrite_mod(Mod))).
@@ -718,7 +737,8 @@ create_sparql_select(Select,Goal,SPARQL,Opts) :-
                 
 create_sparql_select(Select,Goal,SPARQL,Opts) :-
         filter_opts(Opts,OptsFiltered),
-        rewrite_goal(Goal,Goal2,Opts),
+        rewrite_goal(Goal,Goal1,Opts),
+        strip_module(Goal1,_,Goal2),        
         debug(sparqlprog,'Rewritten goal2: ~q',[Goal2]),
         term_variables(Select,Vars),
         debug(sparqlprog,'Vars: ~q',[Vars]),

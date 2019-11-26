@@ -8,6 +8,9 @@
 
 :- begin_tests(basic_test).
 
+:- debug(sparqlprog).
+
+
 test(clause) :-
         % TODO: possible bug in 7.6.x swi?
         % this may not be visible depending on order of execution
@@ -25,6 +28,10 @@ test_construct(H,Q,ExpectedSPARQL) :-
         create_sparql_construct(H,Q,SPARQL,[]),
         format(' ~q :- ~q ==> ~w~n',[ H, Q, SPARQL ]),
         assertion( SPARQL = ExpectedSPARQL ).
+
+test(substring__DUPE) :-
+        test_select( ({substring(L,foo)},rdf(_,rdfs:label,L)),
+                     "SELECT ?v0 ?v1 WHERE {FILTER (contains(?v0,\"foo\")) . ?v1 <http://www.w3.org/2000/01/rdf-schema#label> ?v0}").
 
 
 % todo: Test succeeded with choicepoint

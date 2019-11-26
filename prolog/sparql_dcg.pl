@@ -24,6 +24,8 @@
    ,  ask//1
 	]).
 
+%:- meta_predicate select(?, ?, :, ?, ?, ?).
+
 /** <module> A simple DCG for generating a subset of SPARQL
 
    ==
