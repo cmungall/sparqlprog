@@ -1,3 +1,18 @@
+/** <module> wrapper that provides an obo-format like view over an OWL ontology
+
+  More details on obo format:
+  
+  http://owlcollab.github.io/oboformat/doc/obo-syntax.html
+
+  In particular, this module provides:
+
+   - A graph-like view over an ontology via is_a/2 and relationship/3
+   - the obo synonym model: entity_synonym_scope/3
+   - the obo xref model: entity_xref/2 is re-exported from obo_metadata/oio; additional convenience preds such as entity_xref_src/4
+  
+  
+*/
+
 :- module(obo,
           [
            is_a/2,
@@ -19,6 +34,8 @@
 :- use_module(library(semweb/rdfs)).
 :- use_module(library(sparqlprog/owl_util)).
 
+:- reexport(library(obo_metadata/oio), [has_dbxref/2]).
+
 :- rdf_register_ns(oio,'http://www.geneontology.org/formats/oboInOwl#').
 :- rdf_register_ns(def,'http://purl.obolibrary.org/obo/IAO_0000115').
 
@@ -34,6 +51,10 @@ synprop_scope('http://www.geneontology.org/formats/oboInOwl#hasExactSynonym','EX
 %
 is_a(A,B) :-
         rdf(A,rdfs:subClassOf,B),
+        rdf_is_iri(B),
+        rdf_is_iri(A).
+is_a(A,B) :-
+        rdf(A,rdfs:subPropertyOf,B),
         rdf_is_iri(B),
         rdf_is_iri(A).
 
