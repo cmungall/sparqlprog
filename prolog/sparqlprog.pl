@@ -397,6 +397,11 @@ rewrite_goal(aggregate(A,G,V), aggregate(A,G2,V), D, Opts) :- !, rewrite_goal(G,
 rewrite_goal(aggregate_group(A,GVs,G,V), aggregate_group(A,GVs,G2,V), D, Opts) :- !, rewrite_goal(G,G2,D, Opts).
 rewrite_goal(aggregate_group(A,GVs,G,H,V), aggregate_group(A,GVs,G2,H2,V), D, Opts) :- !, rewrite_goal(G,G2,D, Opts), rewrite_goal(H,H2,D, Opts).
 
+% RDFStar
+rewrite_goal(with(G,EdgeProps), rdfstar(S,P,O,EdgeProps), D, Opts) :- !, rewrite_goal(G,rdf(S,P,O), D, Opts).
+
+% direct evaluation
+rewrite_goal( (pre(G),G2), G3, D, Opts) :- G, !, rewrite_goal(G2,G3, D, Opts).
 
 
 % rdfs terminals
@@ -518,7 +523,7 @@ replace_string_unification(T,T3) :-
         debug(sparqlprog,'replaced string unification: ~q',[T3]).
 
 replace_string_unification_args([],[],T,T).
-replace_string_unification_args([A|Args],[A2|Args2],T,(T2,FreshVar==A)) :-
+replace_string_unification_args([anystr(A)|Args],[A2|Args2],T,(T2,FreshVar==A)) :-
         string(A),
         !,
         A2 = FreshVar,

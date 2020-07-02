@@ -37,7 +37,9 @@
            owl_edge/3,
            owl_edge/4,
            owl_subgraph/4,
-
+           owl_edge_ancestor/2,
+           owl_edge_ancestor/3,
+           
            extract_subontology/3,
 
            quads_objects/2,
@@ -416,19 +418,28 @@ owl_edge(S,P,O) :-
 
 
 owl_edge(S,P,O,G) :-
+        % S sub (P some O)
         rdf(S,rdfs:subClassOf,R,G),
         owl_some(R,P,O),
         \+ rdf_is_bnode(O),
         \+ rdf_is_bnode(S).
 owl_edge(S,rdfs:subClassOf,O,G) :-
+        % S sub O
         rdf(S,rdfs:subClassOf,O,G),
         \+ rdf_is_bnode(O),
         \+ rdf_is_bnode(S).
 owl_edge(S,owl:equivalentClass,O,G) :-
+        % S = O
+        rdf(S,owl:equivalentClass,O,G),
+        \+ rdf_is_bnode(O),
+        \+ rdf_is_bnode(S).
+owl_edge(O,owl:equivalentClass,S,G) :-
+        % O = S (symmetric form)
         rdf(S,owl:equivalentClass,O,G),
         \+ rdf_is_bnode(O),
         \+ rdf_is_bnode(S).
 owl_edge(S,P,O,G) :-
+        % triple / object property assertion
         rdf(S,P,O,G),
         rdf_is_iri(O),
         rdf(S,rdf:type,owl:'NamedIndividual'),
@@ -508,6 +519,14 @@ owl_subgraph([Root|Nodes],Preds,Quads,FinalQuads,Visited,Opts) :-
 normalize_quad(rdf(S,^(P),O,G),rdf(O,P,S,G)) :- !.
 normalize_quad(X,X).
 
+owl_edge_ancestor(S,A) :-
+        owl_edge_ancestor(S,A,_).
+owl_edge_ancestor(S,A,Preds) :-
+        rdf_subject(S),
+        owl_subgraph([S],Preds,QL,[]),
+        member(rdf(_,_,A,_),QL).
+
+
 
 %! extract_subontology(?Objs, ?G, ?Opts) is nondet.
 %
@@ -565,7 +584,9 @@ quads_objects(Quads,Objs) :-
 
 %! quads_dict(?Quads, ?Dict) is nondet.
 %
+%   generates a OBO JSON object from a set of triples or quads
 %
+%  Quads = [rdf(S,P,O,G), ...]
 %
 quads_dict(Quads, Dict) :-
         setof(Obj,quads_object(Quads,Obj),Objs),

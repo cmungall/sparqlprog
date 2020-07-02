@@ -5,6 +5,7 @@
 */
 
 :- use_module(library(semweb/rdf11)).
+:- use_module(library(semweb/turtle)).
 :- use_module(library(sparqlprog)).
 :- use_module(library(sparqlprog/emulate_builtins)).
 :- use_module(library(sparqlprog/search_util)).

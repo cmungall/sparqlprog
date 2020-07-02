@@ -147,6 +147,12 @@ main(Argv) :-
           shortflags(['C']),
           help('Compile Prolog to SPARQL (no execution)')
          ],
+         [opt(construct),
+          type(boolean),
+          default(false),
+          longflags([construct]),
+          help('Compile Prolog to SPARQL CONSTRUCT (no execution)')
+         ],
          [opt(verbose),
           type(boolean),
           default(false),
@@ -276,8 +282,27 @@ run([describe,X], Opts) :-
         atom_uri(X,X2),
         Goal=rdf(X2,P,O),
         exec_query(Goal, Goal, ['P'=P,'O'=O], Opts).
+run([in,X], Opts) :-
+        !,
+        atom_uri(X,X2),
+        Goal=rdf(S,P,X2),
+        exec_query(Goal, Goal, ['S'=S,'P'=P], Opts).
 
-run([owl_noode_info|Xs], Opts) :-
+run([inout,X], Opts) :-
+        !,
+        atom_uri(X,X2),
+        Goal=(
+              rdf(X2,P,O),
+              bind(X2, Subject),
+              bind(O, Object)
+             ;
+              rdf(O,P,X2),
+              bind(O, Subject),
+              bind(X2, Object)
+             ),
+        exec_query((Subject,P,Object), Goal, ['Subject'=Subject,'P'=P,'Object'=Object], Opts).
+
+run([owl_node_info|Xs], Opts) :-
         !,
         maplist(atom_uri,Xs,Xs2),
         Goal=owl_node_info(X,P,O,G),
@@ -378,6 +403,14 @@ make_bindings([A|Args],[C|Cols],[C=A|Bindings]) :-
         make_bindings(Args, Cols, Bindings).
 
 
+opt_show_query(Select, Query, Bindings, Opts) :-
+        option(construct(true),Opts),
+        !,
+        tr_opts(Opts, _Opts2),
+        format('# SELECT=~q QUERY=~q BINDINGS=~q~n',[Select,Query,Bindings]),        
+        create_sparql_construct(Select, Query, SPARQL, []),
+        format('~w~n',[SPARQL]),
+        halt.
 opt_show_query(Select, Query, Bindings, Opts) :-
         option(compile(true),Opts),
         !,

@@ -93,6 +93,19 @@ str(X,V) :-
 % 17.4.2.6 lang
 lang(_^^L,L).
 
+%17.4.2.7 datatype
+datatype(_^^D, D) :- !.
+datatype(_ @ _, xsd:string) :- !.
+datatype(_, xsd:string) :- !.
+
+
+% 17.4.2.8 iri
+iri(X,V) :-
+        ensure_atom(X,A),
+        atom_string(A,V).
+uri(X,V) :- iri(X,V).
+
+
 
 %! regex(?String, +Pattern, +Flag) is nondet.
 %! regex(?String, +Pattern) is nondet.

@@ -89,6 +89,9 @@ owl_search_and_display([SearchTerm], Opts) :-
 %    Search is determined by search_property. By default this is `label`, to
 %    search using rdfs:label
 %
+%    In place of a regex, a prolog query term can be used, e.g
+%    'q//label_of(shape,R),rdfs_subclass_of(Q,R)' to get all subclasses of 'shape'
+%
 %    Opts:
 %
 %     - search_property(Prop)
@@ -138,67 +141,17 @@ owl_search_and_display(SearchTerms, Opts) :-
         display_quads(Objs, Quads, OutFmt, OutFile, Opts).
 
 
-  
-% @Deprecated
-%! owl_search_and_display(+SearchTerm, +PredTerm, +PostTerm, +Rels, +DispTerm, +OutFile, +Opts:list) is det
-%
-%  SearchTerm = SearchAtom / FlagAtom
-%               SearchAtom = regex
-%
-%    a regular expression used to search for literals. E.g. '^limb$'/i (exact match, case insensitive)
-%    
-%
-%  PredTerm = id | label | synonym | all | 'X'
-%
-%    predicate used to connect subject to literal. 'label' will search against rdfs:label.
-%    id will search against the subject IRI *OR* it's curiefied form.
-%    synonym will search against label or synonyms (default oboInOwl vocabulary).
-%    all will search against all predicates
-%
-%  Rels = RelList | RelListAtom
-%         RelListAtom = Rel [',',Rel]*
-%         Rel = CURIE | URI | RelLabel
-%
-%    comma separated relations used to extend out subgraph. See owl_subgraph/6.
-%    Use 's' for shorthand for subClassOf, t for type.
-%    URI or CURIE (e.g. BFO:0000050) or label (e.g. 'part of') can be used.
-%
-%  PostTerm = a | d | c | p
-%
-%    post process initial nodes returned from search
-%
-% @Deprecated
-/*
-
-owl_search_and_display(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile) :-
-        owl_search_and_display(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile, []).
-owl_search_and_display(SearchTerm, PredTerm, PostTerm, Rels, DispTerm, OutFile, Opts) :-
-        normalize_search_pred_terms(SearchTerm, PredTerm, SearchTerm1, PredTerm1),
-        normalize_rels(Rels, Rels1),
-        debug(search,'S:~q P:~q Post:~q R:~q D:~q',[SearchTerm1,PredTerm1,PostTerm,Rels1,DispTerm]),
-        search_and_display1(SearchTerm1, PredTerm1, PostTerm, Rels1, DispTerm, OutFile, Opts).
-matchpred('=').
-matchpred('~').
-*/
-
-/*  
-normalize_search_pred_terms(SearchTerm, _PredTerm, SearchTerm1, PredTerm1) :-
-        matchpred(MatchPred),
-        concat_atom([PredTermX|Rest],MatchPred,SearchTerm),
-        normalize_predterm(PredTermX,PredTerm1),
-        Rest\=[],
+% turn atomic search term into complex term if certain syntax is used
+normalize_searchterm(X,Y/i) :-
+        % if search term is =V, turn into exact regex
+        atom(X),atom_concat('=',Term,X),concat_atom(['^',Term,'$'],Y).
+normalize_searchterm(X,q(Q,Term)) :-
+        % if search term is prolog query
+        % e.g. subclasses of shape: "q//label_of(shape,R),rdfs_subclass_of(Q,R)"
+        atom(X),atom_concat('q//',TermA,X),
         !,
-        concat_atom(Rest,MatchPred,SearchTermX),
-        (   MatchPred='='
-        ->  concat_atom(['^',SearchTermX,'$'],SearchTermY)
-        ;   SearchTermY=SearchTerm),
-        normalize_searchterm(SearchTermY,SearchTerm1).
-normalize_search_pred_terms(SearchTerm, PredTerm, SearchTerm1, PredTerm1) :-
-        normalize_searchterm(SearchTerm, SearchTerm1),
-        normalize_predterm(PredTerm, PredTerm1).
-*/
-
-normalize_searchterm(X,Y/i) :- atom(X),atom_concat('=',Z,X),concat_atom(['^',Z,'$'],Y).
+        atom_to_term(TermA,Term,Bindings),
+        member('Q'=Q,Bindings).
 normalize_searchterm(X,X) :- X = _/_, !.
 normalize_searchterm(X,X/i).
   
@@ -261,38 +214,49 @@ call_lambda(P,In,Out) :- atomic(P),!, G =.. [P,In,Out], G.
 %    SearchTerm = BaseSearchTerm / Flag
 %
 search_to_objs(SearchTerm, PredTerm, Objs, Opts) :-
+        % normalize and redo search
         normalize_searchterm(SearchTerm,SearchTerm1),
         setof(Obj, search_to_obj(SearchTerm1, PredTerm, Obj, Opts), Objs),
         !.
 search_to_objs(SearchTerm, PredTerm, [], _) :-
         debug(info, 'No matches for ~q ~q',[SearchTerm, PredTerm]).
  
+search_to_obj(q(T,Query), _, Obj, _Opts) :-
+        !,
+        setof(T,Query,Objs),
+        member(Obj,Objs).
 search_to_obj(SearchTerm/_, id, Obj, _Opts) :-
+        % if the term is already an entity, use it
         ensure_uri(SearchTerm, Obj),
         rdf_subject(Obj),
         !.
 search_to_obj(SearchTerm/_, id, Obj, _Opts) :-
+        % as above, but assume OBO expansion
         (   Sep=':' ; Sep='_'),
         concat_atom([Pre,Post],Sep,SearchTerm),
         concat_atom(['http://purl.obolibrary.org/obo/',Pre,'_',Post],Obj),
         rdf_subject(Obj),
         !.
 search_to_obj(SearchTerm/FlagStr, id, Obj, _Opts) :-
+        % slash indicates regex search; if search by id, do exact
         !,
         rdf_subject(Obj),
         regex(str(Obj),SearchTerm,FlagStr).
 
 search_to_obj(SearchTerm/FlagStr, all, Obj, _Opts) :-
+        % regex over all
         !,
         rdf(Obj,_,Lit),
         regex(str(Lit),SearchTerm,FlagStr).
 
 search_to_obj(SearchTerm/FlagStr, label, Obj, _Opts) :-
+        % regex over label
         !,
         rdf(Obj,rdfs:label,Lit),
         regex(str(Lit),SearchTerm,FlagStr).
 
 search_to_obj(SearchTerm/FlagStr, synonym, Obj, _Opts) :-
+        %regex over syn
         !,
         label_or_synonym_pred_hook(Pred),
         rdf(Obj,Pred,Lit),
@@ -321,6 +285,10 @@ opt_open_stream(F,S) :-
         open(F,write,S,[]),
         !.
 
+create_style_json_term(FocusObjs, Style) :-
+        maplist(ensure_curie, FocusObjs, IDs),
+        atom_json_term(Style,stylemap{highlightIds: IDs}, []).
+
 
 display_quads(Objs, Quads, Fmt, OutFile, _Opts) :-
         gv_fmt(Fmt),
@@ -330,6 +298,7 @@ display_quads(Objs, Quads, Fmt, OutFile, _Opts) :-
         atom_json_term(Style,stylemap{highlightIds: Objs}, []),
         style_file_args(StyleFileArgs),
         sformat(Cmd,'og2dot.js ~w -S \'~w\' -t ~w -o ~w ~w',[StyleFileArgs,Style, Fmt,OutFile,OgFile]),
+        debug(gv,'cmd: ~w',[Cmd]),
         shell(Cmd).
 
 
@@ -337,9 +306,11 @@ display_quads(Objs, Quads, viz, _, _Opts) :-
         !,
         quads_dict(Quads, Dict),
         write_json_tmp(Dict, OgFile),
-        atom_json_term(Style,stylemap{highlightIds: Objs}, []),
+        create_style_json_term(Objs, Style),
+        %atom_json_term(Style,stylemap{highlightIds: Objs}, []),
         style_file_args(StyleFileArgs),
         sformat(Cmd,'og2dot.js ~w -S \'~w\' -t png ~w',[StyleFileArgs,Style, OgFile]),
+        debug(gv,'cmd: ~w',[Cmd]),
         shell(Cmd).
 display_quads(Objs, Quads, dot, F, _Opts) :-
         !,

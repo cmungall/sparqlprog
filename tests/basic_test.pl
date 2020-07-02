@@ -77,9 +77,12 @@ test(str_eq) :-
                      "SELECT ?v0 ?v1 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . FILTER (?v1 = \"foo\")}").
 
 
+%test(str_eq2) :-
+%        test_select( rdf(_S,rdfs:label,"foo"),
+%                     "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . FILTER (?v1 = \"foo\")}").
 test(str_eq2) :-
         test_select( rdf(_S,rdfs:label,"foo"),
-                     "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> ?v1 . FILTER (?v1 = \"foo\")}").
+                     "SELECT ?v0 WHERE {?v0 <http://www.w3.org/2000/01/rdf-schema#label> \"foo\"}").
 
 %test(str_eq3) :-
 %        test_select( (label(S,Label),

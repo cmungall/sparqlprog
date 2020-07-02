@@ -19,7 +19,7 @@ pq-ebi -l  "sample_property_value(biosd:'SAMN02847463',P,V)"
 pq-ebi  "aggregate(count(distinct(P)),rdf(A,ebi_atlas:propertyType,P),Num)" "x(Num)"
 
 # all distinct attributes (24732)
-pq-ebi --distinct "rdf(A,ebi_atlas:propertyType,P)" "x(P)
+pq-ebi --distinct "rdf(A,ebi_atlas:propertyType,P)" "x(P)"
 
 # federated query
 #  see examples/oma_ebi_federated.pl for explanation

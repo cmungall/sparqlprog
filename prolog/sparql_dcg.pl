@@ -137,6 +137,21 @@ check_remaining_options(Opts) :- throw(unrecognised_options(Opts)).
 
 ignore_option(rule(_)).
 
+edgeprops([]) --> "".
+edgeprops([EP]) -->
+        !,
+        edgeprop(EP).
+edgeprops([EP|EPs]) -->
+        edgeprop(EP),
+        " ; ",
+        edgeprops(EPs).
+
+edgeprop(P=O) -->
+        { rdf_global_object(O,OO) },
+        property(P), " ",
+        object(OO).
+        
+
 
 if_option(Opt,Phrase,O1,O2) -->
    ( {select_option(Opt,O1,O2)} -> call_dcg(Phrase); {O2=O1}).
@@ -185,6 +200,17 @@ goal(rdf(S,P,O)) -->
 
 
 goal(rdf(S,P,O,G)) --> "GRAPH ", resource(G), " ", brace(goal(rdf(S,P,O))).
+
+% RDF*. See https://github.com/blazegraph/database/wiki/Reification_Done_Right
+goal(rdfstar(S,P,O,EdgeProps)) -->
+        { rdf_global_object(O,OO) },
+        "<<",
+        resource(S), " ",
+        property(P), " ",
+        object(OO),
+        ">> ",
+        edgeprops(EdgeProps).
+
 
 % this does not work on many triplestores
 % https://stackoverflow.com/questions/32274562/what-is-the-sparql-query-to-get-the-name-of-all-graphs-existing-in-my-triplestor
@@ -310,6 +336,7 @@ string_literal_expr(S) --> expr(S).
 % 17.4.1.2 IF
 expr(if(Expr,Yes,No)) --> "IF(", cond(Expr), ", ", expr(Yes), ", ", expr(No), ")".
 
+expr('*') --> "*".
 
 
 % [121] builtin call
