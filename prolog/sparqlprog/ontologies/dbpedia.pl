@@ -23,7 +23,11 @@ For complete ontology use rdfs2pl
            directed/2,
            has_genre/2,
            band_member/2,
-           has_name/2]).
+           has_name/2,
+
+           city/1,
+           country/1,
+           sport_competition_result/1]).
 
 :- use_module(library(sparqlprog)).
 :- use_module(library(semweb/rdf11)).
@@ -122,3 +126,9 @@ musical_artist(X) :- rdf(X,rdf:type,dbont:'MusicalArtist').
 %
 %
 disease(X) :- rdf(X,rdf:type,dbont:'Disease').
+
+city(X) :- rdf(X,rdf:type,dbont:'City').
+country(X) :- rdf(X,rdf:type,dbont:'Country').
+sport_competition_result(X) :- rdf(X,rdf:type,dbont:'SportCompetitionResult').
+
+             
