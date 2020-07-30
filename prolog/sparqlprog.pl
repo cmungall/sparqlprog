@@ -20,9 +20,13 @@
    ,  (??)/2
    ,  (??)/3
    ,  (??)/4
+   ,  op(1150,xfy,join)
    ,  op(1150,fx,??)
    ,  op(1150,xfy,??)
-	]).
+   ]).
+
+:- op(1150,xfy,join).
+
 
 /** <module> sparqlprog - logic programming with SPARQL
 
@@ -271,6 +275,7 @@ service_query_all(_,_,_,[]).
 
 
 
+
 /*
 expand_opts(OptsIn,OptsOut) :-
         select(program(P),OptsIn,T),
@@ -299,19 +304,16 @@ subq_term(x:Q,EP,Q,EP).
 expand_subqueries(V,V,_) :-
         var(V),
         !.
-expand_subqueries(In,Out,EP) :-
-        ground(In),
+expand_subqueries(In,Right,EP) :-
+        nonvar(In),
+        In = (Left join Right),
+        !,
+        ??(EP, Left).
+expand_subqueries(In,true,EP) :-
+        nonvar(In),
         subq_term(In,EP,Q,EP2),
         !,
-        Q =.. L,
-        append(L,[NewVar],L2),
-        Q2 =.. L2,
-        debug(sparqlprog,'SUBQ: ~q on ~w',[Q2, EP2]),
-        setof(NewVar,??(EP2,Q2),Values),
-        debug(sparqlprog,'>> RESULTS: ~q',[Values]),
-        % TODO: allow cacheing
-        % TODO: allow option of parallelizing this
-        member(Out,Values).
+        ??(EP2, Q).
 expand_subqueries([],[],_) :- !.
 expand_subqueries([H|L],[H2|L2],EP) :-
         !,
