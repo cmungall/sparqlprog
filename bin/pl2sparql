@@ -92,6 +92,11 @@ main(Argv) :-
           longflags([limit]),
           help('SELECT limit. Note you may want to combine this with --no-autopage')
          ],         
+         [opt(header),
+          type(atom),
+          longflags([header]),
+          help('comma-separated list of column headers, output as first row')
+         ],         
          [opt(autopage),
           type(boolean),
           default(true),
@@ -319,7 +324,7 @@ run([q,SearchTerm,PostTerm,Rels,DispTerm|_Args], Opts) :-
         owl_search_and_display(SearchTerm, _, PostTerm, Rels, DispTerm, _, Opts).
 run([q,SearchTerm], Opts) :-
         !,
-        owl_search_and_display(SearchTerm, l, '.', [], info, _, Opts).
+        owl_search_and_display([SearchTerm], Opts).
 run([q,SearchTerm,DispTerm], Opts) :-
         !,
         owl_search_and_display(SearchTerm, l, '.', [], DispTerm, _, Opts).
@@ -535,6 +540,7 @@ write_result(Term,Opts) :-
 write_result(Term,Opts) :-
         member(format(Fmt),Opts),
         csv_format_separator(Fmt,Sep),
+        write_header(Opts,Sep),
         term_saferow(Term,Term2),
         debug(row,'ROW: ~q',[Term2]),
         csv_write_stream(current_output, [Term2], [separator(Sep)]),
@@ -542,6 +548,20 @@ write_result(Term,Opts) :-
 write_result(Term,_Opts) :-
         write_canonical(Term),
         writeln('.').
+
+:- dynamic written_header/0.
+
+write_header(Opts,Sep) :-
+        \+ written_header,
+        member(header(H),Opts),
+        nonvar(H),
+        concat_atom(Cols,',',H),
+        Cols=[_|_],
+        Row =.. [row|Cols],
+        !,
+        csv_write_stream(current_output, [Row], [separator(Sep)]),
+        assert(written_header).
+write_header(_,_).
 
 % translate a prolog term into an object that is suitable to send to csv_write_stream
 %  - translate literals to atoms

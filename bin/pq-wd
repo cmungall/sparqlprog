@@ -1,3 +1,4 @@
 #!/bin/sh
 #echo "$@"
+echo DEPRECATED - use pq-wikidata
 pl2sparql -u sparqlprog/ontologies/wikidata  -s wd "$@"

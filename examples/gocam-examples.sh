@@ -8,6 +8,7 @@
 # ---
 # genes executing kinase activity as a part of signal transduction
 # ---
+# timeout??
 pq-go "kinase_activity(A),part_of(A,P),signal_transduction(P),enabled_by(A,G)"
 
 # ---

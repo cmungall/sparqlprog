@@ -1,3 +1,3 @@
 #!/bin/sh
 #echo "$@"
-pl2sparql -u obo_ro/ro -u sparqlprog/endpoints -u sparqlprog/ontologies/gocam  -s go "$@"
+pl2sparql -u obo_ro/ro -u obo_core/goslim -u sparqlprog/endpoints -u sparqlprog/ontologies/gocam  -s go "$@"

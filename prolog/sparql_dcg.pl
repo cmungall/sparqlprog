@@ -185,6 +185,7 @@ goal(\+G)     --> "FILTER NOT EXISTS ", brace(goal(G)). %NB consider MINUS { ...
 goal((G1,G2)) --> goal(G1), " . ", goal(G2).
 goal(conj(GS)) --> seqmap_with_sep(" , ",goal,GS).
 goal(optional(G))     --> "OPTIONAL ", brace(goal(G)).
+goal(exists(G))     --> "FILTER(EXISTS ", brace(goal(G)),")".
 
 goal(service(S,G)) --> "SERVICE ",resource(S)," ",brace(goal(G)).
 
@@ -326,8 +327,12 @@ cond(rdf_is_bnode(V))     --> "isBLANK(", object(V), ")".
 cond(rdf_is_literal(V))   --> "isLITERAL(", object(V), ")".
 cond(is_literal(V))   --> "isLITERAL(", object(V), ")".
 
-cond(lang(V))     --> "lang(", object(V), ")".
+
+% rdf_where/1
+cond(lang_matches(V,W))      --> "LANGMATCHES(", expr(lang(V)), ",", object(W), ")".
+
 cond(G)            --> {throw(error(cond(G)))}.
+
 
 
 string_literal_expr(A) --> {atomic(A),atom_string(A,S)},expr(S).
@@ -367,6 +372,8 @@ expr(replace(S,P,R,Z)) --> "replace(", string_literal_expr(S), ", ", string_lite
 expr(ucase(A)) --> "ucase(", string_literal_expr(A), ")".
 expr(lcase(A)) --> "lcase(", string_literal_expr(A), ")".
 
+expr(lang(V))     --> "lang(", object(V), ")".
+
 % TODO more of 121
 
 expr(S)            --> {string(S)},"\"", at(S), "\"".
@@ -391,6 +398,7 @@ expr(X+Y) --> p expr(X), " + ", expr(Y).
 expr(X-Y) --> p expr(X), " - ", expr(Y).
 expr(X*Y) --> p expr(X), " * ", expr(Y).
 expr(X/Y) --> p expr(X), " / ", expr(Y).
+expr((X,Y)) --> p expr(X), " ", expr(Y).
 expr(X) --> {number(X)}, at(X).
 expr(X) --> object(X).
 

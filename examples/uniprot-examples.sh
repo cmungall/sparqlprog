@@ -57,3 +57,7 @@ pq-up -l "xref(P,X),database(X,updb:'MIM')"
 # describe a specific mouse protein
 # ---
 pq-up describe http://purl.uniprot.org/uniprot/Q78E61
+
+# https://douroucouli.wordpress.com/2020/08/05/what-is-the-sars-cov-2-molecular-parts-list/#comments
+# peptides with descriptions
+pq-up "peptide_annotation(Pep),rdf(Pep,rdfs:comment,D),annotation(P,Pep),in_taxon(P,uptaxon:'9606')"

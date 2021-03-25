@@ -14,6 +14,7 @@
            has_ptm_annotation/2,
 
            modification_annotation/1,
+           peptide_annotation/1,
            transmembrane_annotation/1,
            has_transmembrane_annotation/2,
 
@@ -136,6 +137,10 @@ is_dbsnp(X) :- rdf(X,up:database,updb:dbSNP).
 
 %! modification_annotation(?A : uniprot_annotation) is nondet.
 modification_annotation(A) :- rdfs_individual_of(A,up:'Modification_Annotation').
+
+
+%! peptid_annotation(?A : peptide_annotation) is nondet.
+peptide_annotation(A) :- rdfs_individual_of(A,up:'Peptide_Annotation').
 
 
 %! transmembrane_annotation(?A : uniprot_annotation) is nondet.

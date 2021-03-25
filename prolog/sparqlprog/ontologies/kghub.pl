@@ -22,19 +22,20 @@
            chained_edge_provider_count/3,
            edge_provider_count/2,
            provided_by_count/2,
-           relation_provider_count/3,
-           edge_property_count/2
+           relation_provider_count/3
+           %edge_property_count/2
            ]).
 
 %:- use_module(library(biolink_model)).
 %:- reexport([library(biolink_model)]).
 
 
-:- rdf_register_prefix(blmod, 'https://w3id.org/biolink/vocab/').
+:- rdf_register_prefix(biolink, 'https://w3id.org/biolink/vocab/').
+:- rdf_register_prefix(uniprotkb, 'http://identifiers.org/uniprot/').
 :- rdf_register_prefix(tmp, 'https://www.example.org/UNKNOWN/').
 :- sparql_endpoint( kgcovid19, 'http://kg-hub-rdf.berkeleybop.io/blazegraph/sparql').
 
-category(I,C) :- rdf(I,blmod:category,C).
+category(I,C) :- rdf(I,biolink:category,C).
 
 capitalize(W,W2) :-
         atom_chars(W,[C|W1]),
@@ -45,36 +46,36 @@ capitalize(W,W2) :-
 '^'(I,C) :-
         pre((
              kghub:capitalize(C,Cx),
-             rdf_global_id(blmod:Cx,URI)
+             rdf_global_id(biolink:Cx,URI)
              )),
         category(I,URI).
 
 edge(I,R,J,P,V) :-
         edge(_,I,R,J,P,V).
 edge(A,I,R,J,P,V) :-
-        rdf(A,blmod:subject,I),
-        rdf(A,blmod:relation,R),
-        rdf(A,blmod:object,J),
+        rdf(A,biolink:subject,I),
+        rdf(A,biolink:relation,R),
+        rdf(A,biolink:object,J),
         rdf(A,P,V).
 
 edge_property_value(A,P,V) :-
-        rdf(A,blmod:subject,_),
+        rdf(A,biolink:subject,_),
         rdf(A,P,V).
 
 provided_by(A,X) :-
-        rdf(A,blmod:provided_by,X).
+        rdf(A,biolink:provided_by,X).
 provided_by(I,R,J,X) :-
-        rdf(A,blmod:subject,I),
-        rdf(A,blmod:relation,R),
-        rdf(A,blmod:object,J),
-        rdf(A,blmod:provided_by,X).
+        rdf(A,biolink:subject,I),
+        rdf(A,biolink:relation,R),
+        rdf(A,biolink:object,J),
+        rdf(A,biolink:provided_by,X).
 
 
 chained_provider(Src1,Src2,JoinNode) :-
-        rdf(A1,blmod:object,JoinNode),
-        rdf(A2,blmod:subject,JoinNode),
-        rdf(A1,blmod:provided_by,Src1),
-        rdf(A2,blmod:provided_by,Src2).
+        rdf(A1,biolink:object,JoinNode),
+        rdf(A2,biolink:subject,JoinNode),
+        rdf(A1,biolink:provided_by,Src1),
+        rdf(A2,biolink:provided_by,Src2).
         
 
 relation_count(P,N) :- aggregate_group(count(*),[P],rdf(_,P,_),N).
@@ -88,6 +89,7 @@ category_link_count(C1,R,C2,Src,N) :- aggregate_group(count(*),[C1,R,C2],(catego
 chained_edge_provider_count(Src1,Src2,N) :- aggregate_group(count(*),[Src1,Src2],chained_provider(Src1,Src2,_),N).
 provided_by_count(P,N) :- aggregate_group(count(*),[P],provided_by(_,P),N).
 edge_provider_count(S,N) :- aggregate_group(count(*),[],(provided_by(_I1,_R,_I2,S)),N). % TODO
-relation_provider_count(R,S,N) :- aggregate_group(count(A),[R],(rdf(A,blomd:relation,R),rdf(A,blmod:provided_by,S)),N).
+relation_provider_count(R,S,N) :- aggregate_group(count(A),[R],(rdf(A,biolink:relation,R),rdf(A,biolink:provided_by,S)),N).
 
+%edge_property_count(S,N) :- aggregate_group(count(*),[],(provided_by(_I1,_R,_I2,S)),N). % TODO
 %relation_count(P,N) :- aggregate_group(count(*),[P],rdf(_,P,_),N).

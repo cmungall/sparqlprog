@@ -30,6 +30,7 @@
 :- rdf_register_prefix(go,'http://purl.obolibrary.org/obo/GO_').
 :- rdf_register_prefix(bds,'http://www.bigdata.com/rdf/search#').
 :- rdf_register_prefix(lego,'http://geneontology.org/lego/').
+:- rdf_register_prefix(prov,'http://www.w3.org/ns/prov#').
 
 
 gene_to_go(GC,C) :-  gene_to_process(GC,C).
@@ -60,9 +61,10 @@ gene_to_gene(G1C,R,G2C) :-
         rdf(G1,rdf:type,G1C),
         rdf(G2,rdf:type,G2C).
 
-% TODO - restricy
+% TODO - restrict
 model(M) :- rdf(M,rdf:type,owl:'Ontology').
 
+    
 model_title(M,T) :- model(M),rdf(M,dc:title,T).
 model_state(M,X) :- model(M),rdf(M,lego:modelstate,X).
 production_model(M) :- model_state(M,"production").

@@ -1,7 +1,10 @@
 :- module(owl_util,
-          [enlabel_of/2,
+          [is_en/1,
+           enlabel_of/2,
            label_of/2,
            label_of/3,
+
+           literal_atom/2,
 
            declare_shacl_prefixes/0,
 
@@ -56,6 +59,8 @@
            mrca/3,
            common_descendant/3,
            mrcd/3,
+           egraph_common_ancestor/3,
+           egraph_mrca/3,
 
            simj_by_subclass/3,
            simj_by_subclass/5,
@@ -90,6 +95,9 @@ in conjunction with an in-memory triplestore.
 :-op(300,xfy,some).
 :-op(300,xfy,all).
 
+is_en(X) :- rdf_where(lang_matches(X,"en")).
+
+
 enlabel_of(Label,X) :- label_of(Label,X,en).
 
 
@@ -110,8 +118,8 @@ label_of(Label,X,_) :- rdf(X,rdfs:label,Label^^xsd:string).
 declare_shacl_prefixes :-
         rdf(X,'http://www.w3.org/ns/shacl#prefix',Prefix1),
         rdf(X,'http://www.w3.org/ns/shacl#namespace', NS1),
-        ensure_atom(Prefix1,Prefix),
-        ensure_atom(NS1,NS),
+        emulate_builtins:ensure_atom(Prefix1,Prefix),
+        emulate_builtins:ensure_atom(NS1,NS),
         rdf_register_prefix(Prefix, NS),
         debug(owl_util,'Registered ~w ~w',[Prefix,NS]),
         fail.
@@ -360,6 +368,8 @@ rdflist_member(L,M) :-
 
 
 
+
+
 %! common_ancestor(?X, ?Y, ?A) is nondet.
 %
 %
@@ -400,6 +410,33 @@ mrcd(X,Y,D) :-
         common_descendant(X,Y,D),
         \+ ((common_descendant(X,Y,D2),
              rdf_path(D,oneOrMore(rdfs:subClassOf),D2))).
+
+
+%! egraph_common_ancestor(?X, ?Y, ?A) is nondet.
+%
+%
+%  version of common_ancestor/3 for graphs that have entailments materialized (egraphs)
+%
+%  MAY MOVE TO ANOTHER MODULE
+egraph_common_ancestor(X,Y,A) :-
+        subClassOf(X,A),
+        subClassOf(Y,A),
+        X\=Y.
+
+
+%! egraph_mrca(?X, ?Y, ?A) is nondet.
+%
+%
+%  version of mrca/3 for graphs that have entailments materialized (egraphs)
+%
+%
+%  MAY MOVE TO ANOTHER MODULE
+egraph_mrca(X,Y,A) :-
+        egraph_common_ancestor(X,Y,A),
+        \+ ((egraph_common_ancestor(X,Y,A2),
+             A2\=A,
+             subClassOf(A2,A))).
+
 
 :- rdf_meta owl_edge(r,r,r,o).
 :- rdf_meta owl_edge(r,r,r).
@@ -625,8 +662,12 @@ object_property_value(C,P,V,pv{pred:P,val:V}) :-
         debug(owl,'~w PV = ~w ~q',[C,P,V]),
         \+ compound(V).
 
-literal_atom(V@_,V).
-literal_atom(V^^_,V).
+literal_atom(V@_,V) :- !.
+literal_atom(V^^_,V) :- !.
+literal_atom(literal(type(_,V)),V) :- !.
+literal_atom(literal(lang(_,V)),V) :- !.
+literal_atom(literal(V),V) :- !.
+literal_atom(V,V) :- !.
 
         
 

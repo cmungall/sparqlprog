@@ -22,6 +22,7 @@
 :- sparql_endpoint( wikipathways, 'http://sparql.wikipathways.org').
 :- sparql_endpoint( biotea, 'http://biotea.linkeddata.es/sparql').
 :- sparql_endpoint( rhea, 'http://sparql.rhea-db.org/sparql').
+:- sparql_endpoint( ubergraph, 'https://stars-app.renci.org/ubergraph/sparql').
 :- sparql_endpoint( local, 'http://127.0.0.1:8921/bigdata/sparql').
 :- sparql_endpoint( local2, 'http://127.0.0.1:8922/bigdata/sparql').
     

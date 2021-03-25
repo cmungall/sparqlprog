@@ -3,6 +3,7 @@
            dataframe_header/3,
            dataframe_row/2,
            dataframe_row/3,
+           dataframe_row/4,
 
            dataframe_to_csv/2,
            dataframe_to_csv/3]).
@@ -62,18 +63,28 @@ inject_labels_to_header([K|L],[K|L2],SpecOpts,Opts) :-
 
 :- module_transparent(dataframe_row/2).
 :- module_transparent(dataframe_row/3).
+:- module_transparent(dataframe_row/4).
 dataframe_row(Name,Row) :-
         dataframe_row(Name,Row,[]).
 dataframe_row(Name,Row,Opts) :-
+        dataframe_row(Name,Row,Opts,[]).
+dataframe_row(Name,Row,Opts,SpecOpts) :-
         dataframe_specs_opts(Name,[Spec|Specs],SpecOpts),
         spec_bindings_goal(Spec,Bs,G),
         dataframe_header(Name,Header,Opts),
-        G,
+        call_wrap(G,SpecOpts),
         maplist([_=V,V]>>true,Bs,Row1),
         apply_specs(Specs,Row2),
         append(Row1,Row2,Row3),
         flatten_row(Row3,Row,Header,[Spec|Specs],SpecOpts,Opts).
 
+:- module_transparent(call_wrap/2).
+call_wrap(G,Opts) :-
+        member(endpoint(Endpoint),Opts),
+        !,
+        (   Endpoint ?? G).
+call_wrap(G,_) :-
+        G.
 
 :- module_transparent(apply_specs/2).
 apply_specs([],[]).
@@ -143,6 +154,12 @@ serialize_value(S@_,V,_) :-
 serialize_value(S^^_,V,_) :-
         !,
         atom_string(V,S).
+serialize_value(literal(type(_,V)),V,_) :-
+        !.
+serialize_value(literal(lang(_,V)),V,_) :-
+        !.
+serialize_value(literal(V),V,_) :-
+        !.
 serialize_value(S,V,_) :-
         string(S),
         !,
@@ -164,12 +181,12 @@ dataframe_to_csv(Name, Stream, Opts) :-
         csv_write_stream(Stream, [HTerm], [separator(Sep)]),
         dataframe_specs_opts(Name,_Specs,SpecOpts),
         (   member(sort(_),SpecOpts)
-        ->  findall(Row,dataframe_row(Name, Row, Opts),Rows),
+        ->  findall(Row,dataframe_row(Name, Row, Opts, SpecOpts),Rows),
             % TODO sort by key
             sort(Rows,RowsSorted),
             forall((member(Row,RowsSorted), RTerm =.. [row|Row]),
                    csv_write_stream(Stream, [RTerm], [separator(Sep)]))
-        ;   forall((dataframe_row(Name, Row, Opts), RTerm =.. [row|Row]),
+        ;   forall((dataframe_row(Name, Row, Opts, SpecOpts), RTerm =.. [row|Row]),
                    csv_write_stream(Stream, [RTerm], [separator(Sep)]))),
         !.
 dataframe_to_csv(Name, Stream, Opts) :-

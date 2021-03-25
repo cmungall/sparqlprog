@@ -1,3 +1,11 @@
+/** <module>
+
+  KEGG Ortholog Clusters
+  
+See https://www.genome.jp/oc/  
+
+*/
+
 :- module(keggoc,
 	  [
 	      keggoc_ortholog/2

@@ -416,6 +416,9 @@ rewrite_goal({Q}, {Q2}, D, Opts) :-
 rewrite_goal(optional(Q), optional(Q2), _, Opts) :-
         !,
         rewrite_goal(Q,Q2, Opts).
+rewrite_goal(exists(Q), exists(Q2), _, Opts) :-
+        !,
+        rewrite_goal(Q,Q2, Opts).
 rewrite_goal(rdfs_subclass_of(C,P), rdf(C,oneOrMore(rdfs:subClassOf),P),_, _Opts) :- !.
 rewrite_goal(rdfs_subproperty_of(C,P), rdf(C,oneOrMore(rdfs:subPropertyOf),P),_, _Opts) :- !.
 rewrite_goal(rdfs_individual_of(I,C), (rdf(I,rdf:type,X),rdf(X,zeroOrMore(rdfs:subClassOf),C)),_, _Opts) :- !.

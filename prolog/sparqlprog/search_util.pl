@@ -29,16 +29,23 @@
 
 %! lmatch(+Pattern:atom, ?Object) is nondet
 %
+%
 % Uses swi-prolog rdf11 'like' matching:
 %  - case insensitive
 %  - '*' is wildcard
 %  - exact match unless wildcards specified
+%
+% NOTE: this will NOT do a conversion to STR in SPARQL; e.g 
+% SELECT ?x WHERE {FILTER (regex(?v0,"^cell$","i")) . ?x <http://www.w3.org/2000/01/rdf-schema#label> ?v0}
 lmatch(P,C) :-   {like(L,P)},rdf(C,rdfs:label,L).
 
 
 %! lsearch(+Pattern, ?Object, ?Label, +Flags:str, ?Graph) is nondet.
 %
 % search for objects with an rdfs:label matching Pattern
+%
+% NOTE: this will do a conversion to STR in SPARQL; e.g 
+% SELECT ?x WHERE {?x <http://www.w3.org/2000/01/rdf-schema#label> ?v0 . FILTER (regex(STR(?v0),"^cell$","i"))}
 lsearch(P,C,L,F,G) :-   rdf(C,rdfs:label,L,G),regex(str(L),P,F).
 lsearch(P,C,L,F) :-   label(C,L),regex(str(L),P,F).
 lsearch(P,C,L) :-   label(C,L),regex(str(L),P,"i").

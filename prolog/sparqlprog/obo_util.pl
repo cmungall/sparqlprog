@@ -170,6 +170,10 @@ gen_tag(S,E,_,_) :-
         forall(class_differentia(E,P,Y),
                tv(S,intersection_of,[P,Y])).
 
+gen_tag(S,E,_,_) :-
+        rdf(E,rdf:type,owl:'TransitiveProperty'),
+        tv(S,is_transitive,[true]).
+
 tv(S,T,Vs) :-
         format(S,'~w:',[T]),
         forall((member(V,Vs),ensure_id(V,Id)),
@@ -190,6 +194,8 @@ serialize_xrefs(Xs,A) :-
 
 
 
-escq(A,B) :-
+escq(A,C) :-
         concat_atom(Xs,'"',A),
-        concat_atom(Xs,'\\"',B).
+        concat_atom(Xs,'\\"',B),
+        concat_atom(Xs2,'\n',B),
+        concat_atom(Xs2,' ',C).

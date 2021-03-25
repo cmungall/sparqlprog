@@ -83,3 +83,6 @@ pq-wd  'ro_id(P,X)'
 
 # Get GO to MESH mappings (via shared WD entry)
 pq-wd  "mesh_id(X,M),go_id(X,G)"
+
+# clinical trials involving PKIs
+pq-wikidata  -l -L enlabel "clinical_trial(T),research_intervention(T,D),isa_protein_kinase_inhibitor(D)"

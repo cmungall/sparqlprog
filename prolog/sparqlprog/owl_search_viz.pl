@@ -135,6 +135,7 @@ owl_search_and_display(SearchTerms, Opts) :-
         append(Objs,ObjsX,SeedObjs),
         debug(search, 'SG(~q)',[Rels]),
         owl_subgraph(SeedObjs, Rels, Quads, []),
+        debug(search, 'SeedObjs = ~q',[SeedObjs]),
         (   option(output(OutFile),Opts)
         ->  true
         ;   OutFile=_),
