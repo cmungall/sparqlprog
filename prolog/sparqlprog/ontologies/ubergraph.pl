@@ -22,7 +22,9 @@
            never_in_taxon/2,
            not_in_taxon_1/3,
            not_in_taxon_2/3,
-           not_in_taxon/3
+           conservative_not_in_taxon/2,
+           not_in_taxon/3,
+           taxon_propagating_property/1
            ]).
 
 :- use_module(library(sparqlprog)).
@@ -32,6 +34,7 @@
 :- rdf_register_prefix(obo,'http://purl.obolibrary.org/obo/').
 :- rdf_register_prefix(biolink, 'https://w3id.org/biolink/vocab/').
 :- rdf_register_prefix('NCBITaxon', 'http://purl.obolibrary.org/obo/NCBITaxon_').
+:- rdf_register_prefix('UBERON', 'http://purl.obolibrary.org/obo/UBERON_').
 
     
 rdf_ontology(S,P,O):- rdf(S,P,O,ubergraph:ontology).
@@ -99,7 +102,7 @@ simj_e(C1,C2,R,S) :-
 %% --
 
 % NCBITaxon:4930 ! Saccharomyces
-% 
+% UBERON:0000955 ! brain
 
 taxon(T) :-     subClassOf(T,'NCBITaxon':'1').
 
@@ -116,6 +119,18 @@ not_in_taxon_2(C,P,T) :-
 
 not_in_taxon(C,P,T) :- not_in_taxon_1(C,P,T).
 not_in_taxon(C,P,T) :- not_in_taxon_2(C,P,T).
+
+conservative_not_in_taxon(C,T) :-
+        not_in_taxon(C,P,T),
+        taxon_propagating_property(P).
+
+taxon_propagating_property(rdfs:subClassOf).
+taxon_propagating_property(obo:'BFO_0000066').
+taxon_propagating_property(obo:'BFO_0000051').
+taxon_propagating_property(obo:'BFO_0000050').
+
+
+
 
 
         

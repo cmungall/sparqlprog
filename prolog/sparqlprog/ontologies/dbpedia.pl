@@ -9,11 +9,14 @@ For complete ontology use rdfs2pl
 */
 
 :- module(dbpedia,
-          [person/1,
+          [dbpedia_class/1,
+           dbpedia_rootclass/1,
+           person/1,
            musical_artist/1,
            band/1,
            photographer/1,
            disease/1,
+           food/1,
 
            related_to/2,
            has_child/2,
@@ -37,6 +40,12 @@ For complete ontology use rdfs2pl
 :- rdf_register_prefix(foaf,'http://xmlns.com/foaf/0.1/').
 :- rdf_register_prefix(dbont,'http://dbpedia.org/ontology/').
 :- rdf_register_prefix(dbr,'http://dbpedia.org/resource/').
+
+
+dbpedia_class(C) :- rdf(C,rdf:type,owl:'Class').
+
+dbpedia_rootclass(C) :- dbpedia_class(C),rdf(C,rdfs:subClassOf,owl:'Thing').
+
 
 person(Person) :- rdf(Person,rdf:type,foaf:'Person').
 
@@ -99,6 +108,7 @@ related_to(S,O,has_parent) :- has_child(O,S).
 grandchild_of(S,O) :- child_of(S,Z),child_of(Z,O).
 
 
+food(X) :- rdf(X,rdf:type,dbont:'Food').
 
 
 

@@ -33,7 +33,7 @@
 :- rdf_register_prefix(biolink, 'https://w3id.org/biolink/vocab/').
 :- rdf_register_prefix(uniprotkb, 'http://identifiers.org/uniprot/').
 :- rdf_register_prefix(tmp, 'https://www.example.org/UNKNOWN/').
-:- sparql_endpoint( kgcovid19, 'http://kg-hub-rdf.berkeleybop.io/blazegraph/sparql').
+:- sparql_endpoint( kgcovid19, 'http://kg-hub-rdf.berkeleybop.io/sparql').
 
 category(I,C) :- rdf(I,biolink:category,C).
 

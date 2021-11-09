@@ -16,6 +16,8 @@
    ,  create_sparql_construct/4
    ,  inject_label_query/5
    ,  service_query_all/4
+   ,  service/2
+   ,  service/3
    ,  (??)/1
    ,  (??)/2
    ,  (??)/3
@@ -193,6 +195,7 @@ specified in the same language.
 :- multifile srule/4.
 
 :- dynamic sparql_endpoint/5.
+:- dynamic sparql_endpoint_url/2.
 :- multifile sparql_endpoint/5.
 :- set_prolog_flag(double_quotes, codes).
 
@@ -213,6 +216,8 @@ service_query_all(EP,Template,Spec,Results) :-
         !.
 service_query_all(_,_,_,[]).
 
+service(Service,Query) :- ??(Service,Query).
+service(Service,Query,S) :- ??(Service,Query,S).
 
 
 %! '??'(?EP, +Goal:sparql_goal, +SelectTerm) is nondet.
@@ -419,8 +424,8 @@ rewrite_goal(optional(Q), optional(Q2), _, Opts) :-
 rewrite_goal(exists(Q), exists(Q2), _, Opts) :-
         !,
         rewrite_goal(Q,Q2, Opts).
-rewrite_goal(rdfs_subclass_of(C,P), rdf(C,oneOrMore(rdfs:subClassOf),P),_, _Opts) :- !.
-rewrite_goal(rdfs_subproperty_of(C,P), rdf(C,oneOrMore(rdfs:subPropertyOf),P),_, _Opts) :- !.
+rewrite_goal(rdfs_subclass_of(C,P), rdf(C,zeroOrMore(rdfs:subClassOf),P),_, _Opts) :- !.
+rewrite_goal(rdfs_subproperty_of(C,P), rdf(C,zeroOrMore(rdfs:subPropertyOf),P),_, _Opts) :- !.
 rewrite_goal(rdfs_individual_of(I,C), (rdf(I,rdf:type,X),rdf(X,zeroOrMore(rdfs:subClassOf),C)),_, _Opts) :- !.
 rewrite_goal(a(I,C), rdf(I,rdf:type,C),_, _Opts) :- !.
 %rewrite_goal(rdf_member(X,L), rdf(L,oneOrMore(rdf:rest)/rdf:last,X),_, _Opts) :- !.
@@ -612,7 +617,9 @@ sparql_endpoint(EP,Url,Options) :-
    !,
    retract_declared_endpoint(EP,Url),     
    debug(sparqlprog,'Asserting SPARQL end point ~q: ~q ~q ~q ~q.',[EP,Host,Port,Path,Options]),
-   assert(sparql_endpoint(EP,Host,Port,Path,Options)).
+   assert(sparql_endpoint(EP,Host,Port,Path,Options)),
+   retractall(sparql_endpoint_url(EP,_)),
+   assert(sparql_endpoint_url(EP,Url)).
 
 retract_declared_endpoint(EP,Url) :-
    sparql_endpoint(EP,Host,Port,Path,_),
@@ -626,7 +633,6 @@ retract_declared_endpoint(_,_).
 %user:term_expansion(:-(sparql_endpoint(EP,Url,Options)), Expanded) :- 
 %   endpoint_declaration(EP,Url,Options,Expanded).
 
-sparql_endpoint_url(EP,Url) :- sparql_endpoint(EP,Url,_,_,_).
 
 
 endpoint_declaration(EP,Url,Options, sparqlprog:sparql_endpoint(EP,Host,Port,Path,Options)) :-

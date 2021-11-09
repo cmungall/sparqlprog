@@ -4,6 +4,9 @@ pq-ubergraph  -l "rdf_closure(C,rdfs:subClassOf,obo:'CL_0000000')"
 # All cells and what they are part of
 pq-ubergraph  -l "rdf_closure(C,rdfs:subClassOf,obo:'CL_0000000'),part_of(C,Y,ubergraph:nonredundant)"
 
+# All cells in the kidney
+pq-ubergraph  -l "subClassOf(C,obo:'CL_0000000'),rdf(C,obo:'BFO_0000050',A),subClassOf(A,obo:'UBERON_0002113')"
+
 # All cells and what they are part of; this time for any class that fits the label
 pq-ubergraph  -l "lsearch('^cell$',Cell),rdf_closure(C,rdfs:subClassOf,Cell),part_of(C,Y,ubergraph:nonredundant)" "row(C,Y)"
 

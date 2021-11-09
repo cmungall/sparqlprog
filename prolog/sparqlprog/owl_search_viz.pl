@@ -42,6 +42,7 @@ searchviz(Term, Preds) :-
         atom_json_term(Style,stylemap{highlightIds: Objs}, []),
         style_file_args(StyleFileArgs),
         sformat(Cmd,'og2dot.js ~w -S \'~w\' -t png ~w',[StyleFileArgs,Style, OgFile]),
+        debug(gv,'Cmd=~w',[Cmd]),
         shell(Cmd).
 
 searchviz(Term) :-
