@@ -16,7 +16,10 @@
            gene_to_component/2,
            gene_to_go/2,
 
-           gene_to_gene/3
+           gene_to_gene/3,
+           igene_to_igene/3,
+
+           inf_biological_process/1
            
            ]).
 
@@ -31,6 +34,7 @@
 :- rdf_register_prefix(bds,'http://www.bigdata.com/rdf/search#').
 :- rdf_register_prefix(lego,'http://geneontology.org/lego/').
 :- rdf_register_prefix(prov,'http://www.w3.org/ns/prov#').
+:- rdf_register_prefix(gocam,'http://model.geneontology.org/').
 
 
 gene_to_go(GC,C) :-  gene_to_process(GC,C).
@@ -61,6 +65,12 @@ gene_to_gene(G1C,R,G2C) :-
         rdf(G1,rdf:type,G1C),
         rdf(G2,rdf:type,G2C).
 
+igene_to_igene(G1,R,G2) :-
+        ro:enabled_by(F1,G1),
+        rdf(F1,R,F2),
+        ro:enabled_by(F2,G2).
+
+
 % TODO - restrict
 model(M) :- rdf(M,rdf:type,owl:'Ontology').
 
@@ -73,5 +83,28 @@ model_gene(M,GC) :-
         ro:enabled_by(_,G,M),
         rdf(G,rdf:type,GC).
 
-        
+inf_biological_process(X) :-
+        rdf(X,rdf:type,T),
+        rdf(T,rdfs:subClassOf,'http://purl.obolibrary.org/obo/GO_0008150').
 
+% obo:go/extensions/go-graphstore.owl#subclass_closure
+
+/*
+
+rdfs_subclass_of
+  
+  $ pq-go "aggregate(count(X),inf_biological_process(X),N)" "x(N)"
+3410772
+
+  direct
+  
+~/repos/linkml-gocam $ pq-go "aggregate(count(X),inf_biological_process(X),N)" "x(N)"
+79538
+
+  rdfs:subClassOf
+  
+~/repos/linkml-gocam $ pq-go "aggregate(count(X),inf_biological_process(X),N)" "x(N)"
+3410772
+
+
+*/

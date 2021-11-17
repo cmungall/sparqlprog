@@ -67,7 +67,8 @@ inject_labels_to_header([K|L],[K|L2],SpecOpts,Opts) :-
 dataframe_row(Name,Row) :-
         dataframe_row(Name,Row,[]).
 dataframe_row(Name,Row,Opts) :-
-        dataframe_row(Name,Row,Opts,[]).
+        dataframe_specs_opts(Name,_Specs,SpecOpts),
+        dataframe_row(Name,Row,Opts,SpecOpts).
 dataframe_row(Name,Row,Opts,SpecOpts) :-
         dataframe_specs_opts(Name,[Spec|Specs],SpecOpts),
         spec_bindings_goal(Spec,Bs,G),
@@ -82,7 +83,7 @@ dataframe_row(Name,Row,Opts,SpecOpts) :-
 call_wrap(G,Opts) :-
         member(endpoint(Endpoint),Opts),
         !,
-        (   Endpoint ?? G).
+        ??(Endpoint, G).
 call_wrap(G,_) :-
         G.
 

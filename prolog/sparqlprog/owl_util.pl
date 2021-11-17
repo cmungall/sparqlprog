@@ -6,6 +6,7 @@
 
            literal_atom/2,
 
+           instantiated_class/1,
            declare_shacl_prefixes/0,
 
            triple_axiom/2,
@@ -33,6 +34,8 @@
            eq_intersection_member/2,
            intersection_member/2,
            rdflist_member/2,
+
+           inferred_type/2,
 
            class_genus/2,
            class_differentia/3,
@@ -106,6 +109,7 @@ enlabel_of(Label,X) :- label_of(Label,X,en).
 %
 %
 label_of(Label,X) :- label_of(Label,X,_).
+%label_of(Label,X) :- bind(str(Label),LabelStr),label_of(LabelStr,X,_).
 
 %! label_of(?Label, ?X, ?Lang) is nondet.
 %
@@ -114,6 +118,11 @@ label_of(Label,X) :- label_of(Label,X,_).
 label_of(Label,X,Lang) :- rdf(X,rdfs:label,Label@Lang).
 label_of(Label,X,_) :- rdf(X,rdfs:label,Label^^xsd:string).
 %label_of(Label,X,Lang) :- rdf(X,rdfs:label,Lit), (Lit == Label@Lang ; Lit == Label^^xsd:string).
+
+instantiated_class(C) :-
+        rdf(C,rdf:type,owl:'Class'),
+        exists(rdf(_,rdf:type,C)).
+
 
 declare_shacl_prefixes :-
         rdf(X,'http://www.w3.org/ns/shacl#prefix',Prefix1),
@@ -366,6 +375,8 @@ rdflist_member(L,M) :-
         rdf_path(L,(zeroOrMore(rdf:rest)/(rdf:first)),M).
 
 
+inferred_type(I,T) :-
+        rdf_path(I,((rdf:type)/zeroOrMore(rdfs:subClassOf)),T).
 
 
 
@@ -481,7 +492,7 @@ owl_edge(S,P,O,G) :-
         rdf_is_iri(O),
         rdf(S,rdf:type,owl:'NamedIndividual'),
         rdf(O,rdf:type,owl:'NamedIndividual').
-owl_edge(S,rdf:type,O,G) :-
+todo___owl_edge(S,rdf:type,O,G) :-
         rdf(S,rdf:type,O,G),
         rdf_is_iri(O),
         rdf(S,rdf:type,owl:'NamedIndividual'),

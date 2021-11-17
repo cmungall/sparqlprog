@@ -187,7 +187,7 @@ goal(conj(GS)) --> seqmap_with_sep(" , ",goal,GS).
 goal(optional(G))     --> "OPTIONAL ", brace(goal(G)).
 goal(exists(G))     --> "FILTER(EXISTS ", brace(goal(G)),")".
 
-goal(service(S,G)) --> "SERVICE ",resource(S)," ",brace(goal(G)).
+goal(service(S,G)) --> "SERVICE ",{(sparql_endpoint_url(S,URL)->true;URL=S)}, resource(URL)," ",brace(goal(G)).
 
 goal(rdf_path(S,P,O,G)) --> goal(rdf(S,P,O,G)).
 goal(rdf_path(S,P,O)) --> goal(rdf(S,P,O)).
@@ -253,9 +253,13 @@ goal(member(Var,Vals)) -->
         !,
         goal(values(Var,Vals)).
 goal(values(Var,Vals)) -->
-        {\+ is_list(Var)}, !,
+        {\+ is_list(Var)},!,
         "VALUES ",expr(Var)," {",
         seqmap_with_sep(" ",expr,Vals), " }".
+%goal(values(Var,Tuples)) --> "VALUES (",
+%        {writeln(var=Var),writeln(tups=Tuples),trace,compound(Var), Var =.. [Pred|Args],Tuples},
+%        seqmap_with_sep(" ",expr,Args), ") {",
+%        seqmap_with_sep(" ",tuple,Tuples), " }".
 goal(values(Vars,Tuples)) --> "VALUES (",
         seqmap_with_sep(" ",expr,Vars), ") {",
         seqmap_with_sep(" ",tuple,Tuples), " }".
@@ -327,6 +331,9 @@ cond(rdf_is_bnode(V))     --> "isBLANK(", object(V), ")".
 cond(rdf_is_literal(V))   --> "isLITERAL(", object(V), ")".
 cond(is_literal(V))   --> "isLITERAL(", object(V), ")".
 
+% 17.4.2.4 isNumeric
+cond(number(V))   --> "isNumeric(", object(V), ")".
+
 
 % rdf_where/1
 cond(lang_matches(V,W))      --> "LANGMATCHES(", expr(lang(V)), ",", object(W), ")".
@@ -380,7 +387,6 @@ expr(S)            --> {string(S)},"\"", at(S), "\"".
 expr('^^'(S,T))    --> "\"", at(S), "\"^^", resource(T).
 expr('@'(S,Lang))    --> "\"", at(S), "\"@", at(Lang).
 expr(distinct(X))     --> "DISTINCT ", expr(X), " ".
-expr(datatype(V))  --> "DATATYPE(", object(V), ")".
 expr(quote(V))     --> quote(at(V)).
 
 % [127] Aggregate

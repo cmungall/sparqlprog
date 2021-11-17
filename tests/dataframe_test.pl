@@ -39,13 +39,16 @@ test(df) :-
         rdf_assert(p1,rdfs:label,"foo"),
         rdf_assert(item1,rdfs:label,"fridge"),
         rdf_assert(item2,rdfs:label,"spork"),
+        writeln('HEADER'),
         forall(dataframe_header(person,Hdr),
                writeln(Hdr)),
+        writeln('ROWS'),
         forall(dataframe_row(person,Row),
                format('~q.~n',[Row])),
         assertion(dataframe_header(person,[person,'person label',name,street,city,owns,'owns label'])),
         assertion((dataframe_row(person,Row),
                    Row=[p1,foo,joe,'bar_st|foo_st','boston|sf',_,_])),
+        writeln('FRAME'),
         dataframe_to_csv(person,[]).
 
 
