@@ -18,12 +18,21 @@
            ancestor_union/3,
            ancestor_union/4,
 
+           underlaps/3,
+           underlaps_under/4,
+           underlaps_in_subset/4,
+           relational_disjoint_in_subset/3,
+           is_a_or_part_of/2,
+
            taxon/1,
            never_in_taxon/2,
-           not_in_taxon_1/3,
-           not_in_taxon_2/3,
-           conservative_not_in_taxon/2,
-           not_in_taxon/3,
+           inf_never_in_taxon_via_1/3,
+           inf_never_in_taxon_via_2/3,
+           inf_never_in_taxon_via_1/5,
+           inf_never_in_taxon_via_2/5,
+           conservative_inf_never_in_taxon_via/2,
+           inf_never_in_taxon_via/3,
+           inf_never_in_taxon_via/5,
            taxon_propagating_property/1
            ]).
 
@@ -97,6 +106,36 @@ simj_e(C1,C2,R,S) :-
         ??(ubergraph, ancestor_union(C1,C2,R,AU)),
         bind(AI/AU,S).
 
+underlaps(C1,C2,X) :-
+        C1 @< C2,
+        is_a_or_part_of(X,C1),
+        is_a_or_part_of(X,C2).
+
+
+% E.g. UBERON:0000062 ! organ
+underlaps_under(T,C1,C2,X) :-
+        subClassOf(C1,T),
+        subClassOf(C2,T),
+        \+ subClassOf(C1,C2),
+        \+ subClassOf(C2,C1),
+        underlaps(C1,C2,X).
+
+underlaps_in_subset(S,C1,C2,X) :-
+        rdf(C1,'http://www.geneontology.org/formats/oboInOwl#inSubset',S),
+        rdf(C2,'http://www.geneontology.org/formats/oboInOwl#inSubset',S),
+        \+ subClassOf(C1,C2),
+        \+ subClassOf(C2,C1),
+        underlaps(C1,C2,X).
+
+relational_disjoint_in_subset(S,C1,C2) :-
+        rdf(C1,'http://www.geneontology.org/formats/oboInOwl#inSubset',S),
+        rdf(C2,'http://www.geneontology.org/formats/oboInOwl#inSubset',S),
+        C1 @< C2,
+        \+ subClassOf(C1,C2),
+        \+ subClassOf(C2,C1),
+        \+ underlaps(C1,C2,_).
+
+
 %% --
 %% taxon constraints
 %% --
@@ -108,20 +147,27 @@ taxon(T) :-     subClassOf(T,'NCBITaxon':'1').
 
 never_in_taxon(C,T) :- rdf(C,'http://purl.obolibrary.org/obo/RO_0002161',T).
 
-not_in_taxon_1(C,P,T) :-
+inf_never_in_taxon_via_1(C,P,T) :-
+        inf_never_in_taxon_via_1(C,P,T,_,_).
+inf_never_in_taxon_via_1(C,P,T,C1,T1) :-
         rdf(C,P,C1),
         in_taxon(C1,T1),
         \+ subClassOf(T,T1).
-not_in_taxon_2(C,P,T) :-
+inf_never_in_taxon_via_2(C,P,T) :-
+        inf_never_in_taxon_via_2(C,P,T,_,_).
+inf_never_in_taxon_via_2(C,P,T,C1,T1) :-
         rdf(C,P,C1),
         never_in_taxon(C1,T1),
         subClassOf(T,T1).
 
-not_in_taxon(C,P,T) :- not_in_taxon_1(C,P,T).
-not_in_taxon(C,P,T) :- not_in_taxon_2(C,P,T).
+inf_never_in_taxon_via(C,P,T) :- inf_never_in_taxon_via_1(C,P,T).
+inf_never_in_taxon_via(C,P,T) :- inf_never_in_taxon_via_2(C,P,T).
 
-conservative_not_in_taxon(C,T) :-
-        not_in_taxon(C,P,T),
+inf_never_in_taxon_via(C,P,T,C1,T1) :- inf_never_in_taxon_via_1(C,P,T,C1,T1).
+inf_never_in_taxon_via(C,P,T,C1,T1) :- inf_never_in_taxon_via_2(C,P,T,C1,T1).
+
+conservative_inf_never_in_taxon_via(C,T) :-
+        inf_never_in_taxon_via(C,P,T),
         taxon_propagating_property(P).
 
 taxon_propagating_property(rdfs:subClassOf).
@@ -129,9 +175,5 @@ taxon_propagating_property(obo:'BFO_0000066').
 taxon_propagating_property(obo:'BFO_0000051').
 taxon_propagating_property(obo:'BFO_0000050').
 
-
-
-
-
-        
-
+is_a_or_part_of(X,Y) :- rdf(X,rdfs:subClassOf,Y).
+is_a_or_part_of(X,Y) :- rdf(X,obo:'BFO_0000050',Y).
