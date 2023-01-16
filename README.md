@@ -155,8 +155,22 @@ pq-ebi -C "\
 
 will generate the following SPARQL:
 
-```
-SELECT ?g ?h WHERE {?g <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.obolibrary.org/obo/SO_0001217> . ?g <http://biohackathon.org/resource/faldo#location> ?l . ?l <http://biohackathon.org/resource/faldo#begin> ?v0 . ?v0 <http://biohackathon.org/resource/faldo#position> ?b . ?v0 <http://biohackathon.org/resource/faldo#reference> <http://rdf.ebi.ac.uk/resource/ensembl/90/mus_musculus/GRCm38/11> . ?l <http://biohackathon.org/resource/faldo#end> ?v1 . ?v1 <http://biohackathon.org/resource/faldo#position> ?e . ?v1 <http://biohackathon.org/resource/faldo#reference> <http://rdf.ebi.ac.uk/resource/ensembl/90/mus_musculus/GRCm38/11> . FILTER (?b >= 101100523) . FILTER (?e <= 101190725) . ?g <http://semanticscience.org/resource/SIO_000558> ?h . ?h <http://purl.obolibrary.org/obo/RO_0002162> <http://identifiers.org/taxonomy/9606>}
+```sparql
+SELECT  ?g ?h
+WHERE
+  { ?g   a                     <http://purl.obolibrary.org/obo/SO_0001217> ;
+         <http://biohackathon.org/resource/faldo#location>  ?l .
+    ?l   <http://biohackathon.org/resource/faldo#begin>  ?v0 .
+    ?v0  <http://biohackathon.org/resource/faldo#position>  ?b ;
+         <http://biohackathon.org/resource/faldo#reference>  <http://rdf.ebi.ac.uk/resource/ensembl/90/mus_musculus/GRCm38/11> .
+    ?l   <http://biohackathon.org/resource/faldo#end>  ?v1 .
+    ?v1  <http://biohackathon.org/resource/faldo#position>  ?e ;
+         <http://biohackathon.org/resource/faldo#reference>  <http://rdf.ebi.ac.uk/resource/ensembl/90/mus_musculus/GRCm38/11>
+    FILTER ( ?b >= 101100523 )
+    FILTER ( ?e <= 101190725 )
+    ?g  <http://semanticscience.org/resource/SIO_000558>  ?h .
+    ?h  <http://purl.obolibrary.org/obo/RO_0002162>  <http://identifiers.org/taxonomy/9606>
+  }
 ```
 
 withOUT executing it remotely
